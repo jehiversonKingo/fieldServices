@@ -25,8 +25,8 @@ const { width } = Dimensions.get('screen');
 
 const SignInScreen = ({ }) => {
 
-  const [user, setUser] = useState('');
-  const [password, setPassword] = useState('');
+  const [user, setUser] = useState('jehivis@gmail.com');
+  const [password, setPassword] = useState('123123123');
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle] = useState('¡Atención!');
   const [alertMessage, setAlertMessage] = useState('');
@@ -34,16 +34,16 @@ const SignInScreen = ({ }) => {
   const { state, signIn, setLoadingState } = useContext(AuthContext);
 
   const logIn = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     if (!user || !password) {
-      console.log('entro')
+      console.log('entro');
       setAlertMessage("Debes completar todos los campos.");
       setShowAlert(true);
       return;
     }
 
     const login = await signIn({ user, password });
-    setIsLoading(false)
+    setIsLoading(false);
     if (login) setLoadingState();
   };
 

@@ -58,6 +58,7 @@ export const handleUpdateImageVoucher = async (label, area, imgFile) => {
 };
 
 export const handleSignInFirebase = async (user, password) => {
+  console.log(1,"....")
   return await auth()
     .signInWithEmailAndPassword(user, password)
     .then(async (user) => {
@@ -69,10 +70,12 @@ export const handleSignInFirebase = async (user, password) => {
         userExist && (flagSession = {error: userExist.error, message: userExist.message});
         return flagSession;
       } catch (e) {
+        console.log("AQUI MURIO 1")
         return false;
       }
     })
     .catch(async function (error) {
+      console.log("AQUI MURIO 2", error)
       let messageError = await handleTraslateMessageFirebaseError(error.code);
       return {error: true, message: messageError};
     });
