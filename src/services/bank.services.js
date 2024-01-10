@@ -26,6 +26,7 @@ export const getDebetAgent = async () => {
 
 export const getWallerByUser = async () => {
   const user = JSON.parse(await AsyncStorage.getItem('@user'));
+  console.log(user.idUser);
   const response = await axiosInstanceShopkeeper
     .get(`/settings/wallet/user/${user.idUser}`)
   return response.data

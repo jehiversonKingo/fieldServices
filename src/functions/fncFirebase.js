@@ -30,26 +30,31 @@ export const handleUpdateImage = async (label, area, imgFile) => {
 };
 
 export const handleUpdateImageVoucher = async (label, area, imgFile) => {
-  let name = `${area}-${label.toString().replace(/\s+/g, '')}-${moment(new Date()).format('DDMMYYYYhhmmss')}`;
-  //you will use this when need add file at default bucket but in this case i need use other bucket
-  //const reference = storage().ref(name);
-        let flag = await new Promise(async (response, reject) =>{
-          const reference = firebase.app().storage(`${process.env.REACT_APP_BUCKET_VOUCHER}/${area}`).ref(name);
-          const task = reference.putFile(`file://${imgFile.path}`);
-          task.on('state_changed', taskSnapshot => {
-            console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
+  try {
+    let name = `${area}-${label.toString().replace(/\s+/g, '')}-${moment(new Date()).format('DDMMYYYYhhmmss')}`;
+    //you will use this when need add file at default bucket but in this case i need use other bucket
+    //const reference = storage().ref(name);
+          let flag = await new Promise(async (response, reject) =>{
+            const reference = firebase.app().storage(`${process.env.REACT_APP_BUCKET_VOUCHER}/${area}`).ref(name);
+            const task = reference.putFile(`file://${imgFile.path}`);
+            task.on('state_changed', taskSnapshot => {
+              console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
+            });
+  
+            task.then(async() => {
+              const url = await firebase.app().storage(`${process.env.REACT_APP_BUCKET_VOUCHER}/${area}`).ref(name).getDownloadURL();
+              response(url);
+            });
+  
+            task.catch(() => {
+              reject(false);
+            });
           });
-
-          task.then(async() => {
-            const url = await firebase.app().storage(`${process.env.REACT_APP_BUCKET_VOUCHER}/${area}`).ref(name).getDownloadURL();
-            response(url);
-          });
-
-          task.catch(() => {
-            reject(false);
-          });
-        });
-        return flag;
+          return flag;
+  } catch (error) {
+    console.log(error)
+    return false
+  }
 };
 
 export const handleSignInFirebase = async (user, password) => {

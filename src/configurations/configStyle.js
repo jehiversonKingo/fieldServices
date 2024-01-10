@@ -1,5 +1,9 @@
 export const colorsTheme = {
   amarillo: '#fed108',
+  rojo20: '#f05648',
+  rojo40: '#d93832',
+  rojo60: '#c40006',
+  rojo80: '#950000',
   rojo: '#d93832',
   azul: '#0a70b9',
   celeste: '#049cd7',

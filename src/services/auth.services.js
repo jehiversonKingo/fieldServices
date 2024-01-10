@@ -1,6 +1,6 @@
 import { axiosInstance, customHeadersWithoutAuth } from '../functions/fncAxios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {setTokenUser} from './settings.services';
+import { setTokenUser } from './settings.services';
 
 export const getUserByUid = async (uid) => {
     try {
@@ -11,16 +11,16 @@ export const getUserByUid = async (uid) => {
                 if (user.data !== null) {
                     await AsyncStorage.setItem('@session', 'true');
                     await AsyncStorage.setItem('@user', JSON.stringify(user.data));
-                    return {error:false, message:''};
+                    return { error: false, message: '' };
                 } else {
-                    return {error:true, message:'Usuario no encontrado'};
+                    return { error: true, message: 'Usuario no encontrado' };
                 }
             })
             .catch(error => {
-                return {error:true, message:error.message};
+                return { error: true, message: error.message };
             });
     } catch (error) {
-        return {error:true, message:error.message};
+        return { error: true, message: error.message };
     }
 };
 
@@ -29,15 +29,15 @@ export const getUserByRole = async (role, idUser) => {
         .get(`settings/user/${idUser}/role/${role}`, customHeadersWithoutAuth)
         .then(users => {
             let agents = [];
-            users.data.map((user)=>{
-                agents.push({label: `${user.name} ${user.lastName}`, value: user.idUser});
+            users.data.map((user) => {
+                agents.push({ label: `${user.name} ${user.lastName}`, value: user.idUser });
             });
             return agents;
         })
         .catch(() => {
             return [];
         });
-  };
+};
 
 export const getUserById = async (idUser) => {
     console.log(idUser);
@@ -49,4 +49,4 @@ export const getUserById = async (idUser) => {
         .catch(() => {
             return [];
         });
-  };
+};

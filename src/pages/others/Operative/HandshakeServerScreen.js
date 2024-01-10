@@ -32,7 +32,6 @@ const HandshakeServerScreen = ({navigation, route}) => {
     //     {time: '10:45', title: 'VALIDATE_PAYMENT', description: 'TENDERO - Envío 100 bolas'}
     // ]
 
-    
     const handleReceivedData = async (event) => {
         const {action, data} = JSON.parse(event.data)
         let sendResponse = "NULL RESPONSE"
@@ -55,7 +54,7 @@ const HandshakeServerScreen = ({navigation, route}) => {
                     setAmount(data.amount)
                     setTitleAlert(`${data.customer.name}`)
                     setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`)
-                    setShowAlert(true)    
+                    setShowAlert(true)
                 } else {
                     setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: action, description: "El tendero no envío la información del pago"}]);
                 }
@@ -69,7 +68,7 @@ const HandshakeServerScreen = ({navigation, route}) => {
     const handleConfirmAmount = async () => {
         try {
             setShowAlert(false)
-            console.log("[ AMOUNT ] ==>", amount)
+            console.log("[ AMOUNT JEFF ] ==>", amount);
             let sendResponse = JSON.stringify({action: "VALIDATE_PAYMENT", data: {status: "OK", message: "El pago fue recibido", amount}})
             BluetoothServerModule.sendDataToClient(sendResponse);
             setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "RECEIVED_PAYMENT", description: "El pago fue recibido"}]);
