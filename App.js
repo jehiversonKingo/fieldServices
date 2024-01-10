@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FlashMessage, { showMessage } from 'react-native-flash-message';
 import NetInfo from '@react-native-community/netinfo';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 //Others
 import HomeScreen from './src/pages/others/HomeScreen';
 import TaskListScreen from './src/pages/others/Task/TaskListScreen';
@@ -23,7 +24,6 @@ import InventoryScreen from './src/pages/others/Inventory/InventoryScreen';
 import CameraScreen from './src/pages/others/Operative/CameraScreen';
 import CameraMultiShotScreen from './src/pages/others/Operative/CameraMultiShotScreen';
 import ScanBarCodeScreen from './src/pages/others/Operative/ScanBarCode';
-// import ScanBarCodeWithListScreen from './src/pages/others/Operative/ScanBarCodeWithList';
 import OnboardingScreen from './src/pages/others/Operative/OnboardingScreen';
 import ImageFullScreen from './src/pages/others/Operative/ImageFullScreen';
 import HandshakeServerScreen from './src/pages/others/Operative/HandshakeServerScreen';
@@ -32,6 +32,9 @@ import BankPayScreen from './src/pages/others/Bank/BankPayScreen';
 import VoucherScreen from './src/pages/others/Bank/VoucherScreen';
 import CreditListScreen from './src/pages/others/Bank/CreditListScreen';
 import ScanExample from './src/pages/others/Operative/ScanExample';
+
+//Visit
+import VisitScreen from './src/pages/others/Visit/Visit';
 
 //Components
 import Loading from './src/components/General/Loading';
@@ -175,6 +178,11 @@ const HomeFlow = () => {
       <HomeStack.Screen
         name="CreditListScreen"
         component={CreditListScreen}
+        options={{ headerShown: false }}
+      />
+      <HomeStack.Screen
+        name="VisitaScreen"
+        component={VisitScreen}
         options={{ headerShown: false }}
       />
     </HomeStack.Navigator>

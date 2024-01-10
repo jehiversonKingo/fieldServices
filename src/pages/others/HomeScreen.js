@@ -23,29 +23,6 @@ import {getStep, updateStep} from '../../functions/fncSqlite';
 import { getAllCommunities, getModulesByRole } from '../../services/settings.services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const DATADUMMY = [
-  {
-    id: 1,
-    text: 'Tareas',
-    size: 30,
-    icon: 'list',
-    screen: 'Task',
-  },
-  {
-    id: 2,
-    text: 'Ordenes',
-    size: 30,
-    icon: 'clipboard-list',
-    screen: 'Orders',
-  },
-  {
-    id: 3,
-    text: 'Inventario',
-    size: 30,
-    icon: 'warehouse',
-    screen: 'Inventory',
-  },
-];
 
 const HomeScreen = ({navigation}) => {
   const {signOut, setLoadingState, state} = React.useContext(AuthContext);
@@ -79,7 +56,7 @@ const HomeScreen = ({navigation}) => {
           marginTop: -5,
         }}>
         {item.module.text}
-      </Text> 
+      </Text>
     </TouchableOpacity>
   );
 
