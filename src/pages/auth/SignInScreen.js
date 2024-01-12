@@ -25,8 +25,8 @@ const { width } = Dimensions.get('screen');
 
 const SignInScreen = ({ }) => {
 
-  const [user, setUser] = useState('jehivis@gmail.com');
-  const [password, setPassword] = useState('123123123');
+  const [user, setUser] = useState('carlos.lara@kingoenergy.com');
+  const [password, setPassword] = useState('LaraSolano1_');
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle] = useState('¡Atención!');
   const [alertMessage, setAlertMessage] = useState('');
