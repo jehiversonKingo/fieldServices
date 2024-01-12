@@ -10,6 +10,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {colorsTheme} from '../../configurations/configStyle';
+import moment from 'moment';
 const { width } = Dimensions.get('screen');
 
 const RenderItemList = ({item, goTo, onLongPress}) => {
@@ -40,7 +41,10 @@ const RenderItemList = ({item, goTo, onLongPress}) => {
 
     return (
       <TouchableOpacity
-        style={{...styles.containerList.background}}
+        style={{
+          ...styles.containerList.background,
+          backgroundColor: moment().isAfter(moment(item.task.expirationDate)) ? colorsTheme.naranja20 : colorsTheme.blanco
+        }}
         onLongPress={() => onLongPress(item.idTask)}
         onPress={() =>
           goTo(
