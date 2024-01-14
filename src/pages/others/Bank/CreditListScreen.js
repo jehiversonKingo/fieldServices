@@ -34,6 +34,7 @@ const CreditListScreen = ({ navigation }) => {
       setDataUser(user)
 
       if (reqTransactions) {
+        console.log("[ TRANSACTIONS ] => ", reqTransactions);
         setTransactions(reqTransactions)
       }
       if (reqDebet) {
@@ -61,7 +62,7 @@ const CreditListScreen = ({ navigation }) => {
       </View>
       <View>
         <Text style={{ color: "#000", fontSize: 15, fontWeight: "600" }}>{item.typeTransaction === "Credit" ? "CREDITO" : "PAGO"}</Text>
-        <Text style={{ fontWeight: "600", fontSize: 12 }}>{moment(item?.createdAt).format("DD/MM/YYYY")}</Text>
+        <Text style={{ color: colorsTheme.gris60, fontWeight: "600", fontSize: 12 }}>{moment(item?.createdAt).format("DD/MM/YYYY")}</Text>
       </View>
       <View style={{ justifyContent: "center" }}>
         <Text

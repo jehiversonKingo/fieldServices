@@ -27,7 +27,7 @@ const ScanExample = ({navigation, route}) => {
   const {height, width} = Dimensions.get('screen');
   const [barcode] = useState('');
   const [hasPermission, setHasPermission] = useState(false);
-  const [isScanned] = useState(false);
+  const [isScanned, setIsScanned] = useState(false);
   const [codes, setCodes] = useState(data);
   const [torch, setTorch] = useState("off");
   // const [open, isOpen] = useState(false);
@@ -49,7 +49,7 @@ const ScanExample = ({navigation, route}) => {
       // setIsScanned(true)
       toggleActiveState(codes)
     }
-  })
+  });
 
   const checkCameraPermission = async () => {
     const status = await Camera.getCameraPermissionStatus();
@@ -73,6 +73,7 @@ const ScanExample = ({navigation, route}) => {
   // }, [open]);
 
   const toggleActiveState = async (barcodes) => {
+    console.log("SCANNER ===> ", barcodes);
     if (barcodes && barcodes.length > 0 && isScanned === false) {
       barcodes.forEach(async scannedBarcode => {
         if (scannedBarcode.value !== '') {
@@ -92,7 +93,7 @@ const ScanExample = ({navigation, route}) => {
           }
         }
       });
-      // setTimeout(() => setIsScanned(false), 1500)
+      setTimeout(() => setIsScanned(false), 1500)
     }
   };
 
@@ -101,7 +102,8 @@ const ScanExample = ({navigation, route}) => {
       <Header isLeft={true} navigation={navigation} />
       <View>
         {isScanned ? (
-          <Text style={{color: colorsTheme.gris80}}>{barcode}</Text>
+          // <Text style={{color: colorsTheme.gris80}}>{barcode}</Text>
+          <></>
         ) : (
           device != null &&
           hasPermission && (
@@ -113,7 +115,6 @@ const ScanExample = ({navigation, route}) => {
                 isActive={!isScanned}
                 codeScanner={codeScanner}
                 torch={torch}
-                fps={15}
                 audio={false}
               />
               <RNHoleView

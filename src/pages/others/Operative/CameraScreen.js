@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import {useCameraDevices, Camera} from 'react-native-vision-camera';
+import {useCameraDevices, Camera, useCameraDevice, useCameraFormat} from 'react-native-vision-camera';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {handleChange} from '../../../functions/functionChangeValue';
@@ -22,12 +22,20 @@ import {colorsTheme} from '../../../configurations/configStyle';
 const CameraScreen = ({navigation, route}) => {
   const {index, setData, data} = route.params;
   const {height, width} = Dimensions.get('screen');
-  const devices = useCameraDevices();
-  const device = devices.back;
   const [photoData, setPhotoData] = useState('');
   const [hasPermission, setHasPermission] = useState(false);
   const [isScanned, setIsScanned] = useState(true);
   const [torch, setTorch] = useState("off");
+  const device = useCameraDevice('back')
+  const format = useCameraFormat(device, [
+    {
+      photoResolution: {
+        width: 640,
+        height: 480,
+      },
+      fps: 30
+    }
+  ])
   const camera = useRef(null);
 console.log({index, setData, data})
   useEffect(() => {
@@ -55,14 +63,10 @@ console.log({index, setData, data})
 
   const onPressButton = async () => {
     const photo = await camera.current.takePhoto({
-      flash: 'on',
-      qualityPrioritization: 'speed',
-      resolution: {
-        width: 640,
-        height: 480,
-      },
+      flash: torch,
+      qualityPrioritization: 'balanced',
       jpeg: {
-        quality: 50,
+        quality: 0.5,
       },
     });
     setPhotoData(photo);
@@ -72,17 +76,38 @@ console.log({index, setData, data})
   return (
     <SafeAreaView style={{backgroundColor: colorsTheme.negro}}>
       <View>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}>
-          <Fontisto
-            name={'close-a'}
-            color={colorsTheme.gris20}
-            size={20}
-            style={{marginTop: 20, marginBottom: -40, marginLeft: 18}}
-          />
-        </TouchableOpacity>
+        <View
+          style={{
+            marginTop: 20,
+            width: '100%',
+            height: 55,
+            marginBottom: -45,
+            flexDirection: 'row',
+            justifyContent: "space-between"
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {navigation.goBack()}}
+            hitSlop={{top: 20, bottom: 20, left: 50, right: 50}}
+          >
+            <Fontisto
+              name={'close-a'}
+              color={colorsTheme.gris20}
+              size={20}
+              style={{marginTop: 20, marginBottom: -40, marginLeft: 18}}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ marginTop: 20, marginBottom: -35, marginRight: 18 }}
+            onPress={() => setTorch((prevTorch) => prevTorch === "off" ? "on" : "off")}
+            hitSlop={{top: 20, bottom: 20, left: 50, right: 50}}>
+            <Ionicons
+              name={torch === "off" ? 'flash' : 'flash-off'}
+              color={colorsTheme.blanco}
+              size={25}
+            />
+          </TouchableOpacity>
+        </View>
         {isScanned === false && (
           <>
             <View>
@@ -125,7 +150,7 @@ console.log({index, setData, data})
               device={device}
               isActive={isScanned}
               autoFocus="on"
-              // torch={torch}
+              format={format}
               photo={true}
             />
             <View

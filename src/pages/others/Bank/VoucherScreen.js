@@ -36,7 +36,6 @@ const VoucherScreen = ({navigation}) => {
         const data = await getAllBanks();
         let listBanks = []
         if(data){
-            
             data.map(bank => {
                 console.log({value:bank.idBank, label:`${bank.name}-${bank.account}`})
                 listBanks.push({value:bank.idBank, label:`${bank.name}-${bank.account}`})
@@ -65,11 +64,13 @@ const VoucherScreen = ({navigation}) => {
       setTitleAlert("Cargando...")
       setMessageAlert("")
       setShowAlert(true)
-
+      console.log('agents', photo);
       let url = await handleUpdateImageVoucher(Math.random(), 'agents', photo);
+      console.log("[ UPLOAD ]", url);
       try {
           const result = await setVoucher({idBank: selectedBank, photo: url})
-          if (result.status === "OK") {
+          console.log("[ RESPONSE UPLOAD ] => ", result);
+          if (result?.idVoucherUser) {
             setTitleAlert("Proceso terminado")
             setMessageAlert("La boleta fue envíada exitosamente")
             setShowProgress(false)

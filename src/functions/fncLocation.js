@@ -44,34 +44,38 @@ export const handleGetLocation = async (
   setMessageAlert,
   setTitleAlert
 ) => {
-  const hasPermission = await hasLocationPermission();
-  if (!hasPermission) {
-    return;
+  try {
+    const hasPermission = await hasLocationPermission();
+    if (!hasPermission) {
+      return;
+    }
+    setIsAlert(true);
+    setTitleAlert('Obteniendo ubicación');
+    setMessageAlert('Espere un momento por favor...');
+    Geolocation.getCurrentPosition(
+      position => {
+        handleChange(
+          index,
+          {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          },
+          'value',
+          objData,
+          setInformation,
+        );
+        setIsAlert(false);
+      },
+      error => {
+        // See error code charts below.
+        console.log(error.code, error.message);
+        setIsAlert(false);
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+  } catch (error) {
+    console.log("[ GET LOCATION ERROR ] > ", error);
   }
-  setIsAlert(true);
-  setTitleAlert('Obteniendo ubicación');
-  setMessageAlert('Espere un momento por favor...');
-  Geolocation.getCurrentPosition(
-    position => {
-      handleChange(
-        index,
-        {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        },
-        'value',
-        objData,
-        setInformation,
-      );
-      setIsAlert(false);
-    },
-    error => {
-      // See error code charts below.
-      console.log(error.code, error.message);
-      setIsAlert(false);
-    },
-    {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-  );
 };
 
 export const handleGetLocationReturnValue = async (

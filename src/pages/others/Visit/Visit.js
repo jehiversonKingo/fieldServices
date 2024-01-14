@@ -44,6 +44,7 @@ const VisitScreen = ({ navigation, route }) => {
         dpi:ticket.task.ticket.customer.dpi,
         phone:ticket.task.ticket.customer.phone,
         community:ticket.task.ticket.customer.community,
+        description:ticket.task.ticket.description,
         latitude:coordinates[0],
         longitude:coordinates[1],
         color
@@ -96,7 +97,7 @@ const VisitScreen = ({ navigation, route }) => {
                   coordinate={{ latitude: checkpoint.latitude, longitude: checkpoint.longitude }}
                   pinColor={checkpoint.color}
                   title={`Tendero/a ${checkpoint.name}`}
-                  description={`Description ${checkpoint.name}`}
+                  description={`Description ${checkpoint.description}`}
                   onPress={() => handleMarkerPress(checkpoint)}
                 />
               ))}
