@@ -140,6 +140,22 @@ export const handleValidDataPhotos = (array1, array2)=>{
   });
 };
 
+export const handleGPSCoordinates = (value)=>{
+  const coordinates = value;
+  const expresion = /^(-?\d+\.\d+),(-?\d+\.\d+)$/;
+
+  const sameCoordinates = coordinates.match(expresion);
+  if (sameCoordinates) {
+      const latitud = parseFloat(sameCoordinates[1]);
+      const longitud = parseFloat(sameCoordinates[2]);
+      console.log(`Latitud: ${latitud}, Longitud: ${longitud}`);
+      return [latitud, longitud];
+  } else {
+      console.log("Formato de coordenadas no válido.");
+      return [0,0];
+  }
+};
+
 export const handleValidateEmojiAndSpecialCharacter = (text) =>{
   let flag = false;
   const regex = /[^\u0000-\u007F]+|[?!))$&.'!"@&]+/;
