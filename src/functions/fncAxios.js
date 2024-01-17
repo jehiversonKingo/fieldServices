@@ -2,8 +2,8 @@ import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 
 export const axiosInstance = axios.create({
-  baseURL: 'https://v4w3k844-5000.use2.devtunnels.ms/stack-ant-dev/us-central1/antServices',
-  // baseURL: 'https://us-central1-stack-ant-dev.cloudfunctions.net/antServices',
+  // baseURL: 'https://v4w3k844-5000.use2.devtunnels.ms/stack-ant-dev/us-central1/antServices',
+  baseURL: 'https://us-central1-stack-ant-dev.cloudfunctions.net/antServices',
   // baseURL: 'https://us-central1-stack-ant-prod.cloudfunctions.net/antServicesTest',
   // baseURL: 'https://226e-190-122-185-230.ngrok-free.app/stack-ant-prod/us-central1/antServices',
 });
