@@ -122,3 +122,58 @@ export const deleteStep = async (table, idRowModule) => {
     });
   });
 };
+
+
+export const getAllDataSql = async (table) => {
+  return new Promise((resolve, reject) => {
+      let db = openDatabase({ name: database });
+      db.transaction(txn => {
+          txn.executeSql(
+              `SELECT * FROM ${table}`,
+              [],
+              (tx, results) => {
+                  var temp = [];
+                  for (let i = 0; i < results.rows.length; i++) {
+                      let currentRow = results.rows.item(i);
+                      temp.push(JSON.parse(currentRow.value));
+                  }
+                  if (temp.length > 0) {
+                      let stringToJSon = [];
+                      temp.map((data) => {
+                          stringToJSon.push(JSON.parse(data));
+                      });
+                      resolve(stringToJSon);
+                  } else { resolve([]); }
+              },
+              err => {
+                  resolve([]);
+                  reject(err);
+              },
+          );
+      });
+  });
+};
+
+export const getSingleDataSql = async (table, nameParam, idParam) => {
+  return new Promise((resolve, reject) => {
+      let db = openDatabase({ name: database });
+      db.transaction(txn => {
+          txn.executeSql(
+              `SELECT * FROM ${table} WHERE ${nameParam} = ?;`,
+              [idParam],
+              (tx, results) => {
+                  if (results.rows.length > 0) {
+                      let currentRow = results.rows.item(0);
+                      let singleData = JSON.parse(currentRow.value);
+                      resolve(singleData);
+                  } else {
+                      resolve(null);
+                  }
+              },
+              err => {
+                  reject(err);
+              },
+          );
+      });
+  });
+};

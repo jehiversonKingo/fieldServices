@@ -32,6 +32,7 @@ import BankPayScreen from './src/pages/others/Bank/BankPayScreen';
 import VoucherScreen from './src/pages/others/Bank/VoucherScreen';
 import CreditListScreen from './src/pages/others/Bank/CreditListScreen';
 import ScanExample from './src/pages/others/Operative/ScanExample';
+import DownloadOfflineDataScreen from './src/pages/others/Operative/DownloadOfflineDataScreen';
 
 //Visit
 import VisitScreen from './src/pages/others/Visit/Visit';
@@ -183,6 +184,11 @@ const HomeFlow = () => {
       <HomeStack.Screen
         name="VisitaScreen"
         component={VisitScreen}
+        options={{ headerShown: false }}
+      />
+      <HomeStack.Screen
+        name="DownloadData"
+        component={DownloadOfflineDataScreen}
         options={{ headerShown: false }}
       />
     </HomeStack.Navigator>

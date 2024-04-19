@@ -13,7 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {handleChange} from '../../../functions/functionChangeValue';
 import FitImage from 'react-native-fit-image';
-
+import * as RNFS from 'react-native-fs';
 //Components
 import Footer from '../../../components/Layouts/Footer';
 
@@ -23,6 +23,7 @@ const CameraScreen = ({navigation, route}) => {
   const {index, setData, data} = route.params;
   const {height, width} = Dimensions.get('screen');
   const [photoData, setPhotoData] = useState('');
+  const [photoB64, setPhotoB64] = useState('');
   const [hasPermission, setHasPermission] = useState(false);
   const [isScanned, setIsScanned] = useState(true);
   const [torch, setTorch] = useState("off");
@@ -37,7 +38,7 @@ const CameraScreen = ({navigation, route}) => {
     }
   ])
   const camera = useRef(null);
-console.log({index, setData, data})
+
   useEffect(() => {
     checkCameraPermission();
   }, [isScanned]);
@@ -51,7 +52,7 @@ console.log({index, setData, data})
   };
 
   const handleClickBtnSuccess = async () => {
-    setData(photoData)
+    setData(photoB64)
     // handleChange(index, photoData, 'value', data, setData);
     navigation.goBack();
   };
@@ -65,11 +66,11 @@ console.log({index, setData, data})
     const photo = await camera.current.takePhoto({
       flash: torch,
       qualityPrioritization: 'balanced',
-      jpeg: {
-        quality: 0.5,
-      },
+      enableShutterSound: false,
     });
+    const base64 = await RNFS.readFile(`file://${photo.path}`, 'base64');
     setPhotoData(photo);
+    setPhotoB64({photo: `data:image/jpg;base64,${base64}`, path: photo.path});
     setIsScanned(false);
   };
 

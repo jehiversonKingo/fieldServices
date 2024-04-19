@@ -18,7 +18,7 @@ import {updateStep} from '../../../functions/fncSqlite';
 import {
   handleRemove,
 } from '../../../functions/functionChangeValue';
-import { handleValidDataStep, handleIsValidUrl } from '../../../functions/fncGeneral';
+import { handleValidDataStep, handleIsValidUrl, handleGetDataUserLocal } from '../../../functions/fncGeneral';
 
 //functions
 import {hasCameraPermission} from '../../../functions/fncCamera';
@@ -62,6 +62,7 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
           setFunction={setStep1}
           setMessageAlert={setMessageAlert}
           setTitleAlert={setTitleAlert}
+          selectData={item?.values || []}
         />
       </View>
     );
@@ -238,12 +239,15 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
   };
 
   const makeStructureScreen = async({data}) => {
-    let userAgentes = await getUserByRole(3);
-    const {idUser,
+    const { user } = await handleGetDataUserLocal();
+    const {
+      idUser,
       orderDetailAddonData,
       orderDetailKingoData,
       orderStationeryData} = data;
-    setStep1([{
+    let userAgentes = await getUserByRole(3, user.idUser);
+    console.log(userAgentes);
+      setStep1([{
       id: 1,
       label: 'Agente',
       type: 'selects',

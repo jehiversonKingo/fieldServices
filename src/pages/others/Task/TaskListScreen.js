@@ -103,7 +103,7 @@ const TaskListScreen = ({ navigation, route }) => {
 
           await updateStep('taskDescription', task.idTask, JSON.stringify(dataTask), 0);
           await updateStep('taskInfo', task.idTask, JSON.stringify(infoTask), 0);
-          console.log("---", steps)
+          // console.log("---", steps)
           steps.forEach(async (step) => {
             let dataStepsToDo = await getStepInstruction(step.idStep)
             await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
@@ -113,7 +113,7 @@ const TaskListScreen = ({ navigation, route }) => {
         console.log('2');
         let dataTaslList = await getStep('taskList', 0, 0);
         getTaskData = JSON.parse(dataTaslList);
-        console.log(getTaskData)
+        // console.log(getTaskData)
       }
       handleFilterData(getTaskData, filter, setData, setLoading, 'task', 'idTaskState');
       handleFilterData(getTaskData, filter, setDataTmp, setLoading, 'task', 'idTaskState');
@@ -123,12 +123,10 @@ const TaskListScreen = ({ navigation, route }) => {
   };
 
   const handleFilter = (value = "") => {
-    console.log("[ VALUE ]", value.toLowerCase());
     setFilterTxt(value)
     let dataFilter = []
-    const regexPattern = new RegExp(value.toLowerCase(), "g");
-    dataFilter = dataTmp.filter((item => new String(item.idTask).match(regexPattern)))
-
+    const regexPattern = new RegExp(value, "g");
+    dataFilter = dataTmp.filter((item => item.task.ticket.description.match(regexPattern)))
     if (dataFilter.length > 0) {
       setData(dataFilter)
     } else {

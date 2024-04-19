@@ -36,6 +36,10 @@ public class BluetoothServerModule extends ReactContextBaseJavaModule {
         uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // UUID de servicio SPP (Serial Port Profile)
     }
 
+    public boolean isBluetoothEnabled() {
+        return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
+    }
+
     @Override
     public String getName() {
         return "BluetoothServerModule";
@@ -54,13 +58,17 @@ public class BluetoothServerModule extends ReactContextBaseJavaModule {
     // Nuevo método para iniciar el servidor
     @ReactMethod
     public void startServer(Promise promise) {
-        if (!isServerRunning) {
+        if (!isServerRunning && isBluetoothEnabled()) {
             acceptThread = new AcceptThread();
             acceptThread.start();
             isServerRunning = true;
             promise.resolve("Server started");
         } else {
-            promise.reject("ERROR", "Server is already running");
+            if (!isBluetoothEnabled()) {
+                promise.reject("ERROR", "Bluetooth is not enabled. Please turn it on.");
+            } else {
+                promise.reject("ERROR", "Server is already running");
+            }
         }
     }
 

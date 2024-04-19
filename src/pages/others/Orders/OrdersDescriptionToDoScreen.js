@@ -169,6 +169,7 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
   const getData = async () => {
     let orderData = await getOrder(id);
     if (orderData.status) {
+      console.log(orderData.data)
       const {
         idUser,
         orderDetailAddonData,

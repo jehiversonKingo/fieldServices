@@ -2,10 +2,12 @@ import React, { useEffect, useState, useContext } from 'react';
 import { View, StyleSheet, SafeAreaView, TouchableOpacity, Text, FlatList, ActivityIndicator } from 'react-native';
 import { Dimensions } from 'react-native';
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { ListItem } from '@rneui/themed';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FitImage from 'react-native-fit-image';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import * as Progress from 'react-native-progress';
 import orderBy from 'lodash/orderBy';
 
 import Header from '../../../components/Layouts/Header';
@@ -18,7 +20,7 @@ import {updateStep, deleteStep, getStep} from '../../../functions/fncSqlite';
 import { hasCameraPermission } from '../../../functions/fncCamera';
 import { handleValidDataStep, handleValidDataPhotos, handleValidExist } from '../../../functions/fncGeneral';
 
-import { getElemetScreen, setDataAllTask } from '../../../services/task.services';
+import { getCheckListByIdTask, getElemetScreen, setDataAllTask, setDataAllTaskInstall, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskCecklist, setDataTaskEvidens, setDataTaskPhotos } from '../../../services/task.services';
 import { colorsTheme } from '../../../configurations/configStyle';
 
 const { width, height } = Dimensions.get('screen');
@@ -31,6 +33,9 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
   const [active, setActive] = useState(0);
   const [isAlert, setIsAlert] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [showProgressAlert, setShowProgressAlert] = useState(false);
+  const [progressAlert, setProgressAlert] = useState(0);
+  const [totalUpload, setTotalUpload] = useState(0);
   const [messageAlert, setMessageAlert] = useState('');
   const [titleAlert, setTitleAlert] = useState('');
   const [loading, setLoading] = useState(true);
@@ -44,6 +49,8 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
   const [step3, setStep3] = useState([]);
   const [step4, setStep4] = useState([]);
   const [stepFlag4, setStepFlag4] = useState(false);
+  const [step5, setStep5] = useState([]);
+  const [stepFlag5, setStepFlag5] = useState(false);
 
   const {state} = useContext(AuthContext);
   const {inline} = state;
@@ -66,15 +73,15 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
   );
 
   const InputsGenerateStep2 = ({ item, index }) =>(
-      <InputGenerateStep
-        item={item}
-        elementId={'idTaskAddon'}
-        index={index}
-        navigation={navigation}
-        objWithData={step2}
-        setFunction={setStep2}
-      />
-      );
+    <InputGenerateStep
+      item={item}
+      elementId={'idTaskAddon'}
+      index={index}
+      navigation={navigation}
+      objWithData={step2}
+      setFunction={setStep2}
+    />
+  );
 
   const InputsGenerateStep3 = ({ item, index }) => {
     let customEvidence = evidences.filter(image => image.idTaskStep === item.idTaskStep);
@@ -97,7 +104,7 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
                     style={styles.iconImg}
                   />
                   <ListItem.Content>
-                    <ListItem.Title> Fotos</ListItem.Title>
+                    <ListItem.Title> Fotos ({customEvidence.length})</ListItem.Title>
                   </ListItem.Content>
                 </>
               }
@@ -125,7 +132,7 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
   };
 
   const step3PhotoItem = ({ item, index }) => (
-    <View key={index}>
+    <View key={`P-${index}`}>
       <View style={{ alignContent: 'center', alignItems: 'center' }}>
         <TouchableOpacity
           style={{ width: width * 0.3, margin: 10 }}
@@ -134,7 +141,7 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
             indicator={true}
             indicatorColor={colorsTheme.naranja}
             indicatorSize="large"
-            source={{ uri: 'file://' + item.photo.path }}
+            source={{ uri: 'file://' + item.path }}
             resizeMode="stretch"
             originalWidth={100}
             originalHeight={150}
@@ -156,6 +163,41 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
       />
   );
 
+  const InputsGenerateStep5 = ({ item, index }) => {
+    const step = item;
+    return (
+      <View>
+        <Text style={styles.checkTitle}>{step?.step?.name}</Text>
+        <FlatList
+          data={step?.taskStepChecks ? step?.taskStepChecks.filter(a => ["Agente", "Todos"].includes(a.check.checkRole)) : []}
+          key={`check-${index}`}
+          renderItem={({item, index}) => (
+            <View style={styles.checkContainer}>
+              <View key={`B-${index}`} style={{flexDirection: 'row'}}>
+                <View key={`C-${index}`}>
+                  <Text style={{fontSize: 15, fontWeight: '500', width: 280, color: colorsTheme.negro}}>
+                    {item?.check?.description || ""}
+                  </Text>
+                </View>
+                <View style={styles.check}>
+                  <BouncyCheckbox
+                    size={25}
+                    fillColor={colorsTheme.naranja}
+                    unFillColor="#FFFFFF"
+                    iconStyle={{ borderColor: colorsTheme.naranja }}
+                    innerIconStyle={{ borderWidth: 2 }}
+                    textStyle={{ fontFamily: "JosefinSans-Regular" }}
+                    hitSlop={{top: 30, bottom: 30, left: 50, right: 50}}
+                    onPress={(isChecked) => handleClickCheck(isChecked, step.idTaskStep, item)}
+                  />
+                </View>
+              </View>
+            </View>
+          )}
+        />
+      </View>
+    )};
+
   const onClickValidate = async (idTaskStep) => {
     const hasPermission = await hasCameraPermission();
     if (hasPermission) {
@@ -164,67 +206,86 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
   };
 
   const handleDataList = async () => {
-    const { id } = route.params;
     console.log("[ PARAMS ]", route.params)
+    const { id } = route.params;
     let getDataScreen = [];
     let getCommunities = [];
-    if(inline){
-      getDataScreen = await getElemetScreen(id);
-      getCommunities = await getAllCommunities();
-      await updateStep('communities', 1, JSON.stringify(getCommunities), 0);
-    }else{
+    if (inline) {
+      const [screenData, communitiesData] = await Promise.all([getElemetScreen(id), getAllCommunities()]);
+      getDataScreen = screenData;
+      getCommunities = communitiesData;
+      await updateStep('communities', 1, JSON.stringify(communitiesData), 0);
+    } else {
       const comm = await getStep('communities', 1, 0);
       getDataScreen = JSON.parse(await getStep('taskDescription',id, 0));
       if (comm.length > 0) getCommunities = JSON.parse(comm);
     }
-    const { screen, addon, steps, addonReceived } = getDataScreen;
-    
+
+    if (!getDataScreen || !getCommunities) {
+      setShowAlert(true);
+      setTitleAlert('¡Atención!');
+      setMessageAlert('Es posible que hagan falta algunos datos.');
+    }
+
+    const { screen, addon, steps, addonReceived, stepsChecks } = getDataScreen;
+
+    if (!screen || !addon || !steps || !addonReceived || !stepsChecks) {
+      setShowAlert(true);
+      setTitleAlert('¡Atención!');
+      setMessageAlert('Error en la estructura de los datos obtenidos.');
+    }
+
     const newDataScreen = handleValidExist(screen, step1, 'idTaskScreenElement', 1);
+    const newDataAddon = handleValidExist(addon, step2, 'idTaskAddon', 2);
+    const newDataSteps = handleValidExist(steps, step3, 'idTaskStep', 3);
+    const newDataAddonReceived = handleValidExist(addonReceived, step4, 'idReceivedAddon', 4);
+    const newDataChecks = handleValidExist(stepsChecks, step5, 'idTaskStep', 5)
+
+    if (newDataAddon.length == 0) setStepFlag2(true);
+    if (newDataAddonReceived.length == 0) setStepFlag4(true);
+    if (newDataChecks.length == 0) setStepFlag5(true);
+
     setStep1(orderBy(newDataScreen, ['order'], ['asc']));
+    setStep2(orderBy(newDataAddon, ['order'], ['asc']));
+    setStep3(orderBy(newDataSteps, ['order'], ['asc']));
+    setStep4(orderBy(newDataAddonReceived, ['order'], ['asc']));
+    setStep5(orderBy(newDataChecks, ['order'], ['asc']));
+
     setCommunities(getCommunities);
 
-    const newDataAddon = handleValidExist(addon, step2, 'idTaskAddon', 2);
-    newDataAddon.length == 0 && setStepFlag2(true);
-    setStep2(orderBy(newDataAddon, ['order'], ['asc']));
-
-    const newDataSteps = handleValidExist(steps, step3, 'idTaskStep', 3);
-    setStep3(orderBy(newDataSteps, ['order'], ['asc']));
-
-    const newDataAddonReceived = handleValidExist(addonReceived, step4, 'idReceivedAddon', 4);
-    newDataAddonReceived.length == 0 && setStepFlag4(true);
-    console.log(newDataAddonReceived.length, newDataAddonReceived)
-    setStep4(orderBy(newDataAddonReceived, ['order'], ['asc']));
-
-    let locationExpanded = [];
-    newDataAddonReceived.forEach(() => {
-      locationExpanded.push(false);
-    });
+    const locationExpanded = new Array(newDataAddonReceived.length).fill(false);
     setExpanded(locationExpanded);
+
     setLoading(false);
   };
 
   const saveTemporalData = async (dbTable ,step, active) => {
     try {
-      console.log(active, step)
-      const { id } = route.params;
+      const {id} = route.params;
       let isValid = false;
 
       isValid = await handleValidDataStep(step);
-      
-      if(active == 1 && stepFlag2 == true){ 
+
+      if ((active === 1 && stepFlag2) || (active === 3 && stepFlag4)) {
         isValid = true;
-      }else if(active == 3 && stepFlag4 == true){
-        isValid = true; 
       }
 
-      console.log('.....', active, stepFlag4)
-
-      if(active == 2){
+      if(active == 2) {
         let samephotos = await handleValidDataPhotos(step3, evidences);
-        samephotos.length == 0&&isValid==true;
+        samephotos.length == 0 && isValid == true;
       }
 
-      if (isValid === false){
+      if (active === 4) {
+        step5.forEach(item => {
+            item.taskStepChecks.forEach(check => {
+                if (!check.checked) {
+                    isValid = false;
+                }
+            });
+        });
+      }
+
+      if (isValid === false) {
         setShowAlert(true);
         setTitleAlert('¡Atención!');
         setMessageAlert('Debes ingresar todos los datos');
@@ -236,7 +297,8 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
         await updateStep(dbTable, id, step, active)
       }
 
-      if (active === 3){
+      if (active === 4){
+        console.log("[ UPLOAD TASK ]");
         completeTask();
         return;
       }
@@ -248,117 +310,150 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
     }
   };
 
-  const changeSteteTask = async () => {
-    const { id } = route.params;
-    let dataTaskList = JSON.parse(await getStep('taskList',0,0));
-    if (dataTaskList) {
-      let newData = dataTaskList.find(item => item.idTask == id);
-      let index = dataTaskList.indexOf(item => item.idTask == id);
-      let formatNewData = {
-        ...newData,
-        task: {
-          ...newData.task,
-          idTaskState: 2
-        }
-      }
-      console.log("[ index ]", index);
-      dataTaskList[index] = formatNewData;
-      console.log({idTask: dataTaskList[index].idTask, state: dataTaskList[index].task.idTaskState});
-      let comprobar = dataTaskList.find(item => item.idTask == id);
-      console.log("COMPORBACIóN", {idTask: comprobar.idTask, state: comprobar.task.idTaskState})
-      // await updateStep('taskList',0, JSON.stringify(formatNewData), 0);
-    }
-  }
-
   const completeTask = async () => {
     try {
-      const { id } = route.params;
-      setIsAlert(true);
-      setTitleAlert('Cargando Datos, Espere por favor');
-      
-      let dataKingos = await getStep('warehouseEquipment',0,0);
-      let dataAddons = await getStep('warehouseAddon',0,0);
-      let validArrayKingosStep2 = false;
-      let validArrayAddonsStep2 = false;
-      let inventoryKingo = [];
-      let inventoryAddon = [];
-	  
-      console.log(typeof dataKingos, typeof dataAddons);
-      if(typeof dataKingos === 'string' || typeof dataAddons === 'string'){
-        if (JSON.parse(dataKingos).length > 0) {
-          JSON.parse(dataKingos).map(item => inventoryKingo.push(item.barcode));
+        const { id, type } = route.params;
+        setIsAlert(true);
+        setTitleAlert('Iniciando proceso');
+        setMessageAlert('');
+        let dataKingos = JSON.parse(await getStep('warehouseEquipment',0,0));
+        let dataAddons = JSON.parse(await getStep('warehouseAddon',0,0));
+
+        let inventoryKingo = dataKingos.length > 0 ? dataKingos.map(item => item.barcode) : [];
+        let inventoryAddon = dataAddons.length > 0 ? dataAddons.map(item => item.barcode) : [];
+
+        let validArrayKingosStep2 = false;
+        let validArrayAddonsStep2 = false;
+
+        if (type !== 7) { // is different to pickup
+            validArrayKingosStep2 = step2.some(item => /^E/i.test(item.value) ? inventoryKingo.includes(item.value) : inventoryAddon.includes(item.value));
+        } else {
+            validArrayKingosStep2 = true;
+            validArrayAddonsStep2 = true;
         }
 
-        if (JSON.parse(dataAddons).length > 0) {
-          JSON.parse(dataAddons).map(item => inventoryAddon.push(item.barcode));
-        }
-
-        step2.forEach(item => {
-          if (item.value.match(/E/g)){
-
-            if (inventoryKingo.includes(item.value)) {
-              validArrayKingosStep2 = true;
-            } else validArrayKingosStep2 = false;
-
-          } else {
-
-            if (inventoryAddon.includes(item.value)) {
-              validArrayAddonsStep2 = true;
-            } else validArrayAddonsStep2 = false;
-
-          };
-        });
-        
-        if(inline){
-            console.log("[ VALIDATE ] >>", validArrayKingosStep2, validArrayAddonsStep2);
+        if (inline) {
+          let responseCheck = await setDataTaskCecklist({step5, idTask: id});
+          setIsAlert(false);
+          setTimeout(() => {
+            setTitleAlert('Válidando checklist');
+            setMessageAlert('');
+            setIsAlert(true);
+          }, 300)
+          if (responseCheck?.status) {
             if (validArrayKingosStep2 || validArrayAddonsStep2) {
-              let taskStatus = await setDataAllTask({ step1, step2, evidences, step4, idTask: id });
-              await deleteStep('task', id);
-              console.log(taskStatus)
-              navigation.navigate('Task', { taskStatus });
+                let taskStatus = null;
+                setIsAlert(false);
+                setTimeout(() => {
+                  setTitleAlert('Cargando Datos, Espere por favor');
+                  setMessageAlert('');
+                  setIsAlert(true);
+                }, 200)
+                switch (type) {
+                    case 1:
+                    case 2:
+                        taskStatus = await setDataAllTaskInstall({ step1, step2, step3: null, step4, step5, idTask: id });
+                        break;
+                    case 6:
+                        taskStatus = await setDataAllTaskSwap({ step1, step2, step3: evidences, step4, step5, idTask: id });
+                        break;
+                    case 7:
+                        taskStatus = await setDataAllTaskPickup({ step1, step2, step3: evidences, step4, step5, idTask: id });
+                        break;
+                    default:
+                        setIsAlert(false);
+                        setTimeout(() => {
+                          setTitleAlert('¡Atención!');
+                          setMessageAlert('No se puede procesar, problemas con el tipo de tarea');
+                          setShowAlert(true);
+                        }, 150)
+                }
+
+                if (taskStatus?.status) {
+                    setIsAlert(false);
+                    setTimeout(() => {
+                      setShowProgressAlert(true);
+                    }, 300)
+
+                    for (let i = 0; i < evidences.length; i++) {
+                        const item = evidences[i];
+                        let photosReq = await setDataTaskPhotos({ step3: [item], idTask: id });
+                        console.log("[ UPLOAD PHOTO ]", photosReq)
+                        setTotalUpload(prev => prev + 1);
+                        setProgressAlert(prev => prev + (100 / evidences.length) / 100);
+                    }
+
+                    await deleteStep('task', id);
+                    setShowProgressAlert(false);
+                    navigation.navigate('Task', { taskStatus });
+                } else {
+                  setIsAlert(false);
+                  setTimeout(() => {
+                    setTitleAlert('Error');
+                    setMessageAlert('No se puedieron cargar los datos de la tarea.');
+                    setShowAlert(true);
+                  }, 150)
+                }
             } else {
               setIsAlert(false);
               setTimeout(() => {
                 setTitleAlert('Error');
                 setMessageAlert('Alguno de los barcodes que ingresaste no existen en tu bodega.');
                 setShowAlert(true);
-              }, 150)
+              }, 150);
             }
-          
-        } else {
-          console.log("ENTRO AL ELSE")
-          await updateStep('TaskComplete', id, JSON.stringify({ step1, step2, evidences, step4, idTask: id }), 0)
-          if (validArrayKingosStep2 || validArrayAddonsStep2) {
-            // await changeSteteTask();
-            setTimeout(() => {
-              setIsAlert(false)
-              navigation.navigate('Task', {
-                status: true,
-                message: "Tarea Insertada en Cola",
-                title: "Cuando Recupere Conexión a internet se enviara.",
-              });
-            }, 2500)
           } else {
             setIsAlert(false);
             setTimeout(() => {
-              setTitleAlert('Error');
-              setMessageAlert('Alguno de los barcodes que ingresaste no existen en tu bodega.');
+              setTitleAlert('¡Atención!');
+              setMessageAlert('Debes cargar datos antes de salir a realizar una tarea.');
               setShowAlert(true);
-            }, 150);
+            }, 150)
           }
+        } else {
+            await updateStep('TaskComplete', id, JSON.stringify({ step1, step2, evidences, step4, idTask: id }), 0);
+            if (validArrayKingosStep2 || validArrayAddonsStep2) {
+                setTimeout(() => {
+                    setIsAlert(false);
+                    navigation.navigate('Task', {
+                        status: true,
+                        message: "Tarea Insertada en Cola",
+                        title: "Cuando Recupere Conexión a internet se enviará.",
+                    });
+                }, 2500);
+            } else {
+              setIsAlert(false);
+              setTimeout(() => {
+                setTitleAlert('¡Atención!');
+                setMessageAlert('Debes cargar datos antes de salir a realizar una tarea.');
+                setShowAlert(true);
+              }, 150)
+            }
         }
-      } else {
+    } catch (error) {
         setIsAlert(false);
         setTimeout(() => {
-          setTitleAlert('¡Atención!');
-          setMessageAlert('Debes cargar datos antes de salir a realizar una tarea.');
-          setShowAlert(true);
-        }, 150)
-      }
-    } catch (error) {
-      console.log("[ ERROR ] >>", error)
+            setTitleAlert('Error');
+            setMessageAlert(error.message || 'Ha ocurrido un error.');
+            setShowAlert(true);
+        }, 150);
     }
-  };
+};
+
+  const handleClickCheck = (isChecked, taskStep, check) => {
+    setStep5(prev => {
+      return prev.map(item => {
+        if (item.idTaskStep !== taskStep) return item;
+        const updatedChecks = item.taskStepChecks.map(stepCheck => {
+          if (stepCheck.idTaskStepCheck === check.idTaskStepCheck) {
+            return { ...stepCheck, checked: isChecked };
+          }
+          return stepCheck;
+        });
+        return { ...item, taskStepChecks: updatedChecks };
+      });
+    });
+  }
 
   useEffect(() => {
     handleDataList();
@@ -479,14 +574,14 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
                     marginTop: 10,
                     }}>
                     <Text style={{color: colorsTheme.blanco}}>
-                      No se han encontrado pasos.
+                      {"No se han encontrado pasos."}
                     </Text>
                 </View>
                 }
               ListHeaderComponent={
                 <View>
                   <View>
-                    <Text style={{ backgroundColor: colorsTheme.naranja, padding: 15, margin: 3, borderRadius: 10, flex: 8, color: colorsTheme.blanco, fontWeight: '700' }}>Actividades</Text>
+                    <Text style={{backgroundColor: colorsTheme.naranja, padding: 15, margin: 3, borderRadius: 10, flex: 8, color: colorsTheme.blanco, fontWeight: '700'}}>Actividades</Text>
                   </View>
                 </View>
               }
@@ -527,7 +622,43 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
               ListFooterComponent={
                 <View style={{ flexDirection: 'row', marginTop: 15 }}>
                   <ButtonProgressStep text="Anterior" type={'left'} onPress={() => setActive(prev => prev - 1)} />
-                  <ButtonProgressStep text="Completar" type={'complete'} onPress={() => saveTemporalData('task', step4, active)} />
+                  <ButtonProgressStep text="Siguiente" type={'complete'} onPress={() => setActive(prev => prev + 1)} />
+                </View>
+              }
+            />
+          </ProgressStep>
+          <ProgressStep
+            label={'Checklist'}
+            removeBtnRow={true}
+          >
+            <FlatList
+              data={step5}
+              key={"Check-FlatList-1"}
+              renderItem={InputsGenerateStep5}
+              // keyExtractor={item => item.idReceivedAddon}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: '20%' }}
+              ListEmptyComponent={
+                <View
+                    style={{
+                    backgroundColor: colorsTheme.gris80,
+                    width: width,
+                    padding: 10,
+                    alignContent: 'center',
+                    alignItems: 'center',
+                    marginTop: 10,
+                    }}>
+                    <Text style={{color: colorsTheme.blanco}}>
+                      No se han encontrado Equipo.
+                    </Text>
+                </View>
+                }
+              ListFooterComponent={
+                <View style={{ flexDirection: 'row', marginTop: 15 }}>
+                  <ButtonProgressStep text="Anterior" type={'left'} onPress={() => setActive(prev => prev - 1)} />
+                  <ButtonProgressStep text="Completar" type={'complete'} onPress={() => saveTemporalData('task', step5, active)} />
+                  {/* <ButtonProgressStep text="Completar" type={'complete'} onPress={() => handleConsole()} /> */}
                 </View>
               }
             />
@@ -556,6 +687,25 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
           setShowAlert(false);
         }}
       />
+      <AwesomeAlert
+        show={showProgressAlert}
+        title={"Cargando Imagenes..."}
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={false}
+        customView={
+          <View>
+            <Text style={{color: "black", textAlign: "center"}}>{totalUpload} de {evidences.length}</Text>
+            <Progress.Bar
+              progress={progressAlert}
+              width={200}
+              color={colorsTheme.naranja}
+              animated={true}
+              animationType='spring'
+            />
+          </View>
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -581,6 +731,36 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
+  checkContainer: {
+    margin:5,
+    padding: 10,
+    borderRadius:10,
+    borderLeftColor: colorsTheme.naranja60,
+    borderLeftWidth: 5,
+    backgroundColor: colorsTheme.blanco,
+    shadowColor: colorsTheme.gris80,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+    elevation: 6,
+  },
+  checkTitle: {
+    fontSize: 17,
+    color: colorsTheme.negro,
+    borderBottomColor: colorsTheme.gris20,
+    borderBottomWidth: 2,
+    marginVertical: 10,
+  },
+  check: {
+    justifyContent: "center",
+    paddingHorizontal: 5,
+    marginHorizontal: 2,
+    borderLeftWidth: 2,
+    borderColor: colorsTheme.gris20
+  }
 });
 
 export default TaskDescriptionScreen;

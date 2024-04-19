@@ -13,7 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import { handleRemove } from '../../../functions/functionChangeValue';
 import FitImage from 'react-native-fit-image';
-
+import * as RNFS from 'react-native-fs';
 //Components
 import Footer from '../../../components/Layouts/Footer';
 import { FlatList } from 'react-native-gesture-handler';
@@ -29,6 +29,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
   const [photoData, setPhotoData] = useState('');
   const [indexUse, setIndexUse] = useState(0);
   const [photos, setPhotos] = useState(data);
+  const [photosBase64, setPhotosBase64] = useState([]);
   const [hasPermission, setHasPermission] = useState(false);
   const [isScanned, setIsScanned] = useState(true);
   const [torch, setTorch] = useState("off");
@@ -36,7 +37,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     checkCameraPermission();
-    setData(photos);
+    setData(photosBase64);
   }, [isScanned]);
 
   const checkCameraPermission = async () => {
@@ -46,6 +47,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
 
   const handleClickBtnDelete = async () => {
     handleRemove(indexUse, photos, setPhotos);
+    handleRemove(indexUse, photosBase64, setPhotosBase64);
     setIsScanned(true);
   };
 
@@ -63,6 +65,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
     const photo = await camera.current.takePhoto({
       flash: torch,
       qualityPrioritization: 'speed',
+      enableShutterSound: false,
       resolution: {
         width: 640,
         height: 480,
@@ -71,9 +74,13 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
         quality: 50,
       },
     });
+    const base64 = await RNFS.readFile(`file://${photo.path}`, 'base64');
+    console.log("[ SDFASDF ] => ", photo);
     let newValue = [...photos, { photo, idTaskStep }];
+    let newValue2 = [...photosBase64, { photo: `data:image/jpg;base64,${base64}`, idTaskStep, path: photo.path }];
     setPhotos(newValue);
-    setData(newValue);
+    setPhotosBase64(newValue2);
+    setData(newValue2);
   };
   console.log(isScanned, device != null, hasPermission);
   return (

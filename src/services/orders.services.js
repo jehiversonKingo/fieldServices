@@ -34,36 +34,50 @@ export const setDataAllOrder = async (data) => {
   const {idWarehouse} = await handleGetDataUserLocal();
   const {step1, step2, step3} = data;
 
-  let urlsPhotos = [];
-  let url = '';
-  await Promise.all(
-    step3.map(async (photo) => {
-        if (handleIsValidUrl(photo) === false) {
-          url = await handleUpdateImage(Math.random(), 'orders', photo.photo);
-        } else {
-          url = photo;
-        }
+  // let urlsPhotos = [];
+  // let url = '';
+  // await Promise.all(
+  //   step3.map(async (photo) => {
+  //       if (handleIsValidUrl(photo) === false) {
+  //         url = await handleUpdateImage(Math.random(), 'orders', photo.photo);
+  //       } else {
+  //         url = photo;
+  //       }
 
-        urlsPhotos.push({url});
-      })
-    );
+  //       urlsPhotos.push({url});
+  //     })
+  //   );
     return await axiosInstance
       .post('/order/setOrder', {
           received:step1[0].value,
           step2,
-          photos:urlsPhotos,
+          // photos:urlsPhotos,
           sender:idWarehouse,
         }, headers)
       .then(task => {
-        const {title, message} = task.data;
-        return {status: true, title, message};
+        const {title, message, idOrder} = task.data;
+        return {status: true, title, message, idOrder};
       })
       .catch(error => {
-        console.log("ERROR ORDER", error)        
+        console.log("ERROR ORDER", error)
         const {title, message} = error.response.data;
         return {status: false, message, title};
       });
 };
+
+export const setDataOrderPhotos = async (params) => {
+  const headers = await customHeadersAuth();
+  return await axiosInstance
+    .post('/order/images', params, headers)
+    .then(order => {
+      console.log("[ RESPONSE UPLOAD ] => ", order);
+      return order.data;
+    })
+    .catch(error => {
+      console.log("[AXIOS ERROR UPLOAD ORDER ERRORS]>>", error);
+      return error;
+    });
+}
 
 export const getValidAddonOrEquipmentAsigned = async (addons) => {
   const headers = await customHeadersAuth();

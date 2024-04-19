@@ -49,7 +49,7 @@ const RenderItemList = ({item, goTo, onLongPress}) => {
         onPress={() =>
           goTo(
             item.task.idTaskState !== 3 ? 'TaskDescription' : 'TaskNocValidation',
-            {id: item.idTask},
+            {id: item.idTask, type: item.task.ticket.idTicketCategory},
           )
         }>
         <View

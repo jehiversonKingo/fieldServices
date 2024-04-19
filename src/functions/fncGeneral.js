@@ -5,11 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const handleIsValidUrl = urlString => {
   var pattern = new RegExp(
     '^(https?:\\/\\/)?' + // protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-      '(\\#[-a-z\\d_]*)?$',
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+    '(\\#[-a-z\\d_]*)?$',
     'i',
   ); // fragment locator
   return !!pattern.test(urlString);
@@ -90,7 +90,7 @@ export const handleTraslateMessageFirebaseError = message => {
   });
 };
 
-export const handleValidDataStepTask = async (step, ) => {
+export const handleValidDataStepTask = async (step) => {
   let isValid = true;
   if (step.length === 0) {
     isValid = false;
@@ -132,7 +132,7 @@ export const handleValidDataStep = async (step) => {
   return isValid;
 };
 
-export const handleValidDataPhotos = (array1, array2)=>{
+export const handleValidDataPhotos = (array1, array2) => {
   return array1.filter(object1 => {
     return !array2.some(object2 => {
       return object1.idTaskStep === object2.idTaskStep;
@@ -140,27 +140,26 @@ export const handleValidDataPhotos = (array1, array2)=>{
   });
 };
 
-export const handleGPSCoordinates = (value)=>{
+export const handleGPSCoordinates = (value) => {
   const coordinates = value;
-  const expresion = /^(-?\d+\.\d+),(-?\d+\.\d+)$/;
-
+  const expresion = /^(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)$/;
   const sameCoordinates = coordinates.match(expresion);
   if (sameCoordinates) {
-      const latitud = parseFloat(sameCoordinates[1]);
-      const longitud = parseFloat(sameCoordinates[2]);
-      console.log(`Latitud: ${latitud}, Longitud: ${longitud}`);
-      return [latitud, longitud];
+    const latitud = parseFloat(sameCoordinates[1]);
+    const longitud = parseFloat(sameCoordinates[3]);
+    console.log(`Latitud: ${latitud}, Longitud: ${longitud}`);
+    return [latitud, longitud];
   } else {
-      console.log("Formato de coordenadas no válido.");
-      return [0,0];
+    console.log("Formato de coordenadas no válido.");
+    return [0, 0];
   }
 };
 
-export const handleValidateEmojiAndSpecialCharacter = (text) =>{
+export const handleValidateEmojiAndSpecialCharacter = (text) => {
   let flag = false;
   const regex = /[^\u0000-\u007F]+|[?!))$&.'!"@&]+/;
   const newValue = text;
-   if (!regex.test(newValue)) {
+  if (!regex.test(newValue)) {
     flag = true;
   }
   return flag;
@@ -170,7 +169,7 @@ export const handleValidExist = (value, lastValues, find, step) => {
   let refactorData = [...lastValues];
   value.forEach(element => {
     let exist = lastValues.findIndex(dataExist => dataExist[find] === element[find]);
-    if (exist < 0){
+    if (exist < 0) {
       refactorData.push(element);
     }
   });
@@ -188,20 +187,20 @@ export const handleFilterData = (dataForFilter, filter, setData, setLoading, typ
   setLoading(false);
 };
 
-export const handleCustomNotification = async() => {
+export const handleCustomNotification = async () => {
   showMessage({
     message: 'Simple message',
     type: 'info',
   });
 };
 
-export const handleGetDataUserLocal = async() => {
+export const handleGetDataUserLocal = async () => {
   const dataUser = await AsyncStorage.getItem('@user');
-  const {idWarehouse, user} = JSON.parse(dataUser);
-  return ({idWarehouse, user});
+  const { idWarehouse, user } = JSON.parse(dataUser);
+  return ({ idWarehouse, user });
 };
 
-export const handleShowNotification = async({title, body}) => {
+export const handleShowNotification = async ({ title, body }) => {
   const channelId = await notifee.createChannel({
     id: 'default',
     name: 'Default Channel',

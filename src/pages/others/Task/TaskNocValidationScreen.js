@@ -18,34 +18,42 @@ import {colorsTheme} from '../../../configurations/configStyle';
 
 const TaskNocValidationScreen = ({navigation, route}) => {
 
-  const {state} = React.useContext(AuthContext);
+  const {state, changeCodeTask} = React.useContext(AuthContext);
 
   const [code, setCode] = useState('');
+  const [isDisabled, setIsDisabled] = useState(false);
   const [isAlert, setIsAlert] = useState(false);
   const [isAlertButtom, setAlertButtom] = useState(false);
   const [titleAlert, setTitleAlert] = useState('');
+  const [messageAlert, setMessageAlert] = useState('');
   const { id } = route.params;
 
   useEffect(()=>{
-    if (state.code !== ''){setCode(state.code); handleSendCode();}
+    if (state.code !== '') setCode(state.code)
   },[state.code]);
 
   const handleSendCode = async() =>{
-    if (code !== '' && code !== null && code !== undefined || state.code !== ''){
+    setIsDisabled(true);
+    if (code !== '' && code !== null && code !== undefined || state.code !== '') {
       let codeValid = (code !== '' && code !== null && code !== undefined) ? code : state.code;
       setIsAlert(true);
       setTitleAlert('Validando Codigo...');
       let taskStatus = await setCodeNoc({code: codeValid, idTask:id});
       setIsAlert(false);
       if (taskStatus.status){
+        changeCodeTask(null);
         navigation.navigate('Task', {taskStatus});
       } else {
         setAlertButtom(true);
-        setTitleAlert(taskStatus.message);
+        setTitleAlert(taskStatus.title);
+        setMessageAlert(taskStatus.message);
+        setIsDisabled(false);
       }
     } else {
       setAlertButtom(true);
-      setTitleAlert('Debes completar los campos del formulario');
+      setTitleAlert('Atención');
+      setMessageAlert('Debes completar los campos del formulario');
+      setIsDisabled(false);
     }
   };
 
@@ -76,6 +84,7 @@ const TaskNocValidationScreen = ({navigation, route}) => {
               marginHorizontal: 50,
               marginVertical: 10,
             }}
+            disabled={isDisabled}
             onPress={() => handleSendCode()}
           />
         </TouchableOpacity>
@@ -90,6 +99,7 @@ const TaskNocValidationScreen = ({navigation, route}) => {
       <AwesomeAlert
         show={isAlertButtom}
         title={titleAlert}
+        message={messageAlert}
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}
         showCancelButton={false}

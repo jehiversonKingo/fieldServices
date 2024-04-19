@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Dimensions } from 'react-native';
+import * as Progress from 'react-native-progress';
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import FitImage from 'react-native-fit-image';
@@ -34,7 +35,7 @@ import Header from '../../../components/Layouts/Header';
 
 //Servicios
 import { getUserByRole } from '../../../services/auth.services';
-import { setDataAllOrder, getValidAddonOrEquipmentAsigned } from '../../../services/orders.services';
+import { setDataAllOrder, getValidAddonOrEquipmentAsigned, setDataOrderPhotos } from '../../../services/orders.services';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -43,6 +44,9 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAlert, setIsAlert] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [showProgressAlert, setShowProgressAlert] = useState(false);
+  const [progressAlert, setProgressAlert] = useState(0);
+  const [totalUpload, setTotalUpload] = useState(0);
   const [messageAlert, setMessageAlert] = useState('');
   const [titleAlert, setTitleAlert] = useState('');
   const [step1, setStep1] = useState([]);
@@ -109,6 +113,7 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
 
   //3
   const InputsGenerateNewItemPaper = ({ item, index }) => {
+    console.log("[ PHOTO ] ===>  ", item);
     return (
       <View key={index}>
         <View style={{ alignContent: 'center', alignItems: 'center' }}>
@@ -124,7 +129,7 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
                   item.value !== '' ?
                     handleIsValidUrl(item) ?
                       item :
-                      'file://' + item.photo.path
+                      'file://' + item.path
                     : 'https://via.placeholder.com/300',
               }}
               resizeMode="contain"
@@ -164,7 +169,7 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
 
   const handleClickImage = index => {
     let photos = [];
-    step3.map(photo => photos.push({ url: `file://${photo.photo.path}` }));
+    step3.map(photo => photos.push({ url: `file://${photo.path}` }));
     navigation.navigate('ImageFullScreen', { photos, index });
   };
 
@@ -177,6 +182,20 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
       let orderStatus = await setDataAllOrder({ step1, step2, step3 });
       console.log("CREATE ORDER", orderStatus);
       if (orderStatus.status) {
+        setIsAlert(false);
+        setTimeout(() => {
+          setShowProgressAlert(true);
+        }, 500)
+        let iterationProgress = (100 / step3.length) / 100;
+        for (let i = 0; i < step3.length; i++) {
+          const item = step3[i];
+          console.log(item.path);
+          let photosReq = await setDataOrderPhotos({ step3: [item], idOrder: orderStatus.idOrder })
+          setTotalUpload((prev) => prev + 1);
+          setProgressAlert((prev) => prev + iterationProgress);
+          console.log("[ PHOTOS ] => ", photosReq);
+        };
+        setShowProgressAlert(false);
         navigation.navigate('Orders', { orderStatus });
       } else {
         setShowAlert(true);
@@ -197,6 +216,7 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
 
   const getData = async () => {
     const { user } = await handleGetDataUserLocal();
+    console.log("[ USER ] > ", user);
     let userAgentes = await getUserByRole(3, user.idUser);
     setStep1([{
       id: 1,
@@ -422,6 +442,25 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
         onConfirmPressed={() => {
           setShowAlert(false);
         }}
+      />
+      <AwesomeAlert
+        show={showProgressAlert}
+        title={"Cargando Imagenes..."}
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+        showCancelButton={false}
+        customView={
+          <View>
+            <Text style={{color: "black", textAlign: "center"}}>{totalUpload} de {step3.length}</Text>
+            <Progress.Bar
+              progress={progressAlert}
+              width={200}
+              color={colorsTheme.naranja}
+              animated={true}
+              animationType='spring'
+            />
+          </View>
+        }
       />
     </SafeAreaView>
   );

@@ -66,10 +66,12 @@ const HomeScreen = ({navigation}) => {
   };
 
   const getAllDataToOffline = async() => {
-    setOpen(false);
-    setShowIsAlert(true);
-    setTitleAlert("Cargando datos")
-    setMessageAlert("Recopilando datos para almacenamiento...")
+    if(!inline) {
+      setIsAlert(true);
+      setTitleAlert("Error de red")
+      setMessageAlert("Asegurate de tener conexión a internet")
+      setShowIsAlert(false);
+    } else navigation.navigate("DownloadData");
 
     if(inline){
       getTaskData = await getTasks();
@@ -77,7 +79,7 @@ const HomeScreen = ({navigation}) => {
       getTaskData.forEach(async (task) => {
         let dataTask = await getElemetScreen(task.idTask);
         const {steps} = dataTask;
-        
+
         await updateStep('taskDescription',task.idTask, JSON.stringify(dataTask), 0);
         console.log("---",steps)
         steps.forEach(async (step) => {
@@ -92,7 +94,7 @@ const HomeScreen = ({navigation}) => {
 
       getKingo = await getListEquipment();
       await updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0);
-      
+
       let getCommunities = await getAllCommunities();
       await updateStep('communities', 1, JSON.stringify(getCommunities), 0);
 
@@ -102,13 +104,13 @@ const HomeScreen = ({navigation}) => {
       setShowIsAlert(false);
 
     }else{
-
       //setShowIsAlert(false);
       setIsAlert(true);
       setTitleAlert("Error de red")
       setMessageAlert("No te encuentras en linea para realizar este proceso")
       setShowIsAlert(false);
     }
+
 
    /*  setTimeout(() => {
       setIsAlert(false)
@@ -144,7 +146,7 @@ const HomeScreen = ({navigation}) => {
       setIsLoading(false);
     }
   }
-  
+
   useEffect(() => {
     getMenuOptions();
   }, [])

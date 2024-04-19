@@ -90,7 +90,7 @@ const Inputs = ({
 
     const renderSelectData = () => {
         let arrayData = [];
-        console.log("DATA SELECT >>", selectData);
+        console.log("DATA SELECT >>", selectValue);
         if (selectData.length > 0) {
             selectData.forEach(element => {
                 arrayData.push({ value: element[selectValue], label: element[selectLabel] })

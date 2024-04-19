@@ -4,6 +4,7 @@ import {
     Text,
     NativeEventEmitter,
     NativeModules,
+    PermissionsAndroid,
 } from 'react-native';
 
 import {colorsTheme} from '../../../configurations/configStyle';
@@ -21,17 +22,32 @@ const HandshakeServerScreen = ({navigation, route}) => {
     const [receivedData, setReceivedData] = useState([]);
     const [statusServer, setStatusServer] = useState('El servidor esta apagado');
     const [statusServerColor, setStatusServerColor] = useState(colorsTheme.rojo);
+    const [showAlertBluetooth, setShowAlertBluetooth] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [messageAlert, setMessageAlert] = useState('');
     const [titleAlert, setTitleAlert] = useState('');
     const [loading, setLoading] = useState(true);
     const [amount, setAmount] = useState(0);
-    // const [reloadServer, setReloadServer] = useState(false);
-    // const _DATA_ = [
-    //     {time: '09:00', title: 'AGENT_DATA', description: 'TENDERO CONNECTADO'},
-    //     {time: '10:45', title: 'VALIDATE_PAYMENT', description: 'TENDERO - Envío 100 bolas'}
-    // ]
 
+    const handleSaveCustomerData = async (event) => {
+        try {
+            const {idCustomer, lots} = event;
+            const arrayLots = [];
+            if (lots.length > 0) {
+                // for (let i = 0; i < lots.length; i++) {
+                //     const lote = lots[i];
+                //     arrayLots.push({
+                //     })
+                // }
+            } else {
+                setTitleAlert('¡Atencón!')
+                setMessageAlert('No se encontró ningun lote de datos')
+                setShowAlert(true)
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
     const handleReceivedData = async (event) => {
         const {action, data} = JSON.parse(event.data)
         let sendResponse = "NULL RESPONSE"
@@ -39,7 +55,7 @@ const HandshakeServerScreen = ({navigation, route}) => {
         // setReceivedData((prevReceivedData) => [...prevReceivedData, event]);
         switch (action) {
             case 'AGENT_DATA':
-                setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: action, description: "TENDERO CONECTADO"}]);
+                setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "TENDERO CONECTADO"}]);
                 let userData = await AsyncStorage.getItem("@user");
                 sendResponse = JSON.stringify({data: userData, action})
                 console.log("RESPONSE >>", sendResponse)
@@ -48,7 +64,7 @@ const HandshakeServerScreen = ({navigation, route}) => {
                 break;
             case 'VALIDATE_PAYMENT':
                 if (data !== null) {
-                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: action, description:`${data.customer.name} - Envío un pago de Q ${parseFloat(data.amount).toFixed(2)}`}]);
+                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description:`${data.customer.name} - Envío un pago de Q ${parseFloat(data.amount).toFixed(2)}`}]);
                     setLoading(true)
                     setLoading(false)
                     setAmount(data.amount)
@@ -56,7 +72,27 @@ const HandshakeServerScreen = ({navigation, route}) => {
                     setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`)
                     setShowAlert(true)
                 } else {
-                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: action, description: "El tendero no envío la información del pago"}]);
+                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "El tendero no envío la información del pago"}]);
+                }
+                break;
+            case 'CUSTOMER_SEND_OFFLINE_DATA':
+                if (data !== null) {
+                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "Se recibio un lote de data del tendero"}]);
+                    let userData = await AsyncStorage.getItem("@user");
+                    let dataResponse = {
+                        agent: userData,
+                        totalData: typeof data === "object" ? data.length : 0,
+                    }
+
+                    await handleSaveCustomerData(data);
+
+                    sendResponse = JSON.stringify({data: dataResponse, action})
+                    console.log("RESPONSE >>", sendResponse)
+                    BluetoothServerModule.sendDataToClient(sendResponse);
+                } else {
+                    setTitleAlert('¡Atencón!')
+                    setMessageAlert('La sulicitud no posee datos.')
+                    setShowAlert(true)
                 }
                 break;
             default:
@@ -68,7 +104,6 @@ const HandshakeServerScreen = ({navigation, route}) => {
     const handleConfirmAmount = async () => {
         try {
             setShowAlert(false)
-            console.log("[ AMOUNT JEFF ] ==>", amount);
             let sendResponse = JSON.stringify({action: "VALIDATE_PAYMENT", data: {status: "OK", message: "El pago fue recibido", amount}})
             BluetoothServerModule.sendDataToClient(sendResponse);
             setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "RECEIVED_PAYMENT", description: "El pago fue recibido"}]);
@@ -90,30 +125,82 @@ const HandshakeServerScreen = ({navigation, route}) => {
         }
     }
 
+    const requestAllPermissions = async () => {
+        try {
+            let allPerssions = true;
+            const granted = await PermissionsAndroid.requestMultiple([
+                PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+                PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            ]);
+            for (const permission in granted) {
+                if (granted[permission] === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log(`${permission} permission granted`);
+                    allPerssions = true;
+                } else {
+                    console.log(`${permission} permission denied`);
+                    allPerssions = false;
+                    setTitleAlert("Atención")
+                    setMessageAlert("Debes aceptar todos los permisos")
+                    setShowAlertBluetooth(true)
+                    setTimeout(() => {
+                        setShowAlertBluetooth(false);
+                        navigation.goBack();
+                    }, 1500)
+                    break;
+                }
+            }
+            return allPerssions;
+        } catch (err) {
+            console.error("{ PERMISSION ERROR } => ", err);
+            setTitleAlert("Acepta los permisos")
+            setMessageAlert("Debes aceptar todos los permisos")
+            setShowAlertBluetooth(true)
+            setTimeout(() => {
+                setShowAlertBluetooth(false);
+                navigation.goBack();
+            }, 1500)
+            return false;
+
+        }
+    };
+
     useEffect(() => {
-        BluetoothServerModule.startServer()
-        .then(result => {
-            console.log('Servidor iniciado', result)
-            setStatusServer('Servidor iniciado')
-            setStatusServerColor(colorsTheme.verdeClaro)
-            setLoading(false)
-        })
-        .catch(error => {
-            setStatusServer('Servidor apagado')
-            setStatusServerColor(colorsTheme.rojo)
-            console.error('Error al iniciar el servidor', error)
-        });
+        requestAllPermissions()
+            .then((res) => {
+                if (res) {
+                    BluetoothServerModule.startServer()
+                    .then(result => {
+                        console.log('Servidor iniciado', result)
+                        setStatusServer('Servidor iniciado')
+                        setStatusServerColor(colorsTheme.verdeClaro)
+                        setLoading(false)
+                    })
+                    .catch(error => {
+                        setStatusServer('Servidor apagado')
+                        setStatusServerColor(colorsTheme.rojo)
+                        console.error('Error al iniciar el servidor', error)
+                    });
+                } else {
+                    setTitleAlert("Atención")
+                    setMessageAlert("Debes aceptar todos los permisos")
+                    setShowAlertBluetooth(true)
+                    setTimeout(() => {
+                        setShowAlertBluetooth(false);
+                        navigation.goBack();
+                    }, 1500)
+                }
+            })
+            .catch((error) => console.log(error));
 
         const dataReceivedListener = eventEmitter.addListener('DATA_RECEIVED', event => {
             console.log("[ SERVER_RECEIVED ] >>>", event)
             handleReceivedData(event)
         });
-
         eventEmitter.addListener('DATA_SERVER_RECEIVED', (event) => {
             console.log("[ BLUETOOTH DATA ] =>", event)
             handleReceivedData(event)
         });
-
         return () => {
             // Cuando se desmonta el componente, detener el servidor y eliminar el suscriptor del evento
             BluetoothServerModule.stopServer()
@@ -127,40 +214,6 @@ const HandshakeServerScreen = ({navigation, route}) => {
             // dataBlueReceivedListener.remove();
         };
     }, []);
-
-    const renderEvent = (item, index) => {
-        switch (item.action) {
-            case 'AGENT_DATA':
-                return (
-                    <Text style={{color: colorsTheme.negro, fontSize: 15, marginHorizontal: 20}} key={index}>{"TENDERO CONECTADO"}</Text>
-                )
-                break;
-            case 'VALIDATE_PAYMENT':
-                return (
-                    <Text style={{color: colorsTheme.negro, fontSize: 15, marginHorizontal: 20}} key={index}>
-                        {item.data?.customer?.name} {" - Envío un pago de Q "} {parseFloat(item?.data.amount).toFixed(2)}
-                    </Text>
-                )
-                break;
-            case 'REFUSED_PAYMENT':
-                return (
-                    <Text style={{color: colorsTheme.negro, fontSize: 15, marginHorizontal: 20}} key={index}>
-                        {item.data?.message}
-                    </Text>
-                )
-                break;
-            case 'RECEIVED_PAYMENT':
-                return (
-                    <Text style={{color: colorsTheme.negro, fontSize: 15, marginHorizontal: 20}} key={index}>
-                        {item.data?.message}
-                    </Text>
-                )
-            break;
-        
-            default:
-                break;
-        }
-    }
 
     return (
         <>
@@ -218,6 +271,13 @@ const HandshakeServerScreen = ({navigation, route}) => {
                 cancelButtonColor={colorsTheme.rojo}
                 onConfirmPressed={handleConfirmAmount}
                 onCancelPressed={handleCancelAmount}
+            />
+            <AwesomeAlert
+                show={showAlertBluetooth}
+                title={titleAlert}
+                message={messageAlert}
+                closeOnTouchOutside={false}
+                closeOnHardwareBackPress={false}
             />
         </>
     );
