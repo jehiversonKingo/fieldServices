@@ -29,7 +29,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
   const [photoData, setPhotoData] = useState('');
   const [indexUse, setIndexUse] = useState(0);
   const [photos, setPhotos] = useState(data);
-  const [photosBase64, setPhotosBase64] = useState([]);
+  const [photosBase64, setPhotosBase64] = useState(data);
   const [hasPermission, setHasPermission] = useState(false);
   const [isScanned, setIsScanned] = useState(true);
   const [torch, setTorch] = useState("off");
@@ -37,7 +37,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     checkCameraPermission();
-    setData(photosBase64);
+    // setData((prev) => [...prev, ...photosBase64]);
   }, [isScanned]);
 
   const checkCameraPermission = async () => {
@@ -151,7 +151,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
                       photoData !== '' || photoData.path !== '' ?
                         handleIsValidUrl(photoData) ?
                           photoData :
-                          `file://${photoData.photo.path}`
+                          `file://${photoData.path}`
                         : 'https://via.placeholder.com/300',
                   }}
                   style={{ width: width, height: height }}
@@ -218,24 +218,19 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
                   renderItem={({ item, index }) => {
                     return (
                       <TouchableOpacity
-                        key={index}
+                        key={`get-photo-${photos.length + index}`}
                         style={{ width: 80, height: 80, margin: 2 }}
                         onPress={() => handleShowImage(item, index)}>
                         <FitImage
                           indicator={true}
                           indicatorColor={colorsTheme.naranja}
                           indicatorSize="large"
-                          /* source={{
-                            uri: item.photo.path.match('http')
-                              ? item.photo.path
-                              : `file://${item.photo.path}`,
-                          }} */
                           source={{
                             uri:
                               item !== '' ?
                                 handleIsValidUrl(item) ?
                                   item :
-                                  `file://${item.photo.path}`
+                                  `file://${item.path || item.photo.path}`
                                 : 'https://via.placeholder.com/300',
                           }}
                           resizeMode="contain"

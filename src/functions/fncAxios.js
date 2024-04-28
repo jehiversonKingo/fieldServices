@@ -3,17 +3,13 @@ import auth from '@react-native-firebase/auth';
 
 export const axiosInstance = axios.create({
   // baseURL: 'https://v4w3k844-5000.use2.devtunnels.ms/stack-ant-dev/us-central1/antServices',
-  baseURL: 'https://us-central1-stack-ant-dev.cloudfunctions.net/antServices',
-  // baseURL: 'https://us-central1-stack-ant-prod.cloudfunctions.net/antServices',
-  // baseURL: 'https://226e-190-122-185-230.ngrok-free.app/stack-ant-dev/us-central1/antServices',
+  baseURL: process.env.REACT_APP_URI_FIELD,
 });
 
 export const axiosInstanceShopkeeper = axios.create({
-  // // baseURL: "https://us-central1-stack-ant-prod.cloudfunctions.net/apiShopkeeper",
-  baseURL: "https://us-central1-stack-ant-dev.cloudfunctions.net/apiShopkeeper",
+  baseURL: process.env.REACT_APP_URI_SHOPKEEPER,
   // baseURL: "https://v4w3k844-5000.use2.devtunnels.ms/stack-ant-dev/us-central1/apiShopkeeper",
-  // /*PROD*/ headers: { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEN1c3RvbWVyIjoxNTcsIm5hbWUiOiJSb3hhbmEgTGFyYSIsImRwaSI6IjExMTExMTIiLCJwaG9uZSI6Iis1MDIzNTMwMzczNyIsImlhdCI6MTcwMDAxMTk4MX0.6E1TDcECqLbVmN0ujW--taVzpuJYDsBjr5esg12-Ldw" },
-  /*DEV*/ headers: {token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZEN1c3RvbWVyIjoxNTcsIm5hbWUiOiJSb3hhbmEgTGFyYSIsImRwaSI6IjExMTExMTIiLCJwaG9uZSI6Iis1MDIzNTMwMzczNyIsImlhdCI6MTcwMTEyMjk2N30.ea56HMWHS3v-Tgcvzj5C_EKZY7qi7V4u549sVWRj8zI"},
+  headers: {token: process.env.REACT_APP_SHOPKEEPER_TOKEN},
 });
 
 export const customHeadersAuth = async() => {

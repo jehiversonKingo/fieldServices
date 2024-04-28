@@ -135,16 +135,16 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
     <View key={`P-${index}`}>
       <View style={{ alignContent: 'center', alignItems: 'center' }}>
         <TouchableOpacity
-          style={{ width: width * 0.3, margin: 10 }}
+          style={{ width: width * 0.3, margin: 1 }}
         >
           <FitImage
             indicator={true}
             indicatorColor={colorsTheme.naranja}
             indicatorSize="large"
             source={{ uri: 'file://' + item.path }}
-            resizeMode="stretch"
-            originalWidth={100}
-            originalHeight={150}
+            resizeMode="contain"
+            // originalWidth={100}
+            // originalHeight={150}
             // style={{ width: 100 }}
           />
         </TouchableOpacity>
@@ -166,10 +166,10 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
   const InputsGenerateStep5 = ({ item, index }) => {
     const step = item;
     return (
-      <View>
+      <View key={`step-${index}`}>
         <Text style={styles.checkTitle}>{step?.step?.name}</Text>
         <FlatList
-          data={step?.taskStepChecks ? step?.taskStepChecks.filter(a => ["Agente", "Todos"].includes(a.check.checkRole)) : []}
+          data={step?.taskStepChecks ? step?.taskStepChecks.filter(a => ["Agente"].includes(a.access)) : []}
           key={`check-${index}`}
           renderItem={({item, index}) => (
             <View style={styles.checkContainer}>
@@ -189,6 +189,7 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
                     textStyle={{ fontFamily: "JosefinSans-Regular" }}
                     hitSlop={{top: 30, bottom: 30, left: 50, right: 50}}
                     onPress={(isChecked) => handleClickCheck(isChecked, step.idTaskStep, item)}
+                    isChecked={item.checked}
                   />
                 </View>
               </View>
@@ -277,11 +278,13 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
 
       if (active === 4) {
         step5.forEach(item => {
-            item.taskStepChecks.forEach(check => {
-                if (!check.checked) {
-                    isValid = false;
-                }
-            });
+          item.taskStepChecks
+            .filter(item => item.access === "Agente")
+            .forEach(check => {
+              if(!check.checked) {
+                isValid = false;
+              }
+            })
         });
       }
 
@@ -326,101 +329,81 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
         let validArrayAddonsStep2 = false;
 
         if (type !== 7) { // is different to pickup
-            validArrayKingosStep2 = step2.some(item => /^E/i.test(item.value) ? inventoryKingo.includes(item.value) : inventoryAddon.includes(item.value));
+            validArrayKingosStep2 = step2.some(item => {
+              if (/^E/i.test(item.value)) {
+                return inventoryKingo.includes(item.value)
+              } else if (/^A/i.test(item.value)) {
+                console.log(inventoryAddon);
+                return inventoryAddon.includes(item.value)
+              } else return false
+            });
         } else {
             validArrayKingosStep2 = true;
             validArrayAddonsStep2 = true;
         }
 
         if (inline) {
-          let responseCheck = await setDataTaskCecklist({step5, idTask: id});
-          setIsAlert(false);
-          setTimeout(() => {
-            setTitleAlert('Válidando checklist');
-            setMessageAlert('');
-            setIsAlert(true);
-          }, 300)
-          if (responseCheck?.status) {
-            if (validArrayKingosStep2 || validArrayAddonsStep2) {
-                let taskStatus = null;
-                setIsAlert(false);
-                setTimeout(() => {
-                  setTitleAlert('Cargando Datos, Espere por favor');
-                  setMessageAlert('');
-                  setIsAlert(true);
-                }, 200)
-                switch (type) {
-                    case 1:
-                    case 2:
-                        taskStatus = await setDataAllTaskInstall({ step1, step2, step3: null, step4, step5, idTask: id });
-                        break;
-                    case 6:
-                        taskStatus = await setDataAllTaskSwap({ step1, step2, step3: evidences, step4, step5, idTask: id });
-                        break;
-                    case 7:
-                        taskStatus = await setDataAllTaskPickup({ step1, step2, step3: evidences, step4, step5, idTask: id });
-                        break;
-                    default:
-                        setIsAlert(false);
-                        setTimeout(() => {
-                          setTitleAlert('¡Atención!');
-                          setMessageAlert('No se puede procesar, problemas con el tipo de tarea');
-                          setShowAlert(true);
-                        }, 150)
-                }
-
-                if (taskStatus?.status) {
-                    setIsAlert(false);
-                    setTimeout(() => {
-                      setShowProgressAlert(true);
-                    }, 300)
-
-                    for (let i = 0; i < evidences.length; i++) {
-                        const item = evidences[i];
-                        let photosReq = await setDataTaskPhotos({ step3: [item], idTask: id });
-                        console.log("[ UPLOAD PHOTO ]", photosReq)
-                        setTotalUpload(prev => prev + 1);
-                        setProgressAlert(prev => prev + (100 / evidences.length) / 100);
-                    }
-
-                    await deleteStep('task', id);
-                    setShowProgressAlert(false);
-                    navigation.navigate('Task', { taskStatus });
-                } else {
-                  setIsAlert(false);
-                  setTimeout(() => {
-                    setTitleAlert('Error');
-                    setMessageAlert('No se puedieron cargar los datos de la tarea.');
-                    setShowAlert(true);
-                  }, 150)
-                }
-            } else {
-              setIsAlert(false);
-              setTimeout(() => {
-                setTitleAlert('Error');
-                setMessageAlert('Alguno de los barcodes que ingresaste no existen en tu bodega.');
-                setShowAlert(true);
-              }, 150);
-            }
-          } else {
+          if (validArrayKingosStep2 || validArrayAddonsStep2) {
+            let responseCheck = await setDataTaskCecklist({step5, idTask: id});
             setIsAlert(false);
             setTimeout(() => {
-              setTitleAlert('¡Atención!');
-              setMessageAlert('Debes cargar datos antes de salir a realizar una tarea.');
-              setShowAlert(true);
-            }, 150)
-          }
-        } else {
-            await updateStep('TaskComplete', id, JSON.stringify({ step1, step2, evidences, step4, idTask: id }), 0);
-            if (validArrayKingosStep2 || validArrayAddonsStep2) {
-                setTimeout(() => {
+              setTitleAlert('Válidando checklist');
+              setMessageAlert('');
+              setIsAlert(true);
+            }, 300)
+            if (responseCheck?.status) {
+              let taskStatus = null;
+              setIsAlert(false);
+              setTimeout(() => {
+                setTitleAlert('Cargando Datos, Espere por favor');
+                setMessageAlert('');
+                setIsAlert(true);
+              }, 200)
+              switch (type) {
+                case 1:
+                case 2:
+                    taskStatus = await setDataAllTaskInstall({ step1, step2, step3: null, step4, step5, idTask: id });
+                    break;
+                case 6:
+                    taskStatus = await setDataAllTaskSwap({ step1, step2, step3: evidences, step4, step5, idTask: id });
+                    break;
+                case 7:
+                    taskStatus = await setDataAllTaskPickup({ step1, step2, step3: evidences, step4, step5, idTask: id });
+                    break;
+                default:
                     setIsAlert(false);
-                    navigation.navigate('Task', {
-                        status: true,
-                        message: "Tarea Insertada en Cola",
-                        title: "Cuando Recupere Conexión a internet se enviará.",
-                    });
-                }, 2500);
+                    setTimeout(() => {
+                      setTitleAlert('¡Atención!');
+                      setMessageAlert('No se puede procesar, problemas con el tipo de tarea');
+                      setShowAlert(true);
+                    }, 150)
+              }
+
+              if (taskStatus?.status) {
+                  setIsAlert(false);
+                  setTimeout(() => {
+                    setShowProgressAlert(true);
+                  }, 300)
+
+                  for (let i = 0; i < evidences.length; i++) {
+                      const item = evidences[i];
+                      let photosReq = await setDataTaskPhotos({ step3: [item], idTask: id });
+                      console.log("[ UPLOAD PHOTO ]", photosReq)
+                      setTotalUpload(prev => prev + 1);
+                      setProgressAlert(prev => prev + (100 / evidences.length) / 100);
+                  }
+
+                  await deleteStep('task', id);
+                  setShowProgressAlert(false);
+                  navigation.navigate('Task', { taskStatus });
+              } else {
+                setIsAlert(false);
+                setTimeout(() => {
+                  setTitleAlert('Error');
+                  setMessageAlert(taskStatus?.message || 'No se puedieron cargar los datos de la tarea.');
+                  setShowAlert(true);
+                }, 150)
+              }
             } else {
               setIsAlert(false);
               setTimeout(() => {
@@ -429,6 +412,33 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
                 setShowAlert(true);
               }, 150)
             }
+          } else {
+            setIsAlert(false);
+            setTimeout(() => {
+              setTitleAlert('Error');
+              setMessageAlert('Alguno de los barcodes que ingresaste no existen en tu bodega.');
+              setShowAlert(true);
+            }, 150);
+          }
+        } else {
+          await updateStep('TaskComplete', id, JSON.stringify({ step1, step2, evidences, step4, idTask: id }), 0);
+          if (validArrayKingosStep2 || validArrayAddonsStep2) {
+              setTimeout(() => {
+                  setIsAlert(false);
+                  navigation.navigate('Task', {
+                      status: true,
+                      message: "Tarea Insertada en Cola",
+                      title: "Cuando Recupere Conexión a internet se enviará.",
+                  });
+              }, 2500);
+          } else {
+            setIsAlert(false);
+            setTimeout(() => {
+              setTitleAlert('¡Atención!');
+              setMessageAlert('Debes cargar datos antes de salir a realizar una tarea.');
+              setShowAlert(true);
+            }, 150)
+          }
         }
     } catch (error) {
         setIsAlert(false);

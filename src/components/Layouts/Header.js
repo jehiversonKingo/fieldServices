@@ -57,7 +57,7 @@ const Header = ({
         </View>
         <View style={styles.containerLogo}>
           <Image source={Logo} style={styles.imgLogo} />
-          <Text style={{color: colorsTheme.blanco}}>{DeviceInfo.getVersion()}</Text>
+          <Text style={{color: colorsTheme.blanco}}>{process.env.ENVIROMENT}. {DeviceInfo.getVersion()}</Text>
         </View>
         <View style={styles.containerProfile}>
           {isRight && (
