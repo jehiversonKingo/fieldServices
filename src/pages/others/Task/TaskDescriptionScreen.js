@@ -20,7 +20,7 @@ import {updateStep, deleteStep, getStep} from '../../../functions/fncSqlite';
 import { hasCameraPermission } from '../../../functions/fncCamera';
 import { handleValidDataStep, handleValidDataPhotos, handleValidExist } from '../../../functions/fncGeneral';
 
-import { getCheckListByIdTask, getElemetScreen, setDataAllTask, setDataAllTaskInstall, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskCecklist, setDataTaskEvidens, setDataTaskPhotos } from '../../../services/task.services';
+import { getCheckListByIdTask, getElemetScreen, setDataAllTask, setDataAllTaskInstall, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskChecklist, setDataTaskEvidens, setDataTaskPhotos } from '../../../services/task.services';
 import { colorsTheme } from '../../../configurations/configStyle';
 
 const { width, height } = Dimensions.get('screen');
@@ -343,8 +343,8 @@ const TaskDescriptionScreen = ({ navigation, route }) => {
         }
 
         if (inline) {
-          if (validArrayKingosStep2 || validArrayAddonsStep2) {
-            let responseCheck = await setDataTaskCecklist({step5, idTask: id});
+          if (validArrayKingosStep2) {
+            let responseCheck = await setDataTaskChecklist({step5, idTask: id});
             setIsAlert(false);
             setTimeout(() => {
               setTitleAlert('Válidando checklist');

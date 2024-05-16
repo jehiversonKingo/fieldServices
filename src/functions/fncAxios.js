@@ -2,13 +2,13 @@ import axios from 'axios';
 import auth from '@react-native-firebase/auth';
 
 export const axiosInstance = axios.create({
-  // baseURL: 'https://v4w3k844-5000.use2.devtunnels.ms/stack-ant-dev/us-central1/antServices',
-  baseURL: process.env.REACT_APP_URI_FIELD,
+  baseURL: 'https://mb91xm47-5000.use2.devtunnels.ms/stack-ant-dev/us-central1/antServices',
+  // baseURL: process.env.REACT_APP_URI_FIELD,
 });
 
 export const axiosInstanceShopkeeper = axios.create({
   baseURL: process.env.REACT_APP_URI_SHOPKEEPER,
-  // baseURL: "https://v4w3k844-5000.use2.devtunnels.ms/stack-ant-dev/us-central1/apiShopkeeper",
+  // baseURL: "https://mb91xm47-5000.use2.devtunnels.ms/stack-ant-dev/us-central1/apiShopkeeper",
   headers: {token: process.env.REACT_APP_SHOPKEEPER_TOKEN},
 });
 

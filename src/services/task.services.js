@@ -60,7 +60,7 @@ export const setDataAllTask = async (data) => {
     });
 };
 
-export const setDataTaskCecklist = async (data) => {
+export const setDataTaskChecklist = async (data) => {
   const headers = await customHeadersAuth();
   const {step5, idTask} = data;
   return await axiosInstance

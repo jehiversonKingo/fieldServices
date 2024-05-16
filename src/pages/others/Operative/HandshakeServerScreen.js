@@ -5,6 +5,7 @@ import {
     NativeEventEmitter,
     NativeModules,
     PermissionsAndroid,
+    Platform,
 } from 'react-native';
 
 import {colorsTheme} from '../../../configurations/configStyle';
@@ -125,9 +126,21 @@ const HandshakeServerScreen = ({navigation, route}) => {
         }
     }
 
+    const getAndroidVersion = () => {
+        if (Platform.OS === 'android') {
+          const versionString = Platform.Version.toString();
+          const versionParts = versionString.split('.');
+          if (versionParts.length > 0) {
+            return parseInt(versionParts[0]); // Obtener el número principal de la versión de Android
+          }
+        }
+        return null;
+      };
+
     const requestAllPermissions = async () => {
         try {
             let allPerssions = true;
+            console.log("{ VERISON APP } ===> ", Platform.Version);
             const granted = await PermissionsAndroid.requestMultiple([
                 PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
                 PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
@@ -137,8 +150,8 @@ const HandshakeServerScreen = ({navigation, route}) => {
                 if (granted[permission] === PermissionsAndroid.RESULTS.GRANTED) {
                     console.log(`${permission} permission granted`);
                     allPerssions = true;
-                } else {
-                    console.log(`${permission} permission denied`);
+                } else if (Platform.Version > 29 && (granted[permission] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN || granted[permission] === PermissionsAndroid.RESULTS.DENIED)) {
+                    console.log(`${permission} permission denied Or denied with NEVER ASK AGAIN`);
                     allPerssions = false;
                     setTitleAlert("Atención")
                     setMessageAlert("Debes aceptar todos los permisos")
@@ -148,6 +161,8 @@ const HandshakeServerScreen = ({navigation, route}) => {
                         navigation.goBack();
                     }, 1500)
                     break;
+                } else if (Platform.Version <= 29 && granted[permission] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+                    console.log(`${permission} permission unsupported`);
                 }
             }
             return allPerssions;

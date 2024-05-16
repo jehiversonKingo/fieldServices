@@ -69,7 +69,7 @@ const InventoryScreen = ({navigation}) => {
     useEffect(()=>{
         getAllDataInventory();
     },[]);
-  
+
     const AddonsWarehouse = ({item, index}) => {
       return (
         <View
@@ -108,41 +108,40 @@ const InventoryScreen = ({navigation}) => {
     };
 
     const ListInventory = () => (
-      <View>
-        <FlatList
-          key={'FlatList-2'}
-          data={data}
-          renderItem={AddonsWarehouse}
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: '50%', margin:30}}
-          ListHeaderComponent={
-          <View
-              style={{
-              backgroundColor: colorsTheme.naranja,
-              padding: 10,
-              alignItems: 'center',
-              }}>
-              <Text style={{color: colorsTheme.blanco}}>Inventario</Text>
-          </View>
-          }
-          ListEmptyComponent={
-          <View
-              style={{
-              backgroundColor: colorsTheme.gris80,
-              width: width,
-              padding: 10,
-              alignContent: 'center',
-              alignItems: 'center',
-              marginTop: 10,
-              }}>
-              <Text style={{color: colorsTheme.blanco}}>
-              No se han escaneado equipos.
-              </Text>
-          </View>
-          }
-        />
-      </View>
+      <FlatList
+        key={'FlatList-2'}
+        data={data}
+        renderItem={AddonsWarehouse}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        // contentContainerStyle={{margin:20, paddingBottom: 25, backgroundColor: 'yellow'}}
+        style={{margin:20, marginBottom: height * 0.3}}
+        ListHeaderComponent={
+        <View
+            style={{
+            backgroundColor: colorsTheme.naranja,
+            padding: 10,
+            alignItems: 'center',
+            }}>
+            <Text style={{color: colorsTheme.blanco}}>Inventario ({data.length})</Text>
+        </View>
+        }
+        ListEmptyComponent={
+        <View
+            style={{
+            backgroundColor: colorsTheme.gris80,
+            width: width,
+            padding: 10,
+            alignContent: 'center',
+            alignItems: 'center',
+            marginTop: 10,
+            }}>
+            <Text style={{color: colorsTheme.blanco}}>
+            No se han escaneado equipos.
+            </Text>
+        </View>
+        }
+      />
     );
 
   return (
