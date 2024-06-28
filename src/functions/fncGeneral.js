@@ -216,3 +216,11 @@ export const handleShowNotification = async ({ title, body }) => {
 };
 
 export const getDataUser = async () => JSON.parse(await AsyncStorage.getItem('@user'));
+
+export const findInArray = (arr, key, value) => {
+  return arr.find(object => object[key] === value);
+} 
+
+export const findIndexArray = (arr, key, value) => {
+  return arr.findIndex(object => object[key] === value);
+}

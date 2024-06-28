@@ -6,16 +6,20 @@ import {
     NativeModules,
     PermissionsAndroid,
     Platform,
+    Alert,
 } from 'react-native';
-
-import {colorsTheme} from '../../../configurations/configStyle';
-import Header from '../../../components/Layouts/Header';
+import Timeline from 'react-native-timeline-flatlist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { ActivityIndicator } from 'react-native-paper';
-import Timeline from 'react-native-timeline-flatlist';
 import moment from 'moment';
+
+import {colorsTheme} from '../../../configurations/configStyle';
+import Header from '../../../components/Layouts/Header';
+import { getStep, updateStep } from '../../../functions/fncSqlite';
+import { findInArray } from '../../../functions/fncGeneral';
+
 
 const eventEmitter = new NativeEventEmitter(NativeModules.ServerSocketModule);
 const {ServerSocketModule, BluetoothServerModule} = NativeModules;
@@ -30,75 +34,110 @@ const HandshakeServerScreen = ({navigation, route}) => {
     const [loading, setLoading] = useState(true);
     const [amount, setAmount] = useState(0);
 
-    const handleSaveCustomerData = async (event) => {
+    const handleSaveCustomerData = async (data, index) => {
         try {
-            const {idCustomer, lots} = event;
-            const arrayLots = [];
-            if (lots.length > 0) {
-                // for (let i = 0; i < lots.length; i++) {
-                //     const lote = lots[i];
-                //     arrayLots.push({
-                //     })
-                // }
-            } else {
-                setTitleAlert('¡Atencón!')
-                setMessageAlert('No se encontró ningun lote de datos')
-                setShowAlert(true)
+            let userData = await AsyncStorage.getItem("@user");
+            let getWalletCustomers = await getStep('customersOfflineData', 0, 0);
+            console.log("[-0-]", getWalletCustomers)
+            getWalletCustomers = getWalletCustomers.length > 1 ? JSON.parse(getWalletCustomers):[];
+            console.log("[-1-]")
+            let existData = [];
+            let message = "";
+            let lotGive = data;
+                let validUid = await findInArray(getWalletCustomers.customers, 'uid', lotGive.data.uid);
+                console.log("AQUI PASE ", lotGive.data);
+
+                console.log("DATOS VALIDOS ========", validUid, lotGive.uid, lotGive.data.uid)
+                if(validUid === undefined){
+                    console.log("HER DATA=======", getWalletCustomers, getWalletCustomers?.customers.length)
+                    if(getWalletCustomers?.customers.length > 0){
+                        console.log("(1)")
+                        getWalletCustomers.customers.push(lotGive.data);
+                    }else{
+                        console.log("(2)")
+                        getWalletCustomers = {customers:[lotGive.data]};
+                        console.log(getWalletCustomers);
+                    }
+                        console.log("getWalletCustomers DATOS GUARDADOS", getWalletCustomers);
+        
+                        let responseSave = await updateStep('customersOfflineData', 0, JSON.stringify(getWalletCustomers), 0);
+                        console.log("Datos recividos", responseSave);
+                }else{
+                    existData.push(validUid.uid);
+                    console.log("YA EXISTE ", validUid.uid);
+                }
+
+            if(existData.length > 0){
+                message = "Datos de lotes repetidos";
             }
+                
+                setTitleAlert('¡Atencón!');
+                setMessageAlert('Datos guardados con éxito.');
+                setShowAlert(true);
+
+                return { status: true, uid: data.data.uid, idUser: JSON.parse(userData).idUser, time: moment().format("YYYY-MM-DD HH:MM:ss"),  message, repeat: existData, index};
         } catch (error) {
-            console.log(error);
+            let userData = await AsyncStorage.getItem("@user");
+            console.log("<ERRORRR1>",error);
+            setTitleAlert('¡Atencón!')
+            setMessageAlert('Error al intentar guardar los datos')
+            setShowAlert(true)
+            return {status: false, uid: data[0].data.uid, idUser: JSON.parse(userData).idUser};
         }
     }
+
     const handleReceivedData = async (event) => {
-        const {action, data} = JSON.parse(event.data)
-        let sendResponse = "NULL RESPONSE"
-        console.log(action, data)
-        // setReceivedData((prevReceivedData) => [...prevReceivedData, event]);
-        switch (action) {
-            case 'AGENT_DATA':
-                setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "TENDERO CONECTADO"}]);
-                let userData = await AsyncStorage.getItem("@user");
-                sendResponse = JSON.stringify({data: userData, action})
-                console.log("RESPONSE >>", sendResponse)
-                // ServerSocketModule.sendDataToClient(sendResponse);
-                BluetoothServerModule.sendDataToClient(sendResponse);
-                break;
-            case 'VALIDATE_PAYMENT':
-                if (data !== null) {
-                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description:`${data.customer.name} - Envío un pago de Q ${parseFloat(data.amount).toFixed(2)}`}]);
-                    setLoading(true)
-                    setLoading(false)
-                    setAmount(data.amount)
-                    setTitleAlert(`${data.customer.name}`)
-                    setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`)
-                    setShowAlert(true)
-                } else {
-                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "El tendero no envío la información del pago"}]);
-                }
-                break;
-            case 'CUSTOMER_SEND_OFFLINE_DATA':
-                if (data !== null) {
-                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "Se recibio un lote de data del tendero"}]);
+        console.log("[.........]", event.data)
+        try {
+            const {action, data, index} = JSON.parse(event.data)
+            let sendResponse = "NULL RESPONSE";
+            // setReceivedData((prevReceivedData) => [...prevReceivedData, event]);
+            console.log("[SI PASE AQUI **]", action, data)
+            switch (action) {
+                case 'AGENT_DATA':
+                    console.log("How many times i sent this");
+                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "TENDERO CONECTADO"}]);
                     let userData = await AsyncStorage.getItem("@user");
-                    let dataResponse = {
-                        agent: userData,
-                        totalData: typeof data === "object" ? data.length : 0,
-                    }
-
-                    await handleSaveCustomerData(data);
-
-                    sendResponse = JSON.stringify({data: dataResponse, action})
-                    console.log("RESPONSE >>", sendResponse)
+                    let dataLot = await getStep('uploadLots', 0, 0);
+                    console.log("SEND THIS ====>", dataLot);
+                    sendResponse = JSON.stringify({data: userData, lots: dataLot, action});
+                    console.log("RESPONSE >>", sendResponse);
                     BluetoothServerModule.sendDataToClient(sendResponse);
-                } else {
-                    setTitleAlert('¡Atencón!')
-                    setMessageAlert('La sulicitud no posee datos.')
-                    setShowAlert(true)
-                }
-                break;
-            default:
-                BluetoothServerModule.sendDataToClient("NO ENTIENDO QUE NECESITAS");
-                break;
+                    break;
+                case 'VALIDATE_PAYMENT':
+                    if (data !== null) {
+                        setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description:`${data.customer.name} - Envío un pago de Q ${parseFloat(data.amount).toFixed(2)}`}]);
+                        setLoading(true)
+                        setLoading(false)
+                        setAmount(data.amount)
+                        setTitleAlert(`${data.customer.name}`)
+                        setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`)
+                        setShowAlert(true)
+                    } else {
+                        setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "El tendero no envío la información del pago"}]);
+                    }
+                    break;
+                case 'CUSTOMER_SENT_OFFLINE_DATA':
+                    if (data !== null) {
+                        setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "Se recibio un lote de data del tendero"}]);
+                        let saveData = await handleSaveCustomerData(data, index);
+                        console.log("saveData=====1====", saveData)
+                        sendResponse = JSON.stringify({data: saveData, action})
+                        console.log("RESPONSE >>", sendResponse)
+                        BluetoothServerModule.sendDataToClient(sendResponse);
+                    } else {
+                        setTitleAlert('¡Atencón!')
+                        setMessageAlert('La sulicitud no posee datos.')
+                        setShowAlert(true)
+                    }
+                    break;
+                default:
+                    BluetoothServerModule.sendDataToClient("NO ENTIENDO QUE NECESITAS");
+                    break;
+            }   
+        } catch (error) {
+            console.log("[*-0-*]", error)
+            return;
         }
     }
 
@@ -126,31 +165,20 @@ const HandshakeServerScreen = ({navigation, route}) => {
         }
     }
 
-    const getAndroidVersion = () => {
-        if (Platform.OS === 'android') {
-          const versionString = Platform.Version.toString();
-          const versionParts = versionString.split('.');
-          if (versionParts.length > 0) {
-            return parseInt(versionParts[0]); // Obtener el número principal de la versión de Android
-          }
-        }
-        return null;
-      };
-
     const requestAllPermissions = async () => {
         try {
             let allPerssions = true;
             console.log("{ VERISON APP } ===> ", Platform.Version);
             const granted = await PermissionsAndroid.requestMultiple([
-                PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
                 PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+                PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
             ]);
             for (const permission in granted) {
                 if (granted[permission] === PermissionsAndroid.RESULTS.GRANTED) {
                     console.log(`${permission} permission granted`);
                     allPerssions = true;
-                } else if (Platform.Version > 29 && (granted[permission] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN || granted[permission] === PermissionsAndroid.RESULTS.DENIED)) {
+                } else if (Platform.Version > 30 && (granted[permission] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN || granted[permission] === PermissionsAndroid.RESULTS.DENIED)) {
                     console.log(`${permission} permission denied Or denied with NEVER ASK AGAIN`);
                     allPerssions = false;
                     setTitleAlert("Atención")
@@ -161,7 +189,7 @@ const HandshakeServerScreen = ({navigation, route}) => {
                         navigation.goBack();
                     }, 1500)
                     break;
-                } else if (Platform.Version <= 29 && granted[permission] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+                } else if (Platform.Version <= 30 && granted[permission] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
                     console.log(`${permission} permission unsupported`);
                 }
             }
@@ -208,14 +236,11 @@ const HandshakeServerScreen = ({navigation, route}) => {
             })
             .catch((error) => console.log(error));
 
-        const dataReceivedListener = eventEmitter.addListener('DATA_RECEIVED', event => {
-            console.log("[ SERVER_RECEIVED ] >>>", event)
+        const dataReceivedListener = eventEmitter.addListener('DATA_SERVER_RECEIVED', (event) => {
+            console.log("[ BLUETOOTH DATA 1] =>", event)
             handleReceivedData(event)
         });
-        eventEmitter.addListener('DATA_SERVER_RECEIVED', (event) => {
-            console.log("[ BLUETOOTH DATA ] =>", event)
-            handleReceivedData(event)
-        });
+
         return () => {
             // Cuando se desmonta el componente, detener el servidor y eliminar el suscriptor del evento
             BluetoothServerModule.stopServer()

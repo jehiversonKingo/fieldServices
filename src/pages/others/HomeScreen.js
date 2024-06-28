@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import AwesomeAlert from 'react-native-awesome-alerts';
 
 import { SpeedDial } from '@rneui/themed';
 //Components
@@ -17,7 +16,6 @@ import Header from '../../components/Layouts/Header';
 import {Context as AuthContext} from '../../context/AuthContext';
 
 import {colorsTheme} from '../../configurations/configStyle';
-import { getTasks, getElemetScreen, getStepInstruction } from '../../services/task.services';
 import {getListEquipment, getListAddon} from '../../services/inventory.services';
 import {getStep, updateStep} from '../../functions/fncSqlite';
 import { getAllCommunities, getModulesByRole } from '../../services/settings.services';
@@ -28,10 +26,6 @@ const HomeScreen = ({navigation}) => {
   const {signOut, setLoadingState, state} = React.useContext(AuthContext);
   const {inline} = state;
   const [open, setOpen] = React.useState(false);
-  const [showIsAlert, setShowIsAlert] = React.useState(false);
-  const [isAlert, setIsAlert] = React.useState(false);
-  const [messageAlert, setMessageAlert] = React.useState('');
-  const [titleAlert, setTitleAlert] = React.useState('');
   const [menu, setMenu] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const goTo = route => {
@@ -223,24 +217,6 @@ const HomeScreen = ({navigation}) => {
         onClose={() => setOpen(!open)}
       >
         <SpeedDial.Action
-          icon={{ name: 'cloud-upload', color: '#fff' }}
-          color={colorsTheme.naranja}
-          title="Sincronizar Tareas"
-          onPress={() => navigation.navigate('TaskOffline')}
-        />
-        <SpeedDial.Action
-          icon={{ name: 'handshake', type: "font-awesome-5", color: '#fff' }}
-          color={colorsTheme.naranja}
-          title="Handshake"
-          onPress={() => navigation.navigate('HandshakeServer')}
-        />
-        <SpeedDial.Action
-          icon={{ name: 'sync-alt', color: '#fff' }}
-          color={colorsTheme.naranja}
-          title="Cargar Datos"
-          onPress={() => getAllDataToOffline()}
-        />
-        <SpeedDial.Action
           icon={{ name: 'person', color: '#fff' }}
           color={colorsTheme.naranja}
           title="Perfil"
@@ -253,28 +229,6 @@ const HomeScreen = ({navigation}) => {
           onPress={() => fncSingOut()}
         />
       </SpeedDial>
-      <AwesomeAlert
-        show={isAlert}
-        title={titleAlert}
-        message={messageAlert}
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
-        showCancelButton={false}
-        showConfirmButton={true}
-        confirmText="Aceptar"
-        confirmButtonColor={colorsTheme.rojo}
-        onConfirmPressed={() => {
-          setIsAlert(false);
-        }}
-      />
-      <AwesomeAlert
-        show={showIsAlert}
-        showProgress={true}
-        title={titleAlert}
-        message={messageAlert}
-        closeOnTouchOutside={false}
-        closeOnHardwareBackPress={false}
-      />
     </SafeAreaView>
   );
 };

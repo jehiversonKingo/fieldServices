@@ -15,7 +15,7 @@ import SelectDropdown from 'react-native-select-dropdown';
 import { getAllBanks } from "../../../services/settings.services";
 import AwesomeAlert from "react-native-awesome-alerts";
 import { handleUpdateImage, handleUpdateImageVoucher } from "../../../functions/fncFirebase";
-import { setVoucher } from "../../../services/bank.services";
+import { setVoucher } from "../../../services/sales.services";
 
 const { width, fontScale } = Dimensions.get('window')
 const VoucherScreen = ({ navigation }) => {
