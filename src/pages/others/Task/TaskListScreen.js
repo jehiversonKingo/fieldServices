@@ -89,38 +89,41 @@ const TaskListScreen = ({ navigation, route }) => {
 
   const handleDataList = async (filter) => {
     try {
-      console.log('++++++++++++++++++')
       setLoading(true);
       let getTaskData = [];
       if (inline) {
-        console.log('1');
+        console.log('[ TASK INLINE ]');
         getTaskData = await getTasks();
         await updateStep('taskList', 0, JSON.stringify(getTaskData), 0);
-        getTaskData.forEach(async (task) => {
-          let dataTask = await getElemetScreen(task.idTask);
-          let infoTask = await getTaskById(task.idTask);
+        for (const task of getTaskData) {
+          const [dataTask, infoTask] = await Promise.all([
+            getElemetScreen(task.idTask),
+            getTaskById(task.idTask)
+          ]);
           const { steps } = dataTask;
+          await Promise.all([
+            updateStep('taskDescription', task.idTask, JSON.stringify(dataTask), 0),
+            updateStep('taskInfo', task.idTask, JSON.stringify(infoTask), 0)
+          ]);
 
-          await updateStep('taskDescription', task.idTask, JSON.stringify(dataTask), 0);
-          await updateStep('taskInfo', task.idTask, JSON.stringify(infoTask), 0);
-          // console.log("---", steps)
-          steps.forEach(async (step) => {
-            let dataStepsToDo = await getStepInstruction(step.idStep)
+          for (const step of steps) {
+            const dataStepsToDo = await getStepInstruction(step.idStep);
             await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
-          });
-        });
+          }
+        }
       } else {
-        console.log('2');
-        let dataTaslList = await getStep('taskList', 0, 0);
-        getTaskData = JSON.parse(dataTaslList);
-        // console.log(getTaskData)
+        console.log('[ TASK OFF LINE ]');
+        const dataTaskList = await getStep('taskList', 0, 0);
+        getTaskData = JSON.parse(dataTaskList);
       }
+
       handleFilterData(getTaskData, filter, setData, setLoading, 'task', 'idTaskState');
       handleFilterData(getTaskData, filter, setDataTmp, setLoading, 'task', 'idTaskState');
     } catch (error) {
-      console.log("[ handleDataList TASK ]", error);
+      console.error("[ handleDataList TASK ]", error);
     }
   };
+
 
   const handleFilter = (value = "") => {
     setFilterTxt(value)

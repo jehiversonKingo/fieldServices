@@ -207,7 +207,7 @@ const Inputs = ({
                         withShadow={false}
                         value={phoneValue[1]}
                         onChangeFormattedText={(text) => {
-                            handleChange(index, text, 'value', informacion, setInformation);
+                            handleChange(index, ` ${text}`, 'value', informacion, setInformation);
                         }}
                         containerStyle={{ width: 380, borderRadius: 18, marginTop: 10, height: 75 }}
                         countryPickerButtonStyle={{ color: colorsTheme.gris80 }}

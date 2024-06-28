@@ -65,87 +65,91 @@ const HomeScreen = ({navigation}) => {
     signOut();
   };
 
-  const getAllDataToOffline = async() => {
-    if(!inline) {
+  const getAllDataToOffline = async () => {
+    if (!inline) {
       setIsAlert(true);
-      setTitleAlert("Error de red")
-      setMessageAlert("Asegurate de tener conexión a internet")
+      setTitleAlert("Error de red");
+      setMessageAlert("Asegúrate de tener conexión a internet");
       setShowIsAlert(false);
-    } else navigation.navigate("DownloadData");
-
-    if(inline){
-      getTaskData = await getTasks();
-      await updateStep('taskList',0, JSON.stringify(getTaskData), 0);
-      getTaskData.forEach(async (task) => {
-        let dataTask = await getElemetScreen(task.idTask);
-        const {steps} = dataTask;
-
-        await updateStep('taskDescription',task.idTask, JSON.stringify(dataTask), 0);
-        console.log("---",steps)
-        steps.forEach(async (step) => {
-          let dataStepsToDo = await getStepInstruction(step.idStep)
-          await updateStep('taskDescriptionToDo',step.idStep, JSON.stringify(dataStepsToDo), 0);
-        });
-      });
-
-      console.log('*1*');
-      getAddon = await getListAddon();
-      await updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0);
-
-      getKingo = await getListEquipment();
-      await updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0);
-
-      let getCommunities = await getAllCommunities();
-      await updateStep('communities', 1, JSON.stringify(getCommunities), 0);
-
-      setIsAlert(true);
-      setTitleAlert("Datos locales")
-      setMessageAlert("Datos cargados localmente con éxito")
-      setShowIsAlert(false);
-
-    }else{
-      //setShowIsAlert(false);
-      setIsAlert(true);
-      setTitleAlert("Error de red")
-      setMessageAlert("No te encuentras en linea para realizar este proceso")
-      setShowIsAlert(false);
+      return;
     }
 
+    try {
+      const getTaskData = await getTasks();
+      await updateStep('taskList', 0, JSON.stringify(getTaskData), 0);
 
-   /*  setTimeout(() => {
-      setIsAlert(false)
-    }, 6000); */
+      for (const task of getTaskData) {
+        const dataTask = await getElemetScreen(task.idTask);
+        const { steps } = dataTask;
 
-  }
+        // SAVE DATA STEP 1
+        await updateStep('taskDescription', task.idTask, JSON.stringify(dataTask), 0);
+
+        for (const step of steps) {
+          const dataStepsToDo = await getStepInstruction(step.idStep);
+          await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
+        }
+      }
+
+      const [getAddon, getKingo, getCommunities] = await Promise.all([
+        getListAddon(),
+        getListEquipment(),
+        getAllCommunities()
+      ]);
+
+      await Promise.all([
+        updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0),
+        updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0),
+        updateStep('communities', 1, JSON.stringify(getCommunities), 0)
+      ]);
+
+      setIsAlert(true);
+      setTitleAlert("Datos locales");
+      setMessageAlert("Datos cargados localmente con éxito");
+      setShowIsAlert(false);
+    } catch (error) {
+      setIsAlert(true);
+      setTitleAlert("Error al cargar datos");
+      setMessageAlert("Ocurrió un error al cargar los datos: " + error.message);
+      setShowIsAlert(false);
+    }
+  };
 
   const getMenuOptions = async () => {
     try {
       const data = JSON.parse(await AsyncStorage.getItem('@user'));
       let options = [];
+
       if (inline) {
-        options = await getModulesByRole(data.user.idRole)
+        options = await getModulesByRole(data.user.idRole);
         await updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0);
 
-        getAddon = await getListAddon();
-        await updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0);
+        const [getAddon, getKingo, getCommunities] = await Promise.all([
+          getListAddon(),
+          getListEquipment(),
+          getAllCommunities()
+        ]);
 
-        getKingo = await getListEquipment();
-        await updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0);
-        
-        let getCommunities = await getAllCommunities();
-        await updateStep('communities', 1, JSON.stringify(getCommunities), 0);
+        await Promise.all([
+          updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0),
+          updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0),
+          updateStep('communities', 1, JSON.stringify(getCommunities), 0)
+        ]);
       } else {
-        options = JSON.parse(await getStep('menuOptions', data.user.idRole, 0));
+        const storedOptions = await getStep('menuOptions', data.user.idRole, 0);
+        options = JSON.parse(storedOptions);
       }
+
       console.log("OPTIONS", options);
       setMenu(options);
-      setIsLoading(false);
     } catch (error) {
-      console.log("[ GET MENU OPITONS ]", error)
+      console.error("[ GET MENU OPTIONS ]", error);
       setMenu([]);
+    } finally {
       setIsLoading(false);
     }
-  }
+  };
+
 
   useEffect(() => {
     getMenuOptions();
@@ -166,7 +170,7 @@ const HomeScreen = ({navigation}) => {
         elevation: 6,}}>
             <Text style={styles.bottomMenu.text}>Menu Principal</Text>
           </View>
-          <ScrollView 
+          <ScrollView
           contentContainerStyle={{
               flexDirection: 'row',
               flexWrap: 'wrap'}}
