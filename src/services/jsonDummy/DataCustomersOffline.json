@@ -1,0 +1,199 @@
+{
+	"customers": [
+        {
+            "idCustomer": "4",
+            "uid": "4-fa27f758-12b-41a6-8247-11ddeb7da24",
+            "lote": 1,
+            "credits": [
+                {
+                    "idCustomer": 4,
+                    "amount": 1800,
+                    "amountWithPromotion": 1880,
+                    "promotion": 80,
+                    "stateCreditSale": "Offline",
+                    "idCompanyProject": 3,
+                    "state": "Activo",
+                    "createdAt": "2024-04-20"
+                }
+            ],
+            "payments": [
+                {
+                    "idCustomer": 4,
+                    "idUser": 6,
+                    "amount": 2000.00,
+                    "typePayment": "Agent",
+                    "proofOfPayment": "6-8542112",
+                    "idCompanyProject": 8,
+                    "typeTransaction": "PaymentAgent"
+                }
+            ],
+            "sales": [
+                {
+                    "idCustomer": 4,
+                    "code": 4321432143214321,
+                    "internalName": 123123,
+                    "amount": 30,
+                    "typeSale": "Offline",
+                    "idCompanyProject": 1,
+                    "reasonSale": "sale",
+                    "idPlan": 4,
+                    "createdAt": "2024-04-20"
+                }
+            ],
+            "tickets": {
+                "newClients": [
+                    {
+                        "client": {
+                            "name": "Jehiverson",
+                            "lastname": "Franco",
+                            "cellphone": "34345543",
+                            "cui": "3030574160108",
+                            "description": "-",
+                            "state": "Pendiente",
+                            "createdAt": "2024-01-01"
+                        },
+                        "ticket": {
+                            "idTicketCategory": 1,
+                            "idTicketState": 1,
+                            "idCustomer": 163,
+                            "idKingoCustomer": 1,
+                            "description": "Instalacion Kingo B2C 2.0",
+                            "idBusinessType": 2,
+                            "state": "Pendiente",
+                            "createdAt": "2024-01-01"
+                        }
+                    }
+                ],
+                "pickup": [
+                    {
+                        "ticket": {
+                            "idTicketCategory": 7,
+                            "idTicketState": 1,
+                            "idCustomer": 163,
+                            "code": "7156406",
+                            "description": "Ticket de PickUp",
+                            "idBusinessType": 2,
+                            "state": "Activo",
+                            "addonsb2c": [
+                                {
+                                    "id": 1,
+                                    "title": "kingo",
+                                    "icon": "house-user",
+                                    "type": 1
+                                }
+                            ]
+                        },
+                        "idClient": 1,
+                        "createdAt": "2024-01-01"
+                    }
+                ],
+                "swap": [
+                    {
+                        "ticket": {
+                            "idTicketCategory": 6,
+                            "idTicketState": 1,
+                            "idCustomer": 163,
+                            "code": "7156406",
+                            "description": "Ticket de PickUp",
+                            "idBusinessType": 2,
+                            "state": "Activo",
+                            "addonsb2c": [
+                                {
+                                    "id": 1,
+                                    "title": "kingo",
+                                    "icon": "house-user",
+                                    "type": 1
+                                }
+                            ]
+                        },
+                        "idClient": 1,
+                        "createdAt": "2024-01-01"
+                    }
+                ]
+            }
+        },
+        {
+            "idCustomer": "4",
+            "uid": "4-fa27fnn-12b-41a6-8uyy-11ddeb7da24",
+            "lote": 1,
+            "credits": [
+                {
+                    "idCustomer": 4,
+                    "amount": 2000,
+                    "amountWithPromotion": 1880,
+                    "promotion": 80,
+                    "stateCreditSale": "Offline",
+                    "idCompanyProject": 3,
+                    "state": "Activo",
+                    "createdAt": "2024-04-20"
+                }
+            ],
+            "payments": [
+            ],
+            "sales": [
+                {
+                    "idCustomer": 4,
+                    "code": 1234123412341234,
+                    "internalName": 9099,
+                    "amount": 30,
+                    "typeSale": "Offline",
+                    "idCompanyProject": 1,
+                    "reasonSale": "sale",
+                    "idPlan": 4,
+                    "createdAt": "2024-04-20"
+                }
+            ],
+            "tickets": {
+                "newClients": [],
+                "pickup": [],
+                "swap": []
+            }
+        },
+        {
+            "idCustomer": "5",
+            "uid": "5-fa27f723-94db-41a6-8247-e67ddeb21cada",
+            "lote": 1,
+            "credits": [
+                {
+                    "idCustomer": 5,
+                    "amount": 1000,
+                    "amountWithPromotion": 1080,
+                    "promotion": 80,
+                    "stateCreditSale": "Offline",
+                    "idCompanyProject": 3,
+                    "state": "Activo",
+                    "createdAt": "2024-04-20"
+                }
+            ],
+            "payments": [
+                {
+                    "idCustomer": 5,
+                    "idUser": 6,
+                    "amount": 2000.00,
+                    "typePayment": "Agent",
+                    "proofOfPayment": "6-332211",
+                    "idCompanyProject": 8,
+                    "typeTransaction": "PaymentAgent"
+                }
+            ],
+            "sales": [
+                {
+                    "idCustomer": 5,
+                    "code": 9191292932322323,
+                    "internalName":7156406,
+                    "amount": 30,
+                    "typeSale": "Offline",
+                    "idCompanyProject": 1,
+                    "reasonSale": "sale",
+                    "idPlan": 4,
+                    "createdAt": "2024-04-20"
+                }
+            ],
+            "tickets": {
+                "newClients": [],
+                "pickup": [],
+                "swap": []
+            }
+        }
+    ]
+}

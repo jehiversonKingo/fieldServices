@@ -1,5 +1,6 @@
 import {
   axiosInstance,
+  axiosInstanceShopkeeper,
   customHeadersAuth
 } from '../functions/fncAxios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,8 +35,26 @@ export const getDebetAgent = async () => {
 export const getWallerByUser = async () => {
   const headers = await customHeadersAuth();
   const user = JSON.parse(await AsyncStorage.getItem('@user'));
-  console.log(user.idUser);
   const response = await axiosInstance
     .get(`/settings/wallet/user/${user.idUser}`, headers)
   return response.data
 }
+
+export const getWallerByCustomer = async (customerId) => {
+  const response = await axiosInstance
+    .get(`/settings/user/${customerId}`, headers)
+  return response.data
+}
+
+export const getAllPromotions = async () => {
+  const headers = await customHeadersAuth();
+  return await axiosInstanceShopkeeper
+    .get(`sales/balance/customer/offline/promotion`)
+    .then(promotions => {
+      return promotions;
+    })
+    .catch(error => {
+      console.log(error);
+      return error;
+    });
+};

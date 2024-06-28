@@ -25,8 +25,8 @@ const BankPayScreen = ({ navigation }) => {
       id: 2,
       icon: 'money-check-alt',
       size: 30,
-      name: 'Creditos',
-      redirect: 'CreditListScreen',
+      name: 'Estado de cuenta',
+      redirect: 'AccountStatus',
     },
   ];
   const RenderOptions = ({ item }) => (
@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
   },
   bottomMenu: {
     flex: 1,
-    flexDirection: 'row',
     borderRadius: 10,
     margin: 7,
     borderLeftColor: colorsTheme.naranja60,

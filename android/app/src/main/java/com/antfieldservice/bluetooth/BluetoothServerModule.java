@@ -172,13 +172,15 @@ public class BluetoothServerModule extends ReactContextBaseJavaModule {
         }
 
         public void run() {
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[8196];
             int bytesRead;
 
             while (true) {
                 try {
+
                     bytesRead = inputStream.read(buffer);
                     String receivedData = new String(buffer, 0, bytesRead);
+                    Log.e(TAG,"PASE [---------------------------- HOW MANY TIMES I RECEIVED ---------------------------------------------]");
                     sendEvent(EVENT_DATA_RECEIVED, receivedData); // Enviar datos a JavaScript
                 } catch (IOException e) {
                     // Manejar la excepción
