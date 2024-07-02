@@ -18,7 +18,7 @@ import moment from 'moment';
 import {colorsTheme} from '../../../configurations/configStyle';
 import Header from '../../../components/Layouts/Header';
 import { getStep, updateStep } from '../../../functions/fncSqlite';
-import { findInArray } from '../../../functions/fncGeneral';
+import { findInArray, findIndexArray } from '../../../functions/fncGeneral';
 
 
 const eventEmitter = new NativeEventEmitter(NativeModules.ServerSocketModule);
@@ -33,17 +33,19 @@ const HandshakeServerScreen = ({navigation, route}) => {
     const [titleAlert, setTitleAlert] = useState('');
     const [loading, setLoading] = useState(true);
     const [amount, setAmount] = useState(0);
+    const [type, setType] = useState(1);
+    
 
-    const handleSaveCustomerData = async (data, index) => {
+    const handleSaveCustomerData = async (data) => {
         try {
             let userData = await AsyncStorage.getItem("@user");
             let getWalletCustomers = await getStep('customersOfflineData', 0, 0);
             console.log("[-0-]", getWalletCustomers)
             getWalletCustomers = getWalletCustomers.length > 1 ? JSON.parse(getWalletCustomers):[];
-            console.log("[-1-]")
+            console.log("[-1-]", data)
             let existData = [];
             let message = "";
-            let lotGive = data;
+            for(let lotGive of data.lots){
                 let validUid = await findInArray(getWalletCustomers.customers, 'uid', lotGive.data.uid);
                 console.log("AQUI PASE ", lotGive.data);
 
@@ -66,6 +68,23 @@ const HandshakeServerScreen = ({navigation, route}) => {
                     existData.push(validUid.uid);
                     console.log("YA EXISTE ", validUid.uid);
                 }
+            }  
+
+            console.log("_+_+_+_+_+_+_+_+_+_ ", data.deleteLots);
+            let dataUploads = await getStep('uploadLots', 0, 0)
+            dataUploads = typeof dataUploads !== 'string' ? dataUploads:[];
+            for(let deleteLots of data.deleteLots){
+                console.log("--1--", dataUploads, typeof dataUploads)
+                if(dataUploads.length > 0){
+                    let indexUploads = await findIndexArray(dataUploads, 'uid', deleteLots.uid);
+                    console.log("INDEX", indexUploads);
+                    console.log("Element to remove:", dataUploads[indexUploads]);
+                    dataUploads.splice(indexUploads, 1);
+                    console.log("NEW DATA OFFLINE", dataUploads);
+                }
+            }
+            
+            await updateStep('uploadLots', 0, JSON.stringify(dataUploads), 0);
 
             if(existData.length > 0){
                 message = "Datos de lotes repetidos";
@@ -73,9 +92,10 @@ const HandshakeServerScreen = ({navigation, route}) => {
                 
                 setTitleAlert('¡Atencón!');
                 setMessageAlert('Datos guardados con éxito.');
+                setType(2);
                 setShowAlert(true);
 
-                return { status: true, uid: data.data.uid, idUser: JSON.parse(userData).idUser, time: moment().format("YYYY-MM-DD HH:MM:ss"),  message, repeat: existData, index};
+                return { status: true, idUser: JSON.parse(userData).idUser, time: moment().format("YYYY-MM-DD HH:MM:ss"),  message, repeat: existData, lots: getWalletCustomers};
         } catch (error) {
             let userData = await AsyncStorage.getItem("@user");
             console.log("<ERRORRR1>",error);
@@ -89,7 +109,7 @@ const HandshakeServerScreen = ({navigation, route}) => {
     const handleReceivedData = async (event) => {
         console.log("[.........]", event.data)
         try {
-            const {action, data, index} = JSON.parse(event.data)
+            const {action, data} = JSON.parse(event.data)
             let sendResponse = "NULL RESPONSE";
             // setReceivedData((prevReceivedData) => [...prevReceivedData, event]);
             console.log("[SI PASE AQUI **]", action, data)
@@ -100,9 +120,9 @@ const HandshakeServerScreen = ({navigation, route}) => {
                     let userData = await AsyncStorage.getItem("@user");
                     let dataLot = await getStep('uploadLots', 0, 0);
                     console.log("SEND THIS ====>", dataLot);
-                    sendResponse = JSON.stringify({data: userData, lots: dataLot, action});
+                    sendResponse = {data: userData, lots: dataLot?dataLot:[], action};
                     console.log("RESPONSE >>", sendResponse);
-                    BluetoothServerModule.sendDataToClient(sendResponse);
+                    BluetoothServerModule.sendJsonToClient(sendResponse);
                     break;
                 case 'VALIDATE_PAYMENT':
                     if (data !== null) {
@@ -113,18 +133,20 @@ const HandshakeServerScreen = ({navigation, route}) => {
                         setTitleAlert(`${data.customer.name}`)
                         setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`)
                         setShowAlert(true)
+                        setType(1)
                     } else {
                         setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "El tendero no envío la información del pago"}]);
                     }
                     break;
                 case 'CUSTOMER_SENT_OFFLINE_DATA':
                     if (data !== null) {
+                        console.log("ACCCCCTIONNNNNNN", data)
                         setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "Se recibio un lote de data del tendero"}]);
-                        let saveData = await handleSaveCustomerData(data, index);
+                        let saveData = await handleSaveCustomerData(data);
                         console.log("saveData=====1====", saveData)
-                        sendResponse = JSON.stringify({data: saveData, action})
+                        sendResponse = {data: saveData, action}
                         console.log("RESPONSE >>", sendResponse)
-                        BluetoothServerModule.sendDataToClient(sendResponse);
+                        BluetoothServerModule.sendJsonToClient(sendResponse);
                     } else {
                         setTitleAlert('¡Atencón!')
                         setMessageAlert('La sulicitud no posee datos.')
@@ -143,10 +165,20 @@ const HandshakeServerScreen = ({navigation, route}) => {
 
     const handleConfirmAmount = async () => {
         try {
+            console.log("[TIPO]", type)
+            let sendResponse = "";
+            switch(type){
+                case 1:
+                    sendResponse = JSON.stringify({action: "VALIDATE_PAYMENT", data: {status: "OK", message: "El pago fue recibido", amount}})
+                    BluetoothServerModule.sendDataToClient(sendResponse);
+                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "RECEIVED_PAYMENT", description: "El pago fue recibido"}]);
+                    break;
+                case 2:
+                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "RECEIVED_DATA_CUSTOMER", description: "Datos guardados con éxito"}]);
+                    break;
+            }
             setShowAlert(false)
-            let sendResponse = JSON.stringify({action: "VALIDATE_PAYMENT", data: {status: "OK", message: "El pago fue recibido", amount}})
-            BluetoothServerModule.sendDataToClient(sendResponse);
-            setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "RECEIVED_PAYMENT", description: "El pago fue recibido"}]);
+            
         } catch (error) {
             console.log("[ handleConfirmAmount ERROR ]", error)
         }
@@ -154,12 +186,17 @@ const HandshakeServerScreen = ({navigation, route}) => {
 
     const handleCancelAmount = async () => {
         try {
+            switch(type){
+                case 1:
+                    let sendResponse = JSON.stringify({action: "VALIDATE_PAYMENT", data: {status: "REFUSED", message: "El pago fue rechazado por el agente"}})
+                    BluetoothServerModule.sendDataToClient(sendResponse);
+                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "REFUSED_PAYMENT", description: "El pago fue rechazado por el agente"}]);
+                    break;
+                case 2:
+                    setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "RECEIVED_DATA_CUSTOMER", description: "Datos guardados con éxito"}]);
+                    break;
+            }
             setShowAlert(false)
-            let sendResponse = JSON.stringify({action: "VALIDATE_PAYMENT", data: {status: "REFUSED", message: "El pago fue rechazado por el agente"}})
-            // let sendLocalResponse = {"data": JSON.stringify({action: "REFUSED_PAYMENT", data: {status: "REFUSED", message: "El pago fue rechazado por el agente"}})}
-            BluetoothServerModule.sendDataToClient(sendResponse);
-            setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "REFUSED_PAYMENT", description: "El pago fue rechazado por el agente"}]);
-            // setReceivedData((prevReceivedData) => [...prevReceivedData, sendLocalResponse]);
         } catch (error) {
             console.log("[ handleCancelAmount ERROR ]", error)
         }

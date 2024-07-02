@@ -50,92 +50,103 @@ const SyncDataScreen = ({ navigation }) => {
   }, []);
 
   const handleUploadData = async () => {
-    
     try {
-    setButtonDownload(false);
-    console.log(1)
-    let getCustomersData = JSON.parse(await getStep('customersOfflineData', 0, 0));
-    console.log(1.5, getCustomersData)
-    let valuePersentage = 100 / getCustomersData.customers.length;
-    let responsesLots = [];
-    console.log(2, valuePersentage)
-
-    for (let customersLot of getCustomersData.customers) {
-      console.log(3)
-
-      setListItemServer(prevState => prevState.map(item =>
-        item.title === 'Sevidor' ? { ...item, counter: item.counter + 1 } : item
-      ));
-
-      const sendToOffline = await uploatDataOffline(customersLot);
-      console.log("-Esta respuesta tengo-", sendToOffline);
-      responsesLots.push({ ...sendToOffline, uid: customersLot.uid });
-    }
-
-    console.log(4)
-
-    let errorsUpload = responsesLots.filter(lots => lots.status == false);
-    console.log("errorsUpload", errorsUpload, errorsUpload.length);
-    console.log(5, responsesLots)
-
-    //Eliminar Lote
-    //We save uid that we get of server
-    for(let lotSave of responsesLots){
-      let dataLot = await getStep('uploadLots', 0, 0)
-      console.log("I GET THIS", dataLot)
-      let uploadLots = dataLot.length > 0 ? JSON.parse(dataLot):[];
-      console.log("[LOTES]", uploadLots);
-      let isExistUid = await findInArray(uploadLots, 'uid', lotSave.uid);
-      if(!isExistUid){
-        uploadLots.push(lotSave);
+      setButtonDownload(false);
+      console.log(1);
+  
+      // Obtener datos de clientes fuera de línea
+      let getCustomersData = JSON.parse(await getStep('customersOfflineData', 0, 0));
+      console.log(1.5, getCustomersData);
+      let valuePercentage = 100 / getCustomersData.customers.length;
+      let responsesLots = [];
+      console.log(2, valuePercentage);
+  
+      // Cargar datos de clientes fuera de línea
+      for (let customersLot of getCustomersData.customers) {
+        console.log(3);
+  
+        // Actualizar contador en la lista de items del servidor
+        setListItemServer(prevState => prevState.map(item =>
+          item.title === 'Sevidor' ? { ...item, counter: item.counter + 1 } : item
+        ));
+  
+        // Subir datos fuera de línea y almacenar la respuesta
+        const sendToOffline = await uploatDataOffline(customersLot);
+        console.log("-Esta respuesta tengo-", sendToOffline);
+        responsesLots.push({ ...sendToOffline, uid: customersLot.uid });
       }
+  
+      console.log(4);
+  
+      // Filtrar errores de subida
+      let errorsUpload = responsesLots.filter(lots => lots.status === false);
+      console.log("errorsUpload", errorsUpload, errorsUpload.length);
+      console.log(5, responsesLots);
+  
+      // Obtener datos de lotes cargados previamente
+      let dataLot = await getStep('uploadLots', 0, 0);
+      console.log("I GET THIS", typeof dataLot, JSON.parse(dataLot));
+      let uploadLots = typeof dataLot === 'string'?[]:JSON.parse(dataLot);
+  
+      // Procesar respuestas y actualizar datos fuera de línea
+      for (let lotSave of responsesLots) {
+        console.log("[LOTES]", typeof uploadLots);
+        
+        // Verificar si el lote ya existe
+        let isExistUid = await findInArray(uploadLots, 'uid', lotSave.uid);
+        console.log("...2...", isExistUid);
+        if (!isExistUid) {
+          uploadLots.push(lotSave);
+        }
+        
+        // Eliminar lote de datos locales
+        let indexLot = await findIndexArray(getCustomersData.customers, "uid", lotSave.uid);
+        console.log("INDEX", indexLot);
+        console.log("Element to remove:", getCustomersData.customers[indexLot]);
+        getCustomersData.customers.splice(indexLot, 1);
+        console.log("NEW DATA OFFLINE", getCustomersData.customers);
+      }
+  
+      // Actualizar almacenamiento local
       await updateStep('uploadLots', 0, JSON.stringify(uploadLots), 0);
-
-      //Delete lot of we local data
-      let indexLot = await findIndexArray(getCustomersData.customers, "uid", lotSave.uid);
-      console.log("INDEX", indexLot);
-      console.log("Element to remove:", getCustomersData.customers[indexLot]);
-
-      getCustomersData.customers.splice(indexLot, 1);
-      console.log("NEW DATA OFFLINE", getCustomersData.customers);
       await updateStep('customersOfflineData', 0, JSON.stringify(getCustomersData), 0);
-    }
-
-    if (errorsUpload.length > 0){
-      for(let errors of errorsUpload){
+  
+      // Manejar errores de subida
+      if (errorsUpload.length > 0) {
+        for (let errors of errorsUpload) {
           await deleteStorageCollection("Lots", errors.uid);
+        }
+  
+        setDataVisible({
+          type: "error",
+          title: "Error al sincronizar datos",
+          subTitle: "Vuelve a intentar subir los datos",
+          secondButton: true,
+          secondAction: () => {
+            setIsVisible(false);
+          },
+          blocked: true
+        });
+      } else {
+        setDataVisible({
+          type: "success",
+          title: "Datos cargados",
+          subTitle: "Todo cargado con éxito",
+          secondButton: true,
+          secondAction: () => {
+            setIsVisible(false);
+            navigation.navigate("Principal", { reloadData: true });
+          },
+          blocked: true
+        });
       }
-
-      setDataVisible({
-        type: "error",
-        title: "Error, Al sincronizar datos",
-        subTitle: "Vuelve a intentar subir los datos",
-        secondButton: true,
-        secondAction: (() => {
-          setIsVisible(false);
-        }),
-        blocked: true
-      })
-    } else {
-      setDataVisible({
-        type: "success",
-        title: "Datos Cargados",
-        subTitle: "Todo cargado con éxito",
-        secondButton: true,
-        secondAction: (() => {
-          setIsVisible(false);
-          navigation.navigate("Principal", { reloadData: true })
-        }),
-        blocked: true
-      })
+      setIsVisible(true);
+      setButtonDownload(true);
+    } catch (error) {
+      console.log("<><><><><><><>", error);
     }
-    setIsVisible(true);
-    setButtonDownload(true);
-  } catch (error) {
-   console.log("<><><><><><><>",error)   
-  }
   };
-
+  
   const handleAsyncData = async () => {
     try {
       setButtonDownload(false);
@@ -234,6 +245,7 @@ const SyncDataScreen = ({ navigation }) => {
         }), 0);
         await updateStep('confirmationLot', 0, JSON.stringify([]), 0);
         await updateStep('currentDate', 0, JSON.stringify({ currentDate: new Date() }), 0);
+        await updateStep('uploadLots', 0, JSON.stringify([]), 0);
       } else {
         options = JSON.parse(await getStep('menuOptions', data.user.idRole, 0));
       }
