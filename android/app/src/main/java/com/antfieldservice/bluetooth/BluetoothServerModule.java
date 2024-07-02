@@ -20,6 +20,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import org.json.JSONException;
+import org.json.JSONObject;  // Añade esta línea para importar JSONObject y JSONException
+
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
+
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
+
 public class BluetoothServerModule extends ReactContextBaseJavaModule {
     private static final String TAG = "BluetoothServerModule";
     private static final String EVENT_DATA_RECEIVED = "DATA_SERVER_RECEIVED";
@@ -29,6 +39,8 @@ public class BluetoothServerModule extends ReactContextBaseJavaModule {
     private ConnectedThread connectedThread;
     private final UUID uuid;
     private boolean isServerRunning = false; // Variable de estado para rastrear si el servidor está en ejecución
+
+    private StringBuilder receivedDataBuffer = new StringBuilder(); // Buffer para los datos recibidos
 
     public BluetoothServerModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -54,6 +66,26 @@ public class BluetoothServerModule extends ReactContextBaseJavaModule {
             promise.reject("ERROR", "Client not connected or socket is closed.");
         }
     }
+
+    // Método para enviar JSON al cliente
+  @ReactMethod
+    public void sendJsonToClient(ReadableMap jsonMap, Promise promise) {
+        // Convertir ReadableMap a JSONObject
+        JSONObject jsonObject = new JSONObject(jsonMap.toHashMap());
+        String jsonString = jsonObject.toString();
+
+        if (connectedThread != null) {
+            connectedThread.write(jsonString);
+            Log.d(TAG, "[...............]");
+            Log.d(TAG, jsonString);
+            promise.resolve("JSON data sent to client");
+        } else {
+            Log.d(TAG, "Error: 3");
+            promise.reject("ERROR", "Client not connected or socket is closed.");
+        }
+    }
+
+
 
     // Nuevo método para iniciar el servidor
     @ReactMethod
@@ -177,11 +209,20 @@ public class BluetoothServerModule extends ReactContextBaseJavaModule {
 
             while (true) {
                 try {
-
                     bytesRead = inputStream.read(buffer);
                     String receivedData = new String(buffer, 0, bytesRead);
-                    Log.e(TAG,"PASE [---------------------------- HOW MANY TIMES I RECEIVED ---------------------------------------------]");
-                    sendEvent(EVENT_DATA_RECEIVED, receivedData); // Enviar datos a JavaScript
+                    receivedDataBuffer.append(receivedData); // Agregar datos al buffer
+
+                    try {
+                        // Intentar parsear el JSON completo
+                        new JSONObject(receivedDataBuffer.toString());
+                        // Si se parsea correctamente, enviar el evento
+                        sendEvent(EVENT_DATA_RECEIVED, receivedDataBuffer.toString());
+                        receivedDataBuffer.setLength(0); // Limpiar el buffer
+                    } catch (JSONException e) {
+                        // Si el JSON no está completo, esperar más datos
+                        Log.d(TAG, "JSON incompleto, esperando más datos...");
+                    }
                 } catch (IOException e) {
                     // Manejar la excepción
                     break;
@@ -192,8 +233,9 @@ public class BluetoothServerModule extends ReactContextBaseJavaModule {
         public void write(String data) {
             try {
                 outputStream.write(data.getBytes());
+                outputStream.flush();
             } catch (IOException e) {
-                // Manejar la excepción
+                Log.d(TAG, "Error: 1");
             }
         }
 
@@ -201,7 +243,7 @@ public class BluetoothServerModule extends ReactContextBaseJavaModule {
             try {
                 socket.close();
             } catch (IOException e) {
-                // Manejar la excepción
+               Log.d(TAG, "Error: 2");
             }
         }
     }
