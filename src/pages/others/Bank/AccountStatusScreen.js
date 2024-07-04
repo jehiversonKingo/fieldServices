@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   SafeAreaView,
   View,
@@ -9,15 +9,21 @@ import {
   FlatList,
   ActivityIndicator
 } from "react-native"
+
+import { Context as AuthContext } from '../../../context/AuthContext';
 import Header from "../../../components/Layouts/Header"
 import { colorsTheme } from "../../../configurations/configStyle";
 import { getDataUser } from "../../../functions/fncGeneral";
+import { getStep } from '../../../functions/fncSqlite';
 import { getDebetAgent, getTransactionAgent, getWallerByUser } from "../../../services/sales.services";
 import moment from "moment/moment";
 import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width, height, fontScale } = Dimensions.get('window')
 const AccountStatus = ({ navigation }) => {
+
+  const { state } = useContext(AuthContext);
+  const { inline } = state;
   const [dataUser, setDataUser] = useState(null)
   const [debetUser, setDebetUser] = useState(0)
   const [transactions, setTransactions] = useState([])
@@ -27,23 +33,47 @@ const AccountStatus = ({ navigation }) => {
   const getData = async () => {
     try {
       const user = await getDataUser();
-      const reqTransactions = await getTransactionAgent();
-      const reqDebet = await getDebetAgent();
-      const wallet = await getWallerByUser();
-      console.log("[ WALLET ] >>", wallet);
-      setDataUser(user)
+      setDataUser(user);
+      if (inline) {
+        console.log("OOOOONNLINE")
+        const reqTransactions = await getTransactionAgent();
+        const reqDebet = await getDebetAgent();
+        const wallet = await getWallerByUser();
+        console.log("[ WALLET ] >>", wallet);
 
-      if (reqTransactions) {
-        console.log("[ TRANSACTIONS ] => ", reqTransactions);
-        setTransactions(reqTransactions)
-      }
-      if (reqDebet) {
-        setDebetUser(reqDebet.amount)
+        if (reqTransactions) {
+          console.log("[ TRANSACTIONS ] => ", reqTransactions);
+          setTransactions(reqTransactions)
+        }
+        if (reqDebet) {
+          setDebetUser(reqDebet.amount)
+        }
+  
+        if (wallet) {
+          setWalletData(wallet)
+        }
+      }else{
+        console.log("OOOOOFFFFFLINE")
+        const reqTransactions = await getStep('transactionUser',0,0);
+        const reqDebet = await getStep('debtUser',0,0);
+        const wallet = await getStep('walletUser',0,0);
+        console.log("[ WALLET - reqTransactions ] >>", reqDebet, typeof reqDebet );
+
+        if (reqTransactions) {
+          //console.log("[ TRANSACTIONS ] => ", reqTransactions);
+          setTransactions([])
+        }
+        
+        if (reqDebet) {
+          setDebetUser(JSON.parse(reqDebet).amount)
+        }
+  
+        if (wallet) {
+          setWalletData(JSON.parse(wallet))
+        }
       }
 
-      if (wallet) {
-        setWalletData(wallet)
-      }
+      
       setLoading(false)
     } catch (error) {
       console.log(error)

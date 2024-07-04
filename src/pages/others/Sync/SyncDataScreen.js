@@ -12,7 +12,7 @@ import { Context as AuthContext } from '../../../context/AuthContext';
 import { getStep, updateStep } from '../../../functions/fncSqlite';
 import { getAllCommunities, getAllPlans, getAllRules, getModulesByRole } from '../../../services/settings.services';
 import { getListEquipment, getListAddon } from '../../../services/inventory.services';
-import { getWallerByUser, getAllPromotions, getWallerByCustomer } from '../../../services/sales.services';
+import { getWallerByUser, getAllPromotions, getWallerByCustomer, getDebetAgent, getTransactionAgent } from '../../../services/sales.services';
 import { getTasks, getElemetScreen, getStepInstruction } from '../../../services/task.services';
 import { getTicketById } from '../../../services/ticket.services';
 import { uploatDataOffline, deleteStorageCollection } from '../../../services/offline.services';
@@ -84,7 +84,7 @@ const SyncDataScreen = ({ navigation }) => {
       console.log(5, responsesLots);
   
       // Obtener datos de lotes cargados previamente
-      let dataLot = await getStep('uploadLots', 0, 0);
+      let dataLot = JSON(await getStep('uploadLots', 0, 0));
       console.log("I GET THIS", typeof dataLot, JSON.parse(dataLot));
       let uploadLots = typeof dataLot === 'string'?[]:JSON.parse(dataLot);
   
@@ -174,7 +174,12 @@ const SyncDataScreen = ({ navigation }) => {
         ));
 
         let getWallet = await getWallerByUser();
+        let getDebt = await getDebetAgent();
+        let getTransaction = await getTransactionAgent();
+        console.log("////////--1--//////////", getWallet)
         await updateStep('walletUser', 0, JSON.stringify(getWallet), 0);
+        await updateStep('debtUser', 0, JSON.stringify(getDebt), 0);
+        await updateStep('transactionUser', 0, JSON.stringify(getTransaction), 0);
         setListItem(prevState => prevState.map(item =>
           item.title === 'Billetera' ? { ...item, counter: item.counter + 1 } : item
         ));
