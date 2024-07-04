@@ -5,14 +5,13 @@ import * as Progress from 'react-native-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ListItem } from '@rneui/themed';
 import moment from 'moment';
-import DropShadow from 'react-native-drop-shadow';
 
 import { colorsTheme } from '../../../configurations/configStyle';
 import { Context as AuthContext } from '../../../context/AuthContext';
 import { getStep, updateStep } from '../../../functions/fncSqlite';
 import { getAllCommunities, getAllPlans, getAllRules, getModulesByRole } from '../../../services/settings.services';
 import { getListEquipment, getListAddon } from '../../../services/inventory.services';
-import { getWallerByUser, getAllPromotions, getWallerByCustomer } from '../../../services/sales.services';
+import { getWallerByUser, getAllPromotions, getWallerByCustomer, getTransactionCarriedOut, getDebtCustomer, getBalanceCustomer, getSaleCustomer, getCreditsCustomer, getDataCustomerBById, getDataCustomerById } from '../../../services/sales.services';
 import { getTasks, getElemetScreen, getStepInstruction } from '../../../services/task.services';
 import { getTicketById } from '../../../services/ticket.services';
 import { uploatDataOffline, deleteStorageCollection } from '../../../services/offline.services';
@@ -20,7 +19,7 @@ import {findIndexArray, findInArray} from '../../../functions/fncGeneral';
 import Header from '../../../components/Layouts/Header';
 import AlertShow from '../../../components/General/AlertShow';
 
-const { width, fontScale } = Dimensions.get('window');
+const { width, height, fontScale } = Dimensions.get('window');
 
 const SyncDataScreen = ({ navigation }) => {
   const { state } = React.useContext(AuthContext);
@@ -34,7 +33,13 @@ const SyncDataScreen = ({ navigation }) => {
     { title: "Reglas", icon: "filetext1", counter: 0 },
     { title: "Planes", icon: "filetext1", counter: 0 },
     { title: "Promociones", icon: "filetext1", counter: 0 },
-    { title: "Billeteras Tenderos", icon: "wallet", counter: 0 }
+    { title: "Tenderos", icon: "filetext1", counter: 0 },
+    { title: "Billeteras Tenderos", icon: "wallet", counter: 0 },
+    { title: "Transacciones Tenderos", icon: "carryout", counter: 0 },
+    { title: "Deudas Tenderos", icon: "creditcard", counter: 0 },
+    { title: "Balance Tenderos", icon: "calculator", counter: 0 },
+    { title: "Ventas Tenderos", icon: "filetext1", counter: 0 },
+    { title: "Compras Tenderos", icon: "filetext1", counter: 0 },
   ]);
   const [listItemServer, setListItemServer] = useState([{ title: "Sevidor", icon: "layout", counter: 0 }]);
 
@@ -53,52 +58,52 @@ const SyncDataScreen = ({ navigation }) => {
     try {
       setButtonDownload(false);
       console.log(1);
-  
+
       // Obtener datos de clientes fuera de línea
       let getCustomersData = JSON.parse(await getStep('customersOfflineData', 0, 0));
       console.log(1.5, getCustomersData);
       let valuePercentage = 100 / getCustomersData.customers.length;
       let responsesLots = [];
       console.log(2, valuePercentage);
-  
+
       // Cargar datos de clientes fuera de línea
       for (let customersLot of getCustomersData.customers) {
         console.log(3);
-  
+
         // Actualizar contador en la lista de items del servidor
         setListItemServer(prevState => prevState.map(item =>
           item.title === 'Sevidor' ? { ...item, counter: item.counter + 1 } : item
         ));
-  
+
         // Subir datos fuera de línea y almacenar la respuesta
         const sendToOffline = await uploatDataOffline(customersLot);
         console.log("-Esta respuesta tengo-", sendToOffline);
         responsesLots.push({ ...sendToOffline, uid: customersLot.uid });
       }
-  
+
       console.log(4);
-  
+
       // Filtrar errores de subida
       let errorsUpload = responsesLots.filter(lots => lots.status === false);
       console.log("errorsUpload", errorsUpload, errorsUpload.length);
       console.log(5, responsesLots);
-  
+
       // Obtener datos de lotes cargados previamente
       let dataLot = await getStep('uploadLots', 0, 0);
       console.log("I GET THIS", typeof dataLot, JSON.parse(dataLot));
       let uploadLots = typeof dataLot === 'string'?[]:JSON.parse(dataLot);
-  
+
       // Procesar respuestas y actualizar datos fuera de línea
       for (let lotSave of responsesLots) {
         console.log("[LOTES]", typeof uploadLots);
-        
+
         // Verificar si el lote ya existe
         let isExistUid = await findInArray(uploadLots, 'uid', lotSave.uid);
         console.log("...2...", isExistUid);
         if (!isExistUid) {
           uploadLots.push(lotSave);
         }
-        
+
         // Eliminar lote de datos locales
         let indexLot = await findIndexArray(getCustomersData.customers, "uid", lotSave.uid);
         console.log("INDEX", indexLot);
@@ -106,17 +111,17 @@ const SyncDataScreen = ({ navigation }) => {
         getCustomersData.customers.splice(indexLot, 1);
         console.log("NEW DATA OFFLINE", getCustomersData.customers);
       }
-  
+
       // Actualizar almacenamiento local
       await updateStep('uploadLots', 0, JSON.stringify(uploadLots), 0);
       await updateStep('customersOfflineData', 0, JSON.stringify(getCustomersData), 0);
-  
+
       // Manejar errores de subida
       if (errorsUpload.length > 0) {
         for (let errors of errorsUpload) {
           await deleteStorageCollection("Lots", errors.uid);
         }
-  
+
         setDataVisible({
           type: "error",
           title: "Error al sincronizar datos",
@@ -146,7 +151,7 @@ const SyncDataScreen = ({ navigation }) => {
       console.log("<><><><><><><>", error);
     }
   };
-  
+
   const handleAsyncData = async () => {
     try {
       setButtonDownload(false);
@@ -194,7 +199,7 @@ const SyncDataScreen = ({ navigation }) => {
           });
           let dataTicket = await getTicketById(task.task.idTicket);
 
-          customersId.includes(dataTicket.idCustomer) && customersId.push(dataTicket.idCustomer);
+          !customersId.includes(dataTicket.idCustomer) && customersId.push(dataTicket.idCustomer);
 
           setListItem(prevState => prevState.map(item =>
             item.title === 'Tareas' ? { ...item, counter: Number(valueCustomer.toFixed(2)) } : item
@@ -204,7 +209,7 @@ const SyncDataScreen = ({ navigation }) => {
         setListItem(prevState => prevState.map(item =>
           item.title === 'Tareas' ? { ...item, counter: item.counter + counterCustomer } : item
         ));
-
+        console.log("[ CUSTOMER IDS ] >> ", customersId);
         //Customer Informacion
         let getRules = await getAllRules();
         await updateStep('customerRules', 0, JSON.stringify(getRules), 0);
@@ -219,25 +224,106 @@ const SyncDataScreen = ({ navigation }) => {
         ));
 
         let getPromotions = await getAllPromotions();
+        console.log("....................[ PROMOCIONES ]...................", getPromotions);
         await updateStep('customerPromotions', 0, JSON.stringify(getPromotions), 0);
         setListItem(prevState => prevState.map(item =>
           item.title === 'Promociones' ? { ...item, counter: item.counter + 1 } : item
         ));
 
+        let customersData = [];
         let walletsData = [];
+        let transactionData = [];
+        let debetData = [];
+        let balanceData = [];
+        let salesData = [];
+        let creditsData = [];
         let counterWalletCustomer = (1 / customersId.length);
         let valueWalletCustomer = 0;
         customersId.map(async (customer) => {
+          console.log('ENTRE Y SOY EL TENDERO -> ', customer);
+          let customerData = await getDataCustomerById(customer);
           let walletCustomer = await getWallerByCustomer(customer);
+          let transactionCustomer = await getTransactionCarriedOut(customer);
+          let debetCustomer = await getDebtCustomer(customer);
+          let balanceCustomer = await getBalanceCustomer(customer);
+          let salesCustomer = await getSaleCustomer(customer);
+          let creditCustomer = await getCreditsCustomer(customer);
+
+          customersData.push(customerData)
           walletsData.push(walletCustomer);
+          transactionData.push(transactionCustomer);
+          debetData.push(debetCustomer);
+          balanceData.push(balanceCustomer);
+          salesData.push(salesCustomer);
+          creditsData.push(creditCustomer);
+
+          setListItem(prevState => prevState.map(item =>
+            item.title === 'Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
+          ));
+
           setListItem(prevState => prevState.map(item =>
             item.title === 'Billeteras Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
           ));
+
+          setListItem(prevState => prevState.map(item =>
+            item.title === 'Transacciones Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
+          ));
+
+          setListItem(prevState => prevState.map(item =>
+            item.title === 'Deudas Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
+          ));
+
+          setListItem(prevState => prevState.map(item =>
+            item.title === 'Balance Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
+          ));
+
+          setListItem(prevState => prevState.map(item =>
+            item.title === 'Ventas Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
+          ));
+
+          setListItem(prevState => prevState.map(item =>
+            item.title === 'Compras Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
+          ));
+
+          setListItem(prevState => prevState.map(item =>
+            item.title === 'Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
+          ));
+
           valueWalletCustomer = valueWalletCustomer + counterWalletCustomer;
+          await updateStep('customers', customer, JSON.stringify(customerData), 0);
+          await updateStep('customersWallets', customer, JSON.stringify(walletCustomer), 0);
+          await updateStep('transactionWallets', customer, JSON.stringify(transactionCustomer), 0);
+          await updateStep('debetWallets', customer, JSON.stringify(debetCustomer), 0);
+          await updateStep('balanceWallets', customer, JSON.stringify(balanceCustomer), 0);
+          await updateStep('saleWallets', customer, JSON.stringify(salesCustomer), 0);
+          await updateStep('creditWallets', customer, JSON.stringify(creditCustomer), 0);
         });
-        await updateStep('customersWallets', 0, JSON.stringify(walletsData), 0);
+        setListItem(prevState => prevState.map(item =>
+          item.title === 'Tenderos' ? { ...item, counter: item.counter + 1 } : item
+        ));
+
         setListItem(prevState => prevState.map(item =>
           item.title === 'Billeteras Tenderos' ? { ...item, counter: item.counter + 1 } : item
+        ));
+
+        setListItem(prevState => prevState.map(item =>
+          item.title === 'Transacciones Tenderos' ? { ...item, counter: item.counter + 1 } : item
+        ));
+
+        setListItem(prevState => prevState.map(item =>
+          item.title === 'Deudas Tenderos' ? { ...item, counter: item.counter + 1 } : item
+        ));
+
+        setListItem(prevState => prevState.map(item =>
+          item.title === 'Balance Tenderos' ? { ...item, counter: item.counter + 1 } : item
+        ));
+
+        setListItem(prevState => prevState.map(item =>
+          item.title === 'Ventas Tenderos' ? { ...item, counter: item.counter + 1 } : item
+        ));
+
+        setListItem(prevState => prevState.map(item =>
+          item.title === 'Compras Tenderos' ? { ...item, counter: item.counter + 1 } : item
         ));
 
         await updateStep('customersOfflineData', 0, JSON.stringify({
@@ -246,23 +332,34 @@ const SyncDataScreen = ({ navigation }) => {
         await updateStep('confirmationLot', 0, JSON.stringify([]), 0);
         await updateStep('currentDate', 0, JSON.stringify({ currentDate: new Date() }), 0);
         await updateStep('uploadLots', 0, JSON.stringify([]), 0);
+
+        setDataVisible({
+          type: "success",
+          title: "Datos locales",
+          subTitle: "Datos cargados localmente con éxito",
+          secondButton: true,
+          secondAction: (() => {
+            setIsVisible(false);
+            navigation.navigate("Principal", { reloadData: true })
+          }),
+          blocked: true
+        })
+        setIsVisible(true);
       } else {
         options = JSON.parse(await getStep('menuOptions', data.user.idRole, 0));
+        setDataVisible({
+          type: "error",
+          title: "Datos locales",
+          subTitle: "Necesitas conexión a internet para reliazar esta acción",
+          secondButton: true,
+          secondAction: (() => {
+            setIsVisible(false);
+            navigation.navigate("Principal", { reloadData: true })
+          }),
+          blocked: true
+        })
+        setIsVisible(true);
       }
-
-      setDataVisible({
-        type: "success",
-        title: "Datos locales",
-        subTitle: "Datos cargados localmente con éxito",
-        secondButton: true,
-        secondAction: (() => {
-          setIsVisible(false);
-          navigation.navigate("Principal", { reloadData: true })
-        }),
-        blocked: true
-      })
-
-      setIsVisible(true);
       setButtonDownload(true);
     } catch (error) {
       setDataVisible({
@@ -363,9 +460,10 @@ const SyncDataScreen = ({ navigation }) => {
           </View>
           <FlatList
             data={listItem}
-            numColumns={2}
+            numColumns={3}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => <RenderMenuItem item={item} />}
+            contentContainerStyle={{ paddingBottom: height * 0.5 }}
           />
         </View>
       ) : (

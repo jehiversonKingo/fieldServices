@@ -1,9 +1,10 @@
-import React, { useRef, useContext, useState } from 'react';
+import React, { useRef, useContext, useState, useMemo } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PhoneInput from 'react-native-phone-number-input';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FitImage from 'react-native-fit-image';
+import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { handleIsValidUrl, handleCutString } from '../../functions/fncGeneral';
 
@@ -31,7 +32,9 @@ const Inputs = ({
     searchStep = true,
     disable = false,
     editable = true,
-    selectData = [] }) => {
+    selectData = [],
+    bottonSheet
+}) => {
 
     const { state } = useContext(AuthContext);
     const { inline } = state;
@@ -99,6 +102,11 @@ const Inputs = ({
 
         return orderBy(arrayData, [selectValue], ['asc']);
     }
+
+    const toggleBottomSheet = () => {
+        console.log(bottonSheet.current);
+        bottonSheet.current?.expand();
+    };
 
     let validType = item?.screenElement?.elementType?.name ? item.screenElement.elementType.name : item?.elementType?.name ? item.elementType.name : item.type;
     switch (validType) {
@@ -216,7 +224,7 @@ const Inputs = ({
                     />
                 </View>
             );
-        case 'text':
+        case 'textt':
             return (
                 <View key={`text-${item.id}`}>
                     <Text style={styles.colorText}>{item?.addon ? item.addon.name : item.screenElement.label}</Text>
@@ -263,6 +271,23 @@ const Inputs = ({
                     />
                 </View>
             );
+        case 'text':
+            return (
+                <>
+                    <View style={{ flexDirection: 'row' }}>
+                        <TextInput
+                            style={{...styles.inputForm, flex: 1}}
+                            value={'Configurar Tendero'}
+                            editable={false}
+                        />
+                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={toggleBottomSheet}>
+                                <Ionicons name={'color-wand-outline'} color={colorsTheme.naranja} size={40} style={styles.icon} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </>
+            )
     }
 };
 

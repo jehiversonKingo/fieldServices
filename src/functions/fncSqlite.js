@@ -76,6 +76,8 @@ export const updateStep = async(table, idRowModule, params, step) => {
         `CREATE TABLE IF NOT EXISTS ${table}(id INTEGER PRIMARY KEY AUTOINCREMENT, idRowModule INTEGER, value TEXT, step INTEGER);`,
         [],
         async tx => {
+          // let findData = await JSON.parse(getStep(table, idRowModule, step))
+          // console.log('FIND', findData);
           tx.executeSql(
             `INSERT INTO ${table}(idRowModule, value, step) VALUES (?,?,?);`,
             [idRowModule, JSON.stringify(params), step],
