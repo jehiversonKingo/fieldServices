@@ -34,6 +34,7 @@ const HandshakeServerScreen = ({navigation, route}) => {
     const [loading, setLoading] = useState(true);
     const [amount, setAmount] = useState(0);
     const [type, setType] = useState(1);
+    const [debt, setDebt] = useState(1);
     
 
     const handleSaveCustomerData = async (data) => {
@@ -71,7 +72,7 @@ const HandshakeServerScreen = ({navigation, route}) => {
             }  
 
             console.log("_+_+_+_+_+_+_+_+_+_ ", data.deleteLots);
-            let dataUploads = await getStep('uploadLots', 0, 0)
+            let dataUploads = JSON.parse(await getStep('uploadLots', 0, 0))
             dataUploads = typeof dataUploads !== 'string' ? dataUploads:[];
             for(let deleteLots of data.deleteLots){
                 console.log("--1--", dataUploads, typeof dataUploads)
@@ -126,14 +127,63 @@ const HandshakeServerScreen = ({navigation, route}) => {
                     break;
                 case 'VALIDATE_PAYMENT':
                     if (data !== null) {
-                        setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description:`${data.customer.name} - Envío un pago de Q ${parseFloat(data.amount).toFixed(2)}`}]);
-                        setLoading(true)
-                        setLoading(false)
-                        setAmount(data.amount)
-                        setTitleAlert(`${data.customer.name}`)
-                        setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`)
-                        setShowAlert(true)
-                        setType(1)
+                        // Obtener datos del usuario desde AsyncStorage
+                    const userDataString = await AsyncStorage.getItem('@user');
+                    const userData = JSON.parse(userDataString);
+                    console.log("[----1-----]]]]]]]]", userData.user, userData, typeof userData);
+
+                    // Obtener datos de la billetera del usuario
+                    const walletUserString = await getStep('walletUser', 0, 0);
+                    const walletUser = JSON.parse(walletUserString);
+                    console.log("[----2-----]]]]]]]]", walletUser);
+
+                    // Calcular el límite de crédito disponible
+                    const creditLimit = (
+                        (parseFloat(walletUser.wallet.creditLimit) +
+                        parseFloat(walletUser.wallet.additionalFinancing)) -
+                        (parseFloat(walletUser.wallet.debt) + parseFloat(data.amount))
+                    ).toFixed(2);
+
+                    console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{",
+                        parseFloat(walletUser.wallet.creditLimit) ,
+                        parseFloat(walletUser.wallet.additionalFinancing) ,
+                        (parseFloat(walletUser.wallet.debt) + parseFloat(data.amount))
+                    );
+                    // Actualizar la deuda del usuario
+                    const updatedDebt = (
+                        parseFloat(walletUser.wallet.debt) + 
+                        parseFloat(data.amount)
+                    ).toFixed(2);
+                    setDebt(updatedDebt);
+
+                    // Marcar el inicio de la carga
+                    setLoading(true);
+
+                    // Mostrar información en consola
+                    console.log("WALLET", 
+                        parseFloat(walletUser.wallet.creditLimit) , parseFloat(walletUser.wallet.additionalFinancing), 
+                        "PAY++++++++++", 
+                        updatedDebt
+                    );
+                    if(creditLimit > 0){
+                            setLoading(false)
+                            setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description:`${data.customer.name} - Envío un pago de Q ${parseFloat(data.amount).toFixed(2)}`}]);
+                            setAmount(data.amount)
+                            setTitleAlert(`${data.customer.name}`)
+                            setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`)
+                            setShowAlert(true)
+                            setType(1)
+                        }else{
+                            setLoading(false)
+                            setTitleAlert(`Cantidad no soportada`)
+                            setMessageAlert(`No cuenta con el saldo disponible en su wallet faltan Q${creditLimit*-1}`)
+                            setShowAlertBluetooth(true)
+                            setTimeout(() => {
+                                handleCancelAmount()
+                                setShowAlertBluetooth(false)
+                            }, 2000);
+                        }
+                        
                     } else {
                         setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("DD/MM HH:MM:ss"), title: action, description: "El tendero no envío la información del pago"}]);
                     }
@@ -172,6 +222,16 @@ const HandshakeServerScreen = ({navigation, route}) => {
                     sendResponse = JSON.stringify({action: "VALIDATE_PAYMENT", data: {status: "OK", message: "El pago fue recibido", amount}})
                     BluetoothServerModule.sendDataToClient(sendResponse);
                     setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "RECEIVED_PAYMENT", description: "El pago fue recibido"}]);
+                    let walletUser = JSON.parse(await getStep('walletUser', 0, 0));
+                    let debtUser = JSON.parse(await getStep('debtUser', 0, 0));
+                    walletUser.wallet.debt = (debt);
+                    debtUser.amount = (debt);
+
+                    console.log("THISISMY NEWDEVT ==>", walletUser)
+                    console.log("THISISMY NEWDEVT <==", debtUser)
+
+                    await updateStep('walletUser', 0, JSON.stringify(walletUser), 0);
+                    await updateStep('debtUser', 0, JSON.stringify(debtUser), 0);
                     break;
                 case 2:
                     setReceivedData((prevReceivedData) => [...prevReceivedData, {time: moment().format("HH:MM"), title: "RECEIVED_DATA_CUSTOMER", description: "Datos guardados con éxito"}]);
