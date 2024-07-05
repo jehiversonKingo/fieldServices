@@ -101,7 +101,7 @@ export const handleGetLocationReturnValue = async (
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         });
-      }, 
+      },
       error => {
         console.log(error.code, error.message);
         reject({error: error.code, message: error.message})

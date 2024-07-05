@@ -105,6 +105,7 @@ const Inputs = ({
 
     const toggleBottomSheet = () => {
         console.log(bottonSheet.current);
+        handleChange(index, 'sync', 'value', informacion, setInformation);
         bottonSheet.current?.expand();
     };
 
@@ -224,7 +225,7 @@ const Inputs = ({
                     />
                 </View>
             );
-        case 'textt':
+        case 'text':
             return (
                 <View key={`text-${item.id}`}>
                     <Text style={styles.colorText}>{item?.addon ? item.addon.name : item.screenElement.label}</Text>
@@ -271,21 +272,21 @@ const Inputs = ({
                     />
                 </View>
             );
-        case 'text':
+        case 'handshake':
             return (
                 <>
-                    <View style={{ flexDirection: 'row' }}>
-                        <TextInput
-                            style={{...styles.inputForm, flex: 1}}
-                            value={'Configurar Tendero'}
-                            editable={false}
-                        />
-                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                            <TouchableOpacity onPress={toggleBottomSheet}>
-                                <Ionicons name={'color-wand-outline'} color={colorsTheme.naranja} size={40} style={styles.icon} />
-                            </TouchableOpacity>
+                    <TouchableOpacity onPress={toggleBottomSheet}>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TextInput
+                                style={{...styles.inputForm, flex: 1}}
+                                value={'Configurar Tendero'}
+                                editable={false}
+                            />
+                            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                    <Ionicons name={'repeat-outline'} color={colorsTheme.naranja} size={40} style={styles.icon} />
+                            </View>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 </>
             )
     }

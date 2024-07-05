@@ -568,12 +568,30 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           }, 150);
         }
       } else {
+        console.log({
+          step1,
+          step2,
+          evidences,
+          step4,
+          step5,
+          idTask: id,
+          typeTask: type
+        });
         await updateStep(
           'TaskComplete',
           id,
-          JSON.stringify({step1, step2, evidences, step4, idTask: id}),
+          JSON.stringify({
+            step1,
+            step2,
+            evidences,
+            step4,
+            step5,
+            idTask: id,
+            typeTask: type
+          }),
           0,
         );
+        console.log(validArrayKingosStep2, validArrayAddonsStep2);
         if (validArrayKingosStep2 || validArrayAddonsStep2) {
           setTimeout(() => {
             setIsAlert(false);
@@ -595,6 +613,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         }
       }
     } catch (error) {
+      console.log(error)
       setIsAlert(false);
       setTimeout(() => {
         setTitleAlert('Error');
@@ -729,7 +748,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         case 'CONFIG_BALANCE':
           setTransferStep(3);
           const balanceData = await getStep('balanceWallets', idCustomer, 0);
-          // console.log({data: balanceData, action: 'CONFIG_BALANCE'});
+          console.log({data: balanceData, action: 'CONFIG_BALANCE'});
           BluetoothServerModule.sendJsonToClient({data: balanceData, action: 'CONFIG_BALANCE'});
           setSuccessTransfer((prev) => [...prev, 3]);
           break;
@@ -769,7 +788,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           setTransferStep(9)
           const promotionData = await getStep('customerPromotions', 0, 0);
           BluetoothServerModule.sendJsonToClient({data: promotionData, action: 'CONFIG_PROMOTIONS'});
-          setSuccessTransfer((prev) => [...prev, 9]);
+          setSuccessTransfer((prev) => [...prev, 9, 10]);
           break;
         case 'CLOSE':
           sheetRef.current?.close();
@@ -1156,7 +1175,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             </View>
           </View>
           {!isRunning ? (
-            <View style={{margin: 20, alignItems: 'center'}}>
+            <View style={{marginHorizontal: 20, alignItems: 'center'}}>
               <TouchableOpacity onPress={handleClickStartServer}>
                 <Text
                   style={{
@@ -1166,7 +1185,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                     color: colorsTheme.blanco,
                     borderRadius: 8,
                     padding: 10,
-                    marginTop: 10,
                     textAlign: 'center',
                     width: width * 0.6,
                   }}>
@@ -1180,14 +1198,14 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 style={{
                   ...styles.tranferTitle,
                   textAlign: 'center',
-                  margin: 20,
+                  marginHorizontal: 20,
                 }}>
                 {'Esperando que el tendero se conecte'}
               </Text>
             ) : (
-              <View style={{margin: 20}}>
+              <View style={{marginHorizontal: 20}}>
                 <View>
-                  <View style={{margin: 20, alignItems: 'center'}}>
+                  <View style={{alignItems: 'center'}}>
                     <TouchableOpacity onPress={() => handleClickTransferData('CONFIG_CUSTOMER')}>
                       <Text
                         style={{

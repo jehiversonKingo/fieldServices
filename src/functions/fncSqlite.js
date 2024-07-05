@@ -2,7 +2,7 @@ import {openDatabase} from 'react-native-sqlite-storage';
 
 const database = 'kingo.db';
 
-export const getAllDataStep = async(table) => {
+export const getAllDataStep = async(table, columns = '*') => {
   return new Promise((resolve, reject) => {
     let db = openDatabase({name: database});
     db.transaction(txn => {
@@ -11,25 +11,28 @@ export const getAllDataStep = async(table) => {
         `SELECT * FROM ${table}`,
       );
       txn.executeSql(
-        `SELECT * FROM ${table}`,
+        `SELECT ${columns} FROM ${table}`,
         [],
         (tx, results) => {
           var temp = [];
-          console.log(results.rows.length)
+          console.log("TOTAL ROWS +++++> ", results.rows.length)
           for (let i = 0; i < results.rows.length; i++) {
-            console.log(i);
+            console.log('ITEM >> ', i);
             let currentRow = results.rows.item(i);
             temp.push(JSON.parse(currentRow.value));
           }
           if (temp.length > 0) {
-            let stringToJSon = [];
-              temp.map((data) => {
-                stringToJSon.push(JSON.parse(data));
-              });
-            resolve(stringToJSon);
-          } else {resolve([]);}
+            // let stringToJSon = [];
+            //   temp.forEach((data) => {
+            //     console.log("VALUE", data);
+            //     stringToJSon.push(data);
+            //   });
+            console.log('[ TEMP ]', temp);
+            resolve(temp);
+          } else resolve([]);
         },
         err => {
+          console.log(err)
           resolve([]);
           reject(err);
         },
