@@ -79,10 +79,9 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
       },
     });
     const base64 = await RNFS.readFile(`file://${photo.path}`, 'base64');
-    console.log("[ SDFASDF ] => ", photo);
+    // console.log("[ SDFASDF ] => ", photo);
     let newValue = [...photos, { photo, idTaskStep, path: photo.path }];
-    let newValue2 = [...photosBase64, { photo: `data:image/jpg;base64,${base64}`, idTaskStep, path: photo.path }];
-    setPhotos(newValue);
+    let newValue2 = [...photosBase64, { photo: `data:image/jpg;base64,${base64}`, idTaskStep, path: photo.path }];    setPhotos(newValue);
     setPhotosBase64(newValue2);
     if (inline) {
       setData(newValue2);

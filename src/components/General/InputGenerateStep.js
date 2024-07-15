@@ -15,10 +15,16 @@ const InputGenerateStep = ({
   selectData = [],
   selectLabel,
   selectValue,
-  bottonSheet
+  bottonSheet,
+  evidences,
+  setEvidences,
+  idTaskSteps,
 }) => {
   return (
     <Inputs
+        idTaskSteps={idTaskSteps}
+        evidences={evidences}
+        setEvidences={setEvidences}
         key={item[elementId]}
         item={item}
         index={index}

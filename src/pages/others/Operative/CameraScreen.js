@@ -52,10 +52,17 @@ const CameraScreen = ({navigation, route}) => {
   };
 
   const handleClickBtnSuccess = async () => {
-    setData(photoB64)
-    // handleChange(index, photoData, 'value', data, setData);
-    navigation.goBack();
+    try {
+      setData(photoB64);
+      handleChange(index, photoData, 'value', data, setData);
+      navigation.goBack();
+      console.log("[DATA >]", index, photoData, 'value', data, setData);
+      console.log('[ TODO BIEN:) ].');
+    } catch (error) {
+      console.error('[ERROR] >>', error);
+    }
   };
+  
 
   const handleClickBtnCancel = () => {
     setIsScanned(true);

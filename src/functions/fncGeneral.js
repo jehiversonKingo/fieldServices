@@ -107,30 +107,30 @@ export const handleValidDataStepTask = async (step) => {
 
 export const handleValidDataStep = async (step) => {
   let isValid = true;
-  if (step.length === 0) {
-    isValid = false;
-  } else {
-    step.map(element => {
-      console.log(element.screenElement?.elementType.name, element.value);
-      if (element.screenElement?.elementType.name === 'cellphone' && element.value.length < 12) {
-        isValid = false;
-        return;
-      }
+  // if (step.length === 0) {
+  //   isValid = false;
+  // } else {
+  //   step.map(element => {
+  //     console.log(element.screenElement?.elementType.name, element.value);
+  //     if (element.screenElement?.elementType.name === 'cellphone' && element.value.length < 12) {
+  //       isValid = false;
+  //       return;
+  //     }
 
-      if (element.value === '' || element.value === null || element.file === '') {
-        isValid = false;
-        return;
-      }
+  //     if (element.value === '' || element.value === null || element.file === '') {
+  //       isValid = false;
+  //       return;
+  //     }
 
-      // if(element?.addon) {
-      //   if (step.some(item => item.value === element.value)) {
-      //     isValid = false;
-      //     return;
-      //   }
-      // }
+  //     // if(element?.addon) {
+  //     //   if (step.some(item => item.value === element.value)) {
+  //     //     isValid = false;
+  //     //     return;
+  //     //   }
+  //     // }
 
-    });
-  }
+  //   });
+  // }
   return isValid;
 };
 

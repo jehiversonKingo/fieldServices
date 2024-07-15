@@ -28,6 +28,18 @@ export const getElemetScreen = async (id) => {
     });
 };
 
+export const getTaskStep = async (id) => {
+  const headers = await customHeadersAuth();
+  return await axiosInstance
+    .get(`/task/${id}/step`, headers)
+    .then(task => {
+      return task.data;
+    })
+    .catch(error => {
+      return error;
+    });
+};
+
 export const getStepInstruction = async (idStep) => {
   const headers = await customHeadersAuth();
   return await axiosInstance
@@ -115,6 +127,27 @@ export const setDataAllTaskSwap = async (data) => {
       return error;
     });
 };
+
+export const setDataAllTaskMigration = async (data) => {
+  const headers = await customHeadersAuth();
+  const {step1, step2, step3, step4, idTask} = data;
+  return await axiosInstance
+    .post('/task/progressTask/migration', {
+      step1,
+      step2,
+      step3,
+      step4,
+      idTask,
+    }, headers)
+    .then(task => {
+      return task.data;
+    })
+    .catch(error => {
+      console.log("[AXIOS ERROR]>>", error);
+      return error;
+    });
+};
+
 
 export const setDataAllTaskPickup = async (data) => {
   const headers = await customHeadersAuth();
