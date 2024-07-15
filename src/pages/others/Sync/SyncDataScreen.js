@@ -233,12 +233,12 @@ const SyncDataScreen = ({ navigation }) => {
           !customersId.includes(dataTicket.idCustomer) && customersId.push(dataTicket.idCustomer);
 
           setListItem(prevState => prevState.map(item =>
-            item.title === 'Tareas' ? { ...item, counter: Number(valueCustomer.toFixed(2)) } : item
+            item.title === 'Tareas' ? { ...item, counter: Number(valueCustomer.toFixed(2)).toFixed(2) } : item
           ));
           valueCustomer = valueCustomer + counterCustomer;
         }
         setListItem(prevState => prevState.map(item =>
-          item.title === 'Tareas' ? { ...item, counter: item.counter + counterCustomer } : item
+          item.title === 'Tareas' ? { ...item, counter: item.counter + 1 } : item
         ));
         console.log("[ CUSTOMER IDS ] >> ", customersId);
         //Customer Informacion
@@ -270,7 +270,7 @@ const SyncDataScreen = ({ navigation }) => {
         let creditsData = [];
         let counterWalletCustomer = (1 / customersId.length);
         let valueWalletCustomer = 0;
-        customersId.map(async (customer) => {
+        for (let customer of customersId) {
           let customerData = await getDataCustomerById(customer);
           let walletCustomer = await getWallerByCustomer(customer);
           let transactionCustomer = await getTransactionCarriedOut(customer);
@@ -329,7 +329,8 @@ const SyncDataScreen = ({ navigation }) => {
           await updateStep('balanceWallets', customer, JSON.stringify(balanceCustomer), 0);
           await updateStep('saleWallets', customer, JSON.stringify(salesCustomer), 0);
           await updateStep('creditWallets', customer, JSON.stringify(creditCustomer), 0);
-        });
+        }
+
         setListItem(prevState => prevState.map(item =>
           item.title === 'Tenderos' ? { ...item, counter: item.counter + 1 } : item
         ));
@@ -414,6 +415,7 @@ const SyncDataScreen = ({ navigation }) => {
     let getWalletCustomers = JSON.parse(await getStep('customersOfflineData', 0, 0));
     console.log("<------------->", getWalletCustomers, getWalletCustomers.customers.length);
     if(getWalletCustomers.customers.length > 0){setFlagExistData(true); setDataExistData(getWalletCustomers.customers)};
+    getWalletCustomers.customers.map((item) => console.log(item.payments))
   };
 
   const handleChangeOpenCollapse = (value, index) => {

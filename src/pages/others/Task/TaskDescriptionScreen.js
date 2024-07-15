@@ -30,7 +30,7 @@ import ButtonProgressStep from '../../../components/General/ButtonProgressStep';
 import StepToDoComponent from '../../../components/General/StepToDoComponent';
 import InputGenerateStep from '../../../components/General/InputGenerateStep';
 
-import {handleChangeArray} from '../../../functions/functionChangeValue';
+import {handleChange, handleChangeArray} from '../../../functions/functionChangeValue';
 import {updateStep, deleteStep, getStep} from '../../../functions/fncSqlite';
 import {hasCameraPermission} from '../../../functions/fncCamera';
 import {
@@ -389,15 +389,19 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       }
 
       if (active === 4) {
-        step5.forEach(item => {
-          item.taskStepChecks
-            .filter(item => item.access === 'Agente')
-            .forEach(check => {
-              if (!check.checked) {
-                isValid = false;
-              }
-            });
-        });
+        if (step5.length == 0) {
+          isValid == true;
+        } else {
+          step5.forEach(item => {
+            item.taskStepChecks
+              .filter(item => item.access === 'Agente')
+              .forEach(check => {
+                if (!check.checked) {
+                  isValid = false;
+                }
+              });
+          });
+        }
       }
 
       if (isValid === false) {
@@ -597,8 +601,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             setIsAlert(false);
             navigation.navigate('Task', {
               status: true,
-              message: 'Tarea Insertada en Cola',
-              title: 'Cuando Recupere Conexión a internet se enviará.',
+              title: 'Tarea completada',
+              message: 'Los datos de la tarea fueron almacendos, cuando recuperes la conexión a internet debes sincronizar para procesar la tarea.',
             });
           }, 2500);
         } else {
@@ -791,7 +795,10 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           setSuccessTransfer((prev) => [...prev, 9, 10]);
           break;
         case 'CLOSE':
+          // const findIndex = step1.findIndex(item => item.screenElement.idElementType == 7);
           sheetRef.current?.close();
+          console.log('[ CLOESE BOTTOM SHEET ] >> ', findIndex, step1);
+          // if (data !== null) handleChange(findIndex, data.balance, 'value', step1, setStep1);
           break;
 
         default:
@@ -1055,7 +1062,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                   <ButtonProgressStep
                     text="Siguiente"
                     type={'complete'}
-                    onPress={() => setActive(prev => prev + 1)}
+                    onPress={() => saveTemporalData('task', step4, active)}
                   />
                 </View>
               }
@@ -1206,7 +1213,10 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               <View style={{marginHorizontal: 20}}>
                 <View>
                   <View style={{alignItems: 'center'}}>
-                    <TouchableOpacity onPress={() => handleClickTransferData('CONFIG_CUSTOMER')}>
+                    <TouchableOpacity onPress={() => {
+                      setSuccessTransfer([])
+                      handleClickTransferData('CONFIG_CUSTOMER')
+                    }}>
                       <Text
                         style={{
                           borderWidth: 1,

@@ -478,6 +478,7 @@ const TaskOffline = ({navigation}) => {
           });
           setIsAlert(false);
           setDisabeldUpload(false)
+          getAllDataTask();
           // navigation.navigate('Task', { taskStatus });
       } else {
         setDisabeldUpload(false)
@@ -490,7 +491,7 @@ const TaskOffline = ({navigation}) => {
     };
 
     useEffect(()=>{
-        getAllDataTask();
+      getAllDataTask();
     },[]);
 
     const ListOfflineTask = () => (

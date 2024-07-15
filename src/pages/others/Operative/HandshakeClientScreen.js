@@ -38,7 +38,6 @@ const HandshakeServerScreen = ({navigation, route}) => {
     }
 
     useEffect(() => {
-        
         ServerSocketModule.startServer()
         .then(result => {
             console.log('Servidor iniciado', result)
