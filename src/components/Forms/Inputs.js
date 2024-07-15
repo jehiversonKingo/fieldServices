@@ -33,7 +33,11 @@ const Inputs = ({
     disable = false,
     editable = true,
     selectData = [],
-    bottonSheet
+    bottonSheet,
+    evidences,
+    setEvidences,
+    idTaskSteps,
+
 }) => {
 
     const { state } = useContext(AuthContext);
@@ -90,7 +94,6 @@ const Inputs = ({
         }
     };
 
-
     const renderSelectData = () => {
         let arrayData = [];
         console.log("DATA SELECT >>", selectValue);
@@ -107,6 +110,23 @@ const Inputs = ({
         console.log(bottonSheet.current);
         handleChange(index, 'sync', 'value', informacion, setInformation);
         bottonSheet.current?.expand();
+    };
+
+    const toggleCamera = async () => {
+        console.log("[FUNCION onClickValidate]");
+        const hasPermission = await hasCameraPermission();
+        console.log("[IDTASKSTEP]", idTaskSteps);
+        if (hasPermission) {
+            try {
+                navigation.navigate('CameraMultiShot', {
+                    setData: setEvidences,
+                    data: evidences,
+                    idTaskStep: idTaskSteps,
+                  });
+            } catch (error) {
+                console.log("[ERROR] >", error);
+            }
+        }
     };
 
     let validType = item?.screenElement?.elementType?.name ? item.screenElement.elementType.name : item?.elementType?.name ? item.elementType.name : item.type;
@@ -275,18 +295,19 @@ const Inputs = ({
         case 'handshake':
             return (
                 <>
-                    <TouchableOpacity onPress={toggleBottomSheet}>
-                        <View style={{ flexDirection: 'row' }}>
-                            <TextInput
-                                style={{...styles.inputForm, flex: 1}}
-                                value={'Configurar Tendero'}
-                                editable={false}
-                            />
+                    <TouchableOpacity onPress={toggleBottomSheet} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TextInput
+                            style={{ ...styles.inputForm, flex: 1 }}
+                            value={'Configurar Tendero'}
+                            editable={false}
+                        />
+                        <TouchableOpacity onPress={toggleCamera}>
                             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                                    <Ionicons name={'repeat-outline'} color={colorsTheme.naranja} size={40} style={styles.icon} />
+                                <Ionicons name={'camera'} color={colorsTheme.naranja} size={40} style={styles.icon} />
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     </TouchableOpacity>
+
                 </>
             )
     }

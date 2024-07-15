@@ -40,8 +40,10 @@ import {
 } from '../../../functions/fncGeneral';
 
 import {
+  setDataAllTaskMigration,
   getCheckListByIdTask,
   getElemetScreen,
+  getTaskStep,
   setDataAllTask,
   setDataAllTaskInstall,
   setDataAllTaskPickup,
@@ -106,7 +108,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   const [stepFlag4, setStepFlag4] = useState(false);
   const [step5, setStep5] = useState([]);
   const [stepFlag5, setStepFlag5] = useState(false);
-
+  const [idTaskSteps, setIdTaskSteps] = useState(null);
+  
   const {state} = useContext(AuthContext);
   const {inline} = state;
 
@@ -117,6 +120,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       index={index}
       navigation={navigation}
       objWithData={step1}
+      evidences={evidences}
+      setEvidences={setEvidences}
       setFunction={setStep1}
       setIsAlert={setIsAlert}
       setMessageAlert={setMessageAlert}
@@ -125,6 +130,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       selectLabel={'name'}
       selectValue={'idCommunity'}
       bottonSheet={sheetRef}
+      idTaskSteps={idTaskSteps}
     />
   );
 
@@ -193,7 +199,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       </>
     );
   };
-
+  
   const step3PhotoItem = ({item, index}) => (
     <View key={`P-${index}`}>
       <View style={{alignContent: 'center', alignItems: 'center'}}>
@@ -295,6 +301,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   );
 
   const onClickValidate = async idTaskStep => {
+    console.log("[FUNCION onClickValidate]");
     const hasPermission = await hasCameraPermission();
     if (hasPermission) {
       navigation.navigate('CameraMultiShot', {
@@ -307,9 +314,11 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
   const handleDataList = async () => {
     console.log('[ PARAMS ]', route.params);
+
     const {id} = route.params;
     let getDataScreen = [];
     let getCommunities = [];
+
     if (inline) {
       const [screenData, communitiesData] = await Promise.all([
         getElemetScreen(id),
@@ -363,7 +372,11 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     setStep3(orderBy(newDataSteps, ['order'], ['asc']));
     setStep4(orderBy(newDataAddonReceived, ['order'], ['asc']));
     setStep5(orderBy(newDataChecks, ['order'], ['asc']));
-
+      console.log("STEP 3>>", newDataSteps);
+      const filteredTaskStep = newDataSteps.filter(taskStep => taskStep.idStep === 22);
+      const idTaskStep = filteredTaskStep.length > 0 ? filteredTaskStep[0].idTaskStep : null;
+      console.log("idTaskStep filtrado >", idTaskStep);
+      setIdTaskSteps(idTaskStep)
     setCommunities(getCommunities);
 
     const locationExpanded = new Array(newDataAddonReceived.length).fill(false);
@@ -374,6 +387,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
   const saveTemporalData = async (dbTable, step, active) => {
     try {
+      // console.log("[STEP 3] >", step);
       const {id} = route.params;
       let isValid = false;
 
@@ -414,6 +428,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
       if (active === 4) {
         console.log('[ UPLOAD TASK ]');
+        console.log("[ACTIVE] >", active);
         completeTask();
         return;
       }
@@ -423,10 +438,13 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       console.log('[ ERROR SAVE TEMPORAL DATA ] => ', error);
     }
   };
-
+  /**
+   * COMPLETAR LA TAREA >>>>
+   */
   const completeTask = async () => {
     try {
       const {id, type} = route.params;
+      console.log("[TYPE TASK] >>", type);
       setIsAlert(true);
       setTitleAlert('Iniciando proceso');
       setMessageAlert('');
@@ -456,116 +474,137 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         validArrayAddonsStep2 = true;
       }
 
+
+
       if (inline) {
-        if (validArrayKingosStep2) {
-          let responseCheck = await setDataTaskChecklist({step5, idTask: id});
-          setIsAlert(false);
-          setTimeout(() => {
-            setTitleAlert('Válidando checklist');
-            setMessageAlert('');
-            setIsAlert(true);
-          }, 300);
-          if (responseCheck?.status) {
-            let taskStatus = null;
+        if (step2.length <= 0 && step4.length <= 0) {
+          validArrayKingosStep2 = true
+
+          if (validArrayKingosStep2) {
+            console.log("SI ENTRO");
+            let responseCheck = await setDataTaskChecklist({step5, idTask: id});
             setIsAlert(false);
             setTimeout(() => {
-              setTitleAlert('Cargando Datos, Espere por favor');
+              setTitleAlert('Válidando checklist');
               setMessageAlert('');
               setIsAlert(true);
-            }, 200);
-            switch (type) {
-              case 1:
-              case 2:
-                taskStatus = await setDataAllTaskInstall({
-                  step1,
-                  step2,
-                  step3: null,
-                  step4,
-                  step5,
-                  idTask: id,
-                });
-                break;
-              case 6:
-                taskStatus = await setDataAllTaskSwap({
-                  step1,
-                  step2,
-                  step3: evidences,
-                  step4,
-                  step5,
-                  idTask: id,
-                });
-                break;
-              case 7:
-                taskStatus = await setDataAllTaskPickup({
-                  step1,
-                  step2,
-                  step3: evidences,
-                  step4,
-                  step5,
-                  idTask: id,
-                });
-                break;
-              default:
+            }, 300);
+            if (responseCheck?.status) {
+              console.log("[RESPUESTA DEL CHECKLIST] >>>", responseCheck);
+              let taskStatus = null;
+              setIsAlert(false);
+              setTimeout(() => {
+                setTitleAlert('Cargando Datos, Espere por favor');
+                setMessageAlert('');
+                setIsAlert(true);
+              }, 200);
+              switch (type) {
+                case 1:
+                case 2:
+                  taskStatus = await setDataAllTaskInstall({
+                    step1,
+                    step2,
+                    step3: null,
+                    step4,
+                    step5,
+                    idTask: id,
+                  });
+                  break;
+                case 6:
+                  taskStatus = await setDataAllTaskSwap({
+                    step1,
+                    step2,
+                    step3: evidences,
+                    step4,
+                    step5,
+                    idTask: id,
+                  });
+                  break;
+                case 7:
+                  taskStatus = await setDataAllTaskPickup({
+                    step1,
+                    step2,
+                    step3: evidences,
+                    step4,
+                    step5,
+                    idTask: id,
+                  });
+                  break;
+                case 10:
+                  taskStatus = await setDataAllTaskMigration({
+                    step1,
+                    step2,
+                    step3: evidences,
+                    step4,
+                    step5,
+                    idTask: id,
+                  });
+                  break; 
+                default:
+                  console.log("No se puede procesar, problemas con el tipo de tarea");
+                  setIsAlert(false);
+                  setTimeout(() => {
+                    setTitleAlert('¡Atención!');
+                    setMessageAlert(
+                      'No se puede procesar, problemas con el tipo de tarea',
+                    );
+                    setShowAlert(true);
+                  }, 150);
+              }
+  
+              if (taskStatus?.status) {
                 setIsAlert(false);
                 setTimeout(() => {
-                  setTitleAlert('¡Atención!');
+                  setShowProgressAlert(true);
+                }, 300);
+  
+                for (let i = 0; i < evidences.length; i++) {
+                  const item = evidences[i];
+                  let photosReq = await setDataTaskPhotos({
+                    step3: [item],
+                    idTask: id,
+                  });
+                  console.log('[ UPLOAD PHOTO ]', photosReq);
+                  setTotalUpload(prev => prev + 1);
+                  setProgressAlert(prev => prev + 100 / evidences.length / 100);
+                }
+  
+                await deleteStep('task', id);
+                setShowProgressAlert(false);
+                navigation.navigate('Task', {taskStatus});
+              } else {
+                setIsAlert(false);
+                setTimeout(() => {
+                  setTitleAlert('Error');
                   setMessageAlert(
-                    'No se puede procesar, problemas con el tipo de tarea',
+                    taskStatus?.message ||
+                      'No se puedieron cargar los datos de la tarea.',
                   );
                   setShowAlert(true);
                 }, 150);
-            }
-
-            if (taskStatus?.status) {
-              setIsAlert(false);
-              setTimeout(() => {
-                setShowProgressAlert(true);
-              }, 300);
-
-              for (let i = 0; i < evidences.length; i++) {
-                const item = evidences[i];
-                let photosReq = await setDataTaskPhotos({
-                  step3: [item],
-                  idTask: id,
-                });
-                console.log('[ UPLOAD PHOTO ]', photosReq);
-                setTotalUpload(prev => prev + 1);
-                setProgressAlert(prev => prev + 100 / evidences.length / 100);
               }
-
-              await deleteStep('task', id);
-              setShowProgressAlert(false);
-              navigation.navigate('Task', {taskStatus});
             } else {
               setIsAlert(false);
               setTimeout(() => {
-                setTitleAlert('Error');
+                setTitleAlert('¡Atención!');
                 setMessageAlert(
-                  taskStatus?.message ||
-                    'No se puedieron cargar los datos de la tarea.',
+                  'Debes cargar datos antes de salir a realizar una tarea.',
                 );
                 setShowAlert(true);
               }, 150);
             }
           } else {
+            console.log("[VALOR DE validArrayKingosStep2]", validArrayAddonsStep2);
+            console.log("Alguno de los barcodes que ingresaste no existen en tu bodega.");
             setIsAlert(false);
             setTimeout(() => {
-              setTitleAlert('¡Atención!');
+              setTitleAlert('Error');
               setMessageAlert(
-                'Debes cargar datos antes de salir a realizar una tarea.',
+                'Alguno de los barcodes que ingresaste no existen en tu bodega.',
               );
               setShowAlert(true);
             }, 150);
           }
-        } else {
-          setIsAlert(false);
-          setTimeout(() => {
-            setTitleAlert('Error');
-            setMessageAlert(
-              'Alguno de los barcodes que ingresaste no existen en tu bodega.',
-            );
-            setShowAlert(true);
-          }, 150);
         }
       } else {
         console.log({
@@ -592,6 +631,9 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           0,
         );
         console.log(validArrayKingosStep2, validArrayAddonsStep2);
+        if (step2.length <= 0 && step4.length <= 0) {
+          validArrayAddonsStep2 = true;
+        }
         if (validArrayKingosStep2 || validArrayAddonsStep2) {
           setTimeout(() => {
             setIsAlert(false);
@@ -603,6 +645,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           }, 2500);
         } else {
           setIsAlert(false);
+          console.log("Debes cargar datos antes de salir a realizar una tarea.");
           setTimeout(() => {
             setTitleAlert('¡Atención!');
             setMessageAlert(
@@ -869,6 +912,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           activeStepNumColor={colorsTheme.blanco}
           marginBottom={35}
           activeStep={active}>
+          {/* Pantalla Uno */}
           <ProgressStep label="Datos" scrollable={false} removeBtnRow={true}>
             {loading ? (
               <View
@@ -880,18 +924,15 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 <ActivityIndicator size="large" color={colorsTheme.naranja} />
               </View>
             ) : (
-              <FlatList
-                key={'FlatList-1'}
-                data={step1}
-                renderItem={(item, index) =>
-                  InputsGenerateStep1(item, index, navigation)
-                }
-                keyExtractor={item => item.idScreenElement}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{paddingBottom: '50%'}}
-                ListEmptyComponent={
-                  <View
+                <FlatList
+                  key={'FlatList-1'}
+                  data={step1}
+                  renderItem={(item, index) => InputsGenerateStep1(item, index, navigation)}
+                  keyExtractor={item => item.idScreenElement}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingBottom: '50%' }}
+                  ListEmptyComponent={<View
                     style={{
                       backgroundColor: colorsTheme.gris80,
                       width: width,
@@ -900,22 +941,17 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                       alignItems: 'center',
                       marginTop: 10,
                     }}>
-                    <Text style={{color: colorsTheme.blanco}}>
+                    <Text style={{ color: colorsTheme.blanco }}>
                       No se han encontrado Pantalla de inicio.
                     </Text>
-                  </View>
-                }
-                ListFooterComponent={
-                  <ButtonProgressStep
+                  </View>}
+                  ListFooterComponent={<ButtonProgressStep
                     text="Siguiente"
                     type={'right'}
-                    onPress={() => saveTemporalData('task', step1, active)}
-                  />
-                }
-                // ListFooterComponent={<ButtonProgressStep text="Siguiente" type={'right'} onPress={() => changeSteteTask()} />}
-              />
+                    onPress={() => saveTemporalData('task', step1, active)} />} />
             )}
           </ProgressStep>
+          {/* Pantalla Dos */}
           <ProgressStep
             label="AddOns       kingo"
             scrollable={false}
@@ -958,6 +994,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               }
             />
           </ProgressStep>
+          {/* Pantalla Tres */}
           <ProgressStep
             label="Actividades a realizar"
             scrollable={false}
@@ -1019,6 +1056,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               }
             />
           </ProgressStep>
+          {/* Pantalla Cuatro */}
           <ProgressStep
             label="Equipo Recorgido"
             scrollable={false}
@@ -1061,6 +1099,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               }
             />
           </ProgressStep>
+          {/* Pantalla Cinco */}
           <ProgressStep label={'Checklist'} removeBtnRow={true}>
             <FlatList
               data={step5}
