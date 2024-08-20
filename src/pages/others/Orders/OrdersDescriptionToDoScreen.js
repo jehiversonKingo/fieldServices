@@ -13,7 +13,7 @@ import {ProgressSteps, ProgressStep} from 'react-native-progress-steps';
 import FitImage from 'react-native-fit-image';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import {updateStep} from '../../../functions/fncSqlite';
-import { handleValidDataStep, handleIsValidUrl } from '../../../functions/fncGeneral';
+import { handleValidDataStep, handleIsValidUrl, handleGetDataUserLocal } from '../../../functions/fncGeneral';
 
 //Components
 import InputGenerateStep from '../../../components/General/InputGenerateStep';
@@ -52,6 +52,7 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
           navigation={navigation}
           disable={true}
           objWithData={step1}
+          selectData={step1}
           setFunction={setStep1}
           setMessageAlert={setMessageAlert}
           setTitleAlert={setTitleAlert}
@@ -188,7 +189,9 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
   };
 
   const makeStructureScreen = async({data}) => {
-    let userAgentes = await getUserByRole(3);
+    const { user } = await handleGetDataUserLocal();
+    console.log("[ USER ] > ", user);
+    let userAgentes = await getUserByRole(3, user.idUser);
     const {idUser,
       orderDetailAddonData,
       orderDetailKingoData,
@@ -200,7 +203,7 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
       type: 'selects',
       value: idUser,
       isFocus: false,
-      values: userAgentes,
+      values: [{label: `${user.name} ${user.lastName}`, value: user.idUser}],
     }]);
 
     let dataAddons = [];

@@ -1,4 +1,4 @@
-import React, { useRef, useContext, useState, useMemo } from 'react';
+import React, { useRef, useContext, useState, useMemo, useEffect } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PhoneInput from 'react-native-phone-number-input';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -37,7 +37,8 @@ const Inputs = ({
     evidences,
     setEvidences,
     idTaskSteps,
-
+    dataBalance,
+    type = 10
 }) => {
 
     const { state } = useContext(AuthContext);
@@ -97,6 +98,7 @@ const Inputs = ({
     const renderSelectData = () => {
         let arrayData = [];
         console.log("DATA SELECT >>", selectValue);
+        console.log('[ SELECT DATA >>> ]', selectData);
         if (selectData.length > 0) {
             selectData.forEach(element => {
                 arrayData.push({ value: element[selectValue], label: element[selectLabel] })
@@ -108,7 +110,7 @@ const Inputs = ({
 
     const toggleBottomSheet = () => {
         console.log(bottonSheet.current);
-        handleChange(index, 'sync', 'value', informacion, setInformation);
+        // handleChange(index, 'sync', 'value', informacion, setInformation);
         bottonSheet.current?.expand();
     };
 
@@ -128,6 +130,19 @@ const Inputs = ({
             }
         }
     };
+
+    const handleChangeCustomerSetting = () => {
+        let validType = item?.screenElement?.elementType?.name ? item.screenElement.elementType.name : item?.elementType?.name ? item.elementType.name : item.type;
+        if (validType === 'handshake') {
+            if (type === 10) {
+                handleChange(index, dataBalance, 'value', informacion, setInformation);
+            } else handleChange(index, 'actualizado', 'value', informacion, setInformation);
+        }
+    }
+
+    useEffect(() => {
+        handleChangeCustomerSetting()
+    }, [dataBalance])
 
     let validType = item?.screenElement?.elementType?.name ? item.screenElement.elementType.name : item?.elementType?.name ? item.elementType.name : item.type;
     switch (validType) {
@@ -232,16 +247,20 @@ const Inputs = ({
                         ref={phoneInputRef}
                         defaultCode="GT"
                         layout="first"
-                        placeholderTextColor={colorsTheme.gris80}
                         withShadow={false}
                         value={phoneValue[1]}
                         onChangeFormattedText={(text) => {
                             handleChange(index, ` ${text}`, 'value', informacion, setInformation);
                         }}
-                        containerStyle={{ width: 380, borderRadius: 18, marginTop: 10, height: 75 }}
-                        countryPickerButtonStyle={{ color: colorsTheme.gris80 }}
                         placeholder="Número de celular"
                         disabled={!editable}
+                        placeholderTextColor={colorsTheme.negro}
+                        textContainerStyle={{padding: 0, margin: 0, backgroundColor: colorsTheme.gris20, borderTopEndRadius: 10, borderBottomRightRadius: 10}}
+                        codeTextStyle={{padding: 0, margin: 0}}
+                        textInputStyle={{ padding: 0, margin: 0, color: colorsTheme.negro}}
+
+                        containerStyle={{ width: '100%', backgroundColor: colorsTheme.gris20, borderRadius: 17, marginTop: 10, padding: 0 }}
+                        countryPickerButtonStyle={{ color: colorsTheme.gris80, padding: 0, margin: 0 }}
                     />
                 </View>
             );
@@ -294,21 +313,21 @@ const Inputs = ({
             );
         case 'handshake':
             return (
-                <>
-                    <TouchableOpacity onPress={toggleBottomSheet} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TextInput
-                            style={{ ...styles.inputForm, flex: 1 }}
-                            value={'Configurar Tendero'}
-                            editable={false}
-                        />
-                        <TouchableOpacity onPress={toggleCamera}>
-                            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                                <Ionicons name={'camera'} color={colorsTheme.naranja} size={40} style={styles.icon} />
-                            </View>
+                <View>
+                    <Text style={styles.colorText}>{'Configurar tendero'}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TouchableOpacity onPress={toggleBottomSheet} style={{flex: 1}}>
+                            <TextInput
+                                style={{ ...styles.inputForm }}
+                                value={type === 10 ? `Configiración Tendero: Q ${parseFloat(dataBalance).toFixed(2)}` : 'Actualizar Tendero'}
+                                editable={false}
+                            />
                         </TouchableOpacity>
-                    </TouchableOpacity>
-
-                </>
+                        <TouchableOpacity onPress={toggleCamera} style={{ justifyContent: 'center', alignItems: 'center' }}>
+                            <Ionicons name={'camera'} color={colorsTheme.naranja} size={40} style={styles.icon} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
             )
     }
 };

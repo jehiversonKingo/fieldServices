@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext, useMemo, useRef} from 'react';
+import React, {useEffect, useState, useContext, useMemo, useRef, useCallback} from 'react';
 import {
   View,
   StyleSheet,
@@ -62,21 +62,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const TRANSACTION_LIST = [
-  { id: 1, title: "Datos Tendero", icon: "filetext1", counter: 0 },
-  { id: 2, title: "Billeteras Tenderos", icon: "wallet", counter: 0 },
-  { id: 3, title: "Balance Tendero", icon: "calculator", counter: 0 },
-  { id: 4, title: "Transacciones Tenderos", icon: "carryout", counter: 0 },
-  { id: 5, title: "Deudas Tenderos", icon: "creditcard", counter: 0 },
-  { id: 6, title: "Ventas Tenderos", icon: "filetext1", counter: 0 },
-  { id: 7, title: "Compras Tenderos", icon: "filetext1", counter: 0 },
-  { id: 8, title: "Reglas", icon: "filetext1", counter: 0 },
-  { id: 9, title: "Planes", icon: "filetext1", counter: 0 },
-  { id: 10, title: "Promociones", icon: "filetext1", counter: 0 },
+  { id: 1, types: [10, 11], title: "Datos Tendero", icon: "filetext1", counter: 0 },
+  { id: 2, types: [10, 11], title: "Billeteras Tenderos", icon: "wallet", counter: 0 },
+  { id: 3, types: [10], title: "Balance Tendero", icon: "calculator", counter: 0 },
+  { id: 4, types: [10], title: "Transacciones Tenderos", icon: "carryout", counter: 0 },
+  { id: 5, types: [10], title: "Deudas Tenderos", icon: "creditcard", counter: 0 },
+  { id: 6, types: [10], title: "Ventas Tenderos", icon: "filetext1", counter: 0 },
+  { id: 7, types: [10], title: "Compras Tenderos", icon: "filetext1", counter: 0 },
+  { id: 8, types: [10, 11], title: "Reglas", icon: "filetext1", counter: 0 },
+  { id: 9, types: [10, 11], title: "Planes", icon: "filetext1", counter: 0 },
+  { id: 10, types: [10, 11], title: "Promociones", icon: "filetext1", counter: 0 },
 ];
 
 const eventEmitter = new NativeEventEmitter(NativeModules.ServerSocketModule);
 const {BluetoothServerModule} = NativeModules;
 const TaskDescriptionScreen = ({navigation, route}) => {
+  const typeTask = route.params.type;
   //Step
   const [active, setActive] = useState(0);
   const [isAlert, setIsAlert] = useState(false);
@@ -97,6 +98,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   const [statusServerColor, setStatusServerColor] = useState(colorsTheme.rojo);
   const [transferStep, setTransferStep] = useState(0);
   const [successTransfer, setSuccessTransfer] = useState([]);
+  const [dataBalance, setDataBalance] = useState(0);
+  const [dataAvailableDays, setDataAvailableDays] = useState(14);
   const snapPoints = useMemo(() => ['100%', '100%', '90%'], []);
   const sheetRef = useRef(null);
 
@@ -131,6 +134,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       selectValue={'idCommunity'}
       bottonSheet={sheetRef}
       idTaskSteps={idTaskSteps}
+      dataBalance={dataBalance}
+      type={typeTask}
     />
   );
 
@@ -199,7 +204,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       </>
     );
   };
-  
+
   const step3PhotoItem = ({item, index}) => (
     <View key={`P-${index}`}>
       <View style={{alignContent: 'center', alignItems: 'center'}}>
@@ -280,24 +285,29 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   };
 
   const RenderTransactionList = ({item, index}) => (
-    <View style={{ flex: 3, borderWidth: 2, borderColor: colorsTheme.naranja, padding: 10, margin: 5, borderRadius: 10 }}>
-      <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center" }}>
-        <AntDesignIcon size={30} color="black" name={item.icon} />
-      </View>
-      <View style={{ alignItems: "center", marginTop: 10 }}>
-        <Text style={{ color: "black", fontSize: 14, marginBottom: 5 }}>{item.title}</Text>
-        {(!successTransfer.includes(item.id) && transferStep > 0) && (
-          <View style={{ alignContent: "center" }}>
-            <ActivityIndicator size="large" color={colorsTheme.verdeClaro}/>
+    <>
+      {item.types.includes(typeTask) && (
+        <View style={{ flex: 3, borderWidth: 2, borderColor: colorsTheme.naranja, padding: 10, margin: 5, borderRadius: 10 }}>
+          <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center" }}>
+            <AntDesignIcon size={30} color="black" name={item.icon} />
           </View>
-        )}
-        {successTransfer.includes(item.id) && (
-          <View style={{ alignContent: "center" }}>
-            <FontAwesome5 size={20} color={colorsTheme.verdeClaro} name={'check'} />
+          <View style={{ alignItems: "center", marginTop: 10 }}>
+            <Text style={{ color: "black", fontSize: 14, marginBottom: 5 }}>{item.title}</Text>
+            {(!successTransfer.includes(item.id) && transferStep > 0) && (
+              <View style={{ alignContent: "center" }}>
+                <ActivityIndicator size="large" color={colorsTheme.verdeClaro}/>
+              </View>
+            )}
+            {successTransfer.includes(item.id) && (
+              <View style={{ alignContent: "center" }}>
+                <FontAwesome5 size={20} color={colorsTheme.verdeClaro} name={'check'} />
+              </View>
+            )}
           </View>
-        )}
-      </View>
-    </View>
+        </View>
+
+      )}
+    </>
   );
 
   const onClickValidate = async idTaskStep => {
@@ -387,7 +397,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
   const saveTemporalData = async (dbTable, step, active) => {
     try {
-      // console.log("[STEP 3] >", step);
+      console.log("[ STEP ] >", step);
       const {id} = route.params;
       let isValid = false;
 
@@ -404,17 +414,19 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
       if (active === 4) {
         if (step5.length == 0) {
-          isValid == true;
+          isValid = true;
         } else {
           step5.forEach(item => {
-            item.taskStepChecks
-              .filter(item => item.access === 'Agente')
-              .forEach(check => {
-                if (!check.checked) {
-                  isValid = false;
-                }
-              });
-          });
+              if (item.taskStepChecks.filter(item => item.access === 'Agente')) {
+                item.taskStepChecks
+                  .filter(item => item.access === 'Agente')
+                  .forEach(check => {
+                    if (!check.checked) {
+                      isValid = false;
+                    }
+                  });
+              } else isValid = true;
+            });
         }
       }
 
@@ -535,6 +547,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                   });
                   break;
                 case 10:
+                case 11:
                   taskStatus = await setDataAllTaskMigration({
                     step1,
                     step2,
@@ -542,8 +555,9 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                     step4,
                     step5,
                     idTask: id,
+                    availableDays: dataAvailableDays
                   });
-                  break; 
+                  break;
                 default:
                   console.log("No se puede procesar, problemas con el tipo de tarea");
                   setIsAlert(false);
@@ -555,13 +569,13 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                     setShowAlert(true);
                   }, 150);
               }
-  
+
               if (taskStatus?.status) {
                 setIsAlert(false);
                 setTimeout(() => {
                   setShowProgressAlert(true);
                 }, 300);
-  
+
                 for (let i = 0; i < evidences.length; i++) {
                   const item = evidences[i];
                   let photosReq = await setDataTaskPhotos({
@@ -572,7 +586,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                   setTotalUpload(prev => prev + 1);
                   setProgressAlert(prev => prev + 100 / evidences.length / 100);
                 }
-  
+
                 await deleteStep('task', id);
                 setShowProgressAlert(false);
                 navigation.navigate('Task', {taskStatus});
@@ -611,7 +625,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           }
         }
       } else {
-        console.log({
+        console.log('...............................[TaskComplete]............................', {
           step1,
           step2,
           evidences,
@@ -630,7 +644,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             step4,
             step5,
             idTask: id,
-            typeTask: type
+            typeTask: type,
+            availableDays: dataAvailableDays
           }),
           0,
         );
@@ -766,7 +781,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   const handleClickTransferData = async (action, data) => {
     try {
       const {idCustomer} = route.params;
-      console.log(idCustomer);
+      console.log('[ ACTION ] ==========> ', action);
       switch (action) {
         case 'CONFIG_CUSTOMER':
           setTransferStep(0);
@@ -838,10 +853,12 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           setSuccessTransfer((prev) => [...prev, 9, 10]);
           break;
         case 'CLOSE':
-          // const findIndex = step1.findIndex(item => item.screenElement.idElementType == 7);
+          if (data !== null) {
+            console.log('[ CLOSE DATA ] ========> ', data)
+            setDataBalance(data?.balance)
+            setDataAvailableDays(data?.availableDays)
+          };
           sheetRef.current?.close();
-          console.log('[ CLOESE BOTTOM SHEET ] >> ', findIndex, step1);
-          // if (data !== null) handleChange(findIndex, data.balance, 'value', step1, setStep1);
           break;
 
         default:
@@ -881,27 +898,31 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   }, [active]);
 
   useEffect(() => {
-    const dataReceivedListener = eventEmitter.addListener(
-      'DATA_SERVER_RECEIVED',
-      event => {
-        console.log('[ BLUETOOTH DATA 1] =>', event);
-        handleReceivedData(event);
-      },
-    );
+    try {
+      const dataReceivedListener = eventEmitter.addListener(
+        'DATA_SERVER_RECEIVED',
+        event => {
+          console.log('[ BLUETOOTH DATA 1] =>', event);
+          handleReceivedData(event);
+        },
+      );
 
-    return () => {
-      // Cuando se desmonta el componente, detener el servidor y eliminar el suscriptor del evento
-      BluetoothServerModule.stopServer()
-        .then(res => {
-          console.log('Servidor detenido', res);
-          setStatusServer('Servidor detenido');
-          setStatusServerColor(colorsTheme.naranja60);
-          setIsRunning(false);
-        })
-        .catch(error => console.error('Error al detener el servidor', error));
-      dataReceivedListener.remove();
-      // dataBlueReceivedListener.remove();
-    };
+      return () => {
+        // Cuando se desmonta el componente, detener el servidor y eliminar el suscriptor del evento
+        BluetoothServerModule.stopServer()
+          .then(res => {
+            console.log('Servidor detenido', res);
+            setStatusServer('Servidor detenido');
+            setStatusServerColor(colorsTheme.naranja60);
+            setIsRunning(false);
+          })
+          .catch(error => console.error('Error al detener el servidor', error));
+        dataReceivedListener.remove();
+        // dataBlueReceivedListener.remove();
+      };
+    } catch (error) {
+      console.log(error)
+    }
   }, []);
 
   return (

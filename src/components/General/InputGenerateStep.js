@@ -19,6 +19,8 @@ const InputGenerateStep = ({
   evidences,
   setEvidences,
   idTaskSteps,
+  dataBalance = 0,
+  type = 10
 }) => {
   return (
     <Inputs
@@ -39,6 +41,8 @@ const InputGenerateStep = ({
         selectLabel={selectLabel}
         selectValue={selectValue}
         bottonSheet={bottonSheet}
+        dataBalance={dataBalance}
+        type={type}
       />
   );
 };

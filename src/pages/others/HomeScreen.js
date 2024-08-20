@@ -90,7 +90,6 @@ const HomeScreen = ({navigation}) => {
       setMenu(options.sort((a,b) => a.module.text - b.module.text));
     } catch (error) {
       console.error("[ GET MENU OPTIONS ]", error);
-      setMenu([]);
     } finally {
       setIsLoading(false);
     }
