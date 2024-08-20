@@ -7,12 +7,12 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
+  Dimensions,
   PermissionsAndroid,
   Platform,
   NativeModules,
   NativeEventEmitter,
 } from 'react-native';
-import {Dimensions} from 'react-native';
 import {ProgressSteps, ProgressStep} from 'react-native-progress-steps';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {ListItem} from '@rneui/themed';
