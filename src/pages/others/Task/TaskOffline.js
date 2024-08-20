@@ -9,7 +9,7 @@ import * as RNFS from 'react-native-fs';
 
 //Components
 import Header from '../../../components/Layouts/Header';
-import { setDataAllTask, setDataAllTaskInstall, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskChecklist, setDataTaskPhotos } from '../../../services/task.services';
+import { setDataAllTask, setDataAllTaskInstall, setDataAllTaskMigration, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskChecklist, setDataTaskPhotos } from '../../../services/task.services';
 import {getAllDataStep, deleteStep, getStep} from '../../../functions/fncSqlite';
 import {handleGetLocationReturnValue} from '../../../functions/fncLocation';
 import {colorsTheme} from '../../../configurations/configStyle';
@@ -309,7 +309,8 @@ const TaskOffline = ({navigation}) => {
 
     const handleResolveTask = async (task) => {
       try {
-        const {idTask, typeTask, step1, step2, evidences, step4, step5} = task;
+        const {idTask, typeTask, step1, step2, evidences, step4, step5, availableDays} = task;
+        console.log('[ AVAILABLE DAYS ] >>>>>>>>>>>>>> ', availableDays);
         setIsAlert(true);
         setTitleAlert(`Preparando tarea ${idTask}`);
         setMessageAlert('');
@@ -340,14 +341,21 @@ const TaskOffline = ({navigation}) => {
           validArrayAddonsStep2 = true;
         }
 
+        if (step2.length <= 0 && step4.length <= 0) {
+          validArrayKingosStep2 = true;
+        }
+
         if (validArrayKingosStep2) {
-          let responseCheck = await setDataTaskChecklist({step5, idTask});
-          setIsAlert(false);
-          setTimeout(() => {
-            setTitleAlert('Válidando checklist');
-            setMessageAlert('');
-            setIsAlert(true);
-          }, 300);
+          let responseCheck = {status: true}
+          if (step5.length > 0) {
+            responseCheck = await setDataTaskChecklist({step5, idTask});
+            setIsAlert(false);
+            setTimeout(() => {
+              setTitleAlert('Válidando checklist');
+              setMessageAlert('');
+              setIsAlert(true);
+            }, 300);
+          }
           if (responseCheck?.status) {
             let taskStatus = null;
             setIsAlert(false);
@@ -386,6 +394,19 @@ const TaskOffline = ({navigation}) => {
                   step4,
                   step5,
                   idTask,
+                });
+                break;
+              case 10:
+              case 11:
+                console.log('EN EL 10 estoy');
+                taskStatus = await setDataAllTaskMigration({
+                  step1,
+                  step2,
+                  step3: evidences,
+                  step4,
+                  step5,
+                  idTask,
+                  blockDays: availableDays
                 });
                 break;
               default:
@@ -478,6 +499,7 @@ const TaskOffline = ({navigation}) => {
           });
           setIsAlert(false);
           setDisabeldUpload(false)
+          getAllDataTask();
           // navigation.navigate('Task', { taskStatus });
       } else {
         setDisabeldUpload(false)
@@ -490,7 +512,7 @@ const TaskOffline = ({navigation}) => {
     };
 
     useEffect(()=>{
-        getAllDataTask();
+      getAllDataTask();
     },[]);
 
     const ListOfflineTask = () => (

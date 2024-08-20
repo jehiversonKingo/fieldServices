@@ -130,15 +130,9 @@ export const setDataAllTaskSwap = async (data) => {
 
 export const setDataAllTaskMigration = async (data) => {
   const headers = await customHeadersAuth();
-  const {step1, step2, step3, step4, idTask} = data;
+  // const {step1, step2, step3, step4, idTask} = data;
   return await axiosInstance
-    .post('/task/progressTask/migration', {
-      step1,
-      step2,
-      step3,
-      step4,
-      idTask,
-    }, headers)
+    .post('/task/progressTask/migration', data, headers)
     .then(task => {
       return task.data;
     })

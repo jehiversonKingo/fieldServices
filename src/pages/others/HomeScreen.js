@@ -21,6 +21,7 @@ import {getStep, updateStep} from '../../functions/fncSqlite';
 import { getAllCommunities, getModulesByRole } from '../../services/settings.services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDebetAgent } from '../../services/sales.services';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const HomeScreen = ({navigation}) => {
@@ -60,56 +61,6 @@ const HomeScreen = ({navigation}) => {
     signOut();
   };
 
-  const getAllDataToOffline = async () => {
-    if (!inline) {
-      setIsAlert(true);
-      setTitleAlert("Error de red");
-      setMessageAlert("Asegúrate de tener conexión a internet");
-      setShowIsAlert(false);
-      return;
-    }
-
-    try {
-      const getTaskData = await getTasks();
-      await updateStep('taskList', 0, JSON.stringify(getTaskData), 0);
-
-      for (const task of getTaskData) {
-        const dataTask = await getElemetScreen(task.idTask);
-        const { steps } = dataTask;
-
-        // SAVE DATA STEP 1
-        await updateStep('taskDescription', task.idTask, JSON.stringify(dataTask), 0);
-
-        for (const step of steps) {
-          const dataStepsToDo = await getStepInstruction(step.idStep);
-          await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
-        }
-      }
-
-      const [getAddon, getKingo, getCommunities] = await Promise.all([
-        getListAddon(),
-        getListEquipment(),
-        getAllCommunities()
-      ]);
-
-      await Promise.all([
-        updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0),
-        updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0),
-        updateStep('communities', 1, JSON.stringify(getCommunities), 0)
-      ]);
-
-      setIsAlert(true);
-      setTitleAlert("Datos locales");
-      setMessageAlert("Datos cargados localmente con éxito");
-      setShowIsAlert(false);
-    } catch (error) {
-      setIsAlert(true);
-      setTitleAlert("Error al cargar datos");
-      setMessageAlert("Ocurrió un error al cargar los datos: " + error.message);
-      setShowIsAlert(false);
-    }
-  };
-
   const getMenuOptions = async () => {
     try {
       const data = JSON.parse(await AsyncStorage.getItem('@user'));
@@ -117,7 +68,6 @@ const HomeScreen = ({navigation}) => {
       if (inline) {
         options = await getModulesByRole(data.user.idRole);
         console.log("OPTIONS", options);
-        // await updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0);
         const [getAddon, getKingo, getCommunities] = await Promise.all([
           getListAddon(),
           getListEquipment(),
@@ -127,38 +77,37 @@ const HomeScreen = ({navigation}) => {
         await Promise.all([
           updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0),
           updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0),
-          updateStep('communities', 1, JSON.stringify(getCommunities), 0)
+          updateStep('communities', 1, JSON.stringify(getCommunities), 0),
+          updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0),
         ]);
       } else {
         const storedOptions = JSON.parse(await getStep('menuOptions', data.user.idRole, 0));
         console.log('[ OFFLINE ] ............', storedOptions);
-        if (storedOptions) {
-          options = storedOptions.filter((item) => item.offline);
-        }
+        if (storedOptions) options = storedOptions.filter((item) => item.offline);
       }
       console.log('[ INLINE ] ............', inline);
       options.map(item => console.log(item))
       setMenu(options.sort((a,b) => a.module.text - b.module.text));
     } catch (error) {
       console.error("[ GET MENU OPTIONS ]", error);
-      setMenu([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleValidBlocked = async() => {
-    console.log('VALIDAMOS');
+    setUploadSync(false);
+    setBlocked(false);
     let getDebt = await getDebetAgent();
     let debtUser = JSON.parse(await getStep('debtUser', 0, 0));
     let getWalletCustomers = JSON.parse(await getStep('customersOfflineData', 0, 0));
     console.log('[ DEBET USER OFFLINE ]', parseFloat(debtUser.amount).toFixed(2));
     console.log('[ DEBET USER ]', parseFloat(getDebt.amount).toFixed(2))
-    if (debtUser && getDebt) {
-      if (parseFloat(debtUser.amount).toFixed(2) !== parseFloat(getDebt.amount).toFixed(2)) {
-        setBlocked(true)
-      }
-    }
+    // if (debtUser && getDebt) {
+    //   if (parseFloat(debtUser.amount).toFixed(2) !== parseFloat(getDebt.amount).toFixed(2)) {
+    //     setBlocked(true)
+    //   }
+    // }
 
     if(getWalletCustomers) {
       if(getWalletCustomers.customers.length > 0) {
@@ -174,7 +123,14 @@ const HomeScreen = ({navigation}) => {
     getMenuOptions();
   }, [inline])
 
-  if (blocked) {
+  useFocusEffect(
+    React.useCallback(() => {
+      handleValidBlocked();
+      getMenuOptions();
+    }, [inline])
+  );
+
+  if (blocked || uploadSync) {
     return (
       <View style={{ justifyContent: 'center', alignItems: 'center', alignContent: "center", flex: 1 }}>
         <Text style={{ color: colorsTheme.naranja, fontSize: 20 }}> Aplicación bloqueada</Text>

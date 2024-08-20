@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,9 +10,12 @@ import {
 import Header from '../../../components/Layouts/Header';
 import { colorsTheme } from '../../../configurations/configStyle';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {Context as AuthContext} from '../../../context/AuthContext';
 
 const { width, fontScale } = Dimensions.get('window');
 const BankPayScreen = ({ navigation }) => {
+  const {state} = useContext(AuthContext);
+  const {inline} = state;
   const options = [
     {
       id: 1,
@@ -20,6 +23,7 @@ const BankPayScreen = ({ navigation }) => {
       size: 30,
       name: 'Voucher',
       redirect: 'VoucherScreen',
+      offline: false
     },
     {
       id: 2,
@@ -27,6 +31,7 @@ const BankPayScreen = ({ navigation }) => {
       size: 30,
       name: 'Estado de cuenta',
       redirect: 'AccountStatus',
+      offline: true
     },
   ];
   const RenderOptions = ({ item }) => (
@@ -62,7 +67,11 @@ const BankPayScreen = ({ navigation }) => {
           marginVertical: 10,
         }}>
         {options.map(item => (
-          <RenderOptions key={item.id} item={item} />
+          inline ? (
+            <RenderOptions key={item.id} item={item} />
+          ) : (
+            item.offline && <RenderOptions key={item.id} item={item} />
+          )
         ))}
       </View>
     </SafeAreaView>
