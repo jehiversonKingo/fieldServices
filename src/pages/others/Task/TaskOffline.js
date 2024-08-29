@@ -558,6 +558,7 @@ const TaskOffline = ({navigation}) => {
         <Header
         isLeft={true}
         navigation={navigation}
+        route={'Principal'}
         title={'Listado De Tareas'}
       />
       {loading ?

@@ -159,6 +159,7 @@ const TaskListScreen = ({ navigation, route }) => {
       <Header
         isLeft={true}
         navigation={navigation}
+        route={'Principal'}
         title={'Listado De Tareas'}
         isOpen={open}
         isOpenFunction={isOpen}

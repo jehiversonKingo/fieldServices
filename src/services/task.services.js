@@ -103,10 +103,50 @@ export const setDataAllTaskInstall = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS ERROR]>>", error);
+      console.log("[AXIOS INSTALL ERROR]>>", error);
       return error;
     });
 };
+
+export const setDataAllTaskMaintenance = async (data) => {
+  const headers = await customHeadersAuth();
+  const {step1, step2, step3, step4, idTask} = data;
+  return await axiosInstance
+    .post('/task/progressTask/maintenance', {
+      step1,
+      step2,
+      step3,
+      step4,
+      idTask,
+    }, headers)
+    .then(task => {
+      return task.data;
+    })
+    .catch(error => {
+      console.log("[AXIOS MAINTENANCE ERROR]>>", error);
+      return error;
+    });
+}
+
+export const setDataAllTaskProspect = async (data) => {
+  const headers = await customHeadersAuth();
+  const {step1, step2, step3, step4, idTask} = data;
+  return await axiosInstance
+    .post('/task/progressTask/prospect', {
+      step1,
+      step2,
+      step3,
+      step4,
+      idTask,
+    }, headers)
+    .then(task => {
+      return task.data;
+    })
+    .catch(error => {
+      console.log("[AXIOS MAINTENANCE ERROR]>>", error);
+      return error;
+    });
+}
 
 export const setDataAllTaskSwap = async (data) => {
   const headers = await customHeadersAuth();
@@ -123,7 +163,7 @@ export const setDataAllTaskSwap = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS ERROR]>>", error);
+      console.log("[AXIOS SWAP ERROR]>>", error);
       return error;
     });
 };
@@ -137,7 +177,7 @@ export const setDataAllTaskMigration = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS ERROR]>>", error);
+      console.log("[AXIOS MIGRATION ERROR]>>", error);
       return error;
     });
 };
@@ -158,7 +198,7 @@ export const setDataAllTaskPickup = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS ERROR]>>", error);
+      console.log("[AXIOS PICKUP ERROR]>>", error);
       return error;
     });
 };

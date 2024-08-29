@@ -17,7 +17,7 @@ import {Context as AuthContext} from '../../context/AuthContext';
 
 import {colorsTheme} from '../../configurations/configStyle';
 import {getListEquipment, getListAddon} from '../../services/inventory.services';
-import {getStep, updateStep} from '../../functions/fncSqlite';
+import {getAllDataStep, getStep, updateStep} from '../../functions/fncSqlite';
 import { getAllCommunities, getModulesByRole } from '../../services/settings.services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDebetAgent } from '../../services/sales.services';
@@ -30,6 +30,7 @@ const HomeScreen = ({navigation}) => {
   const [open, setOpen] = React.useState(false);
   const [menu, setMenu] = React.useState([]);
   const [blocked, setBlocked] = React.useState(false);
+  const [blockedForTask, setBlockedTask] = React.useState(false);
   const [uploadSync, setUploadSync] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const goTo = route => navigation.navigate(route);
@@ -67,6 +68,8 @@ const HomeScreen = ({navigation}) => {
       let options = [];
       if (inline) {
         options = await getModulesByRole(data.user.idRole);
+        let dataTask = await getAllDataStep('TaskComplete');
+        console.log('[ OFFLINE TASK ]', dataTask)
         console.log("OPTIONS", options);
         const [getAddon, getKingo, getCommunities] = await Promise.all([
           getListAddon(),
@@ -80,8 +83,10 @@ const HomeScreen = ({navigation}) => {
           updateStep('communities', 1, JSON.stringify(getCommunities), 0),
           updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0),
         ]);
+        setBlockedTask(dataTask && dataTask.length > 0)
       } else {
         const storedOptions = JSON.parse(await getStep('menuOptions', data.user.idRole, 0));
+        setBlockedTask(false)
         console.log('[ OFFLINE ] ............', storedOptions);
         if (storedOptions) options = storedOptions.filter((item) => item.offline);
       }
@@ -129,6 +134,25 @@ const HomeScreen = ({navigation}) => {
       getMenuOptions();
     }, [inline])
   );
+
+
+  if (blockedForTask) {
+    return (
+      <View style={{ justifyContent: 'center', alignItems: 'center', alignContent: "center", flex: 1 }}>
+        <Text style={{ color: colorsTheme.naranja, fontSize: 20 }}> Aplicación bloqueada</Text>
+        <View style={{ marginHorizontal: 25, flexDirection: "row" }}>
+          <Text style={{ color: colorsTheme.negro, fontWeight: "bold" }}>Tienes tareas pendiente de subir</Text>
+        </View>
+        <TouchableOpacity style={{ paddingHorizontal: 45, paddingVertical: 10, backgroundColor: colorsTheme.naranja, borderRadius: 15, marginTop: 10, flexDirection: "row" }}
+          onPress={() => navigation.navigate("TaskOffline")}
+        >
+          <FontAwesome5 name='cloud-upload-alt' color={colorsTheme.blanco} size={20} style={{ marginRight: 5 }} />
+          <Text style={{ color: "white", fontSize: 15, marginTop: 3 }}>Subir Tareas</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
 
   if (blocked || uploadSync) {
     return (

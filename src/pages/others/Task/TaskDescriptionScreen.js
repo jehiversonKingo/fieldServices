@@ -51,6 +51,8 @@ import {
   setDataTaskChecklist,
   setDataTaskEvidens,
   setDataTaskPhotos,
+  setDataAllTaskMaintenance,
+  setDataAllTaskProspect,
 } from '../../../services/task.services';
 import {colorsTheme} from '../../../configurations/configStyle';
 
@@ -476,15 +478,20 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       let validArrayAddonsStep2 = false;
 
       if (type !== 7) {
-        // is different to pickup
-        validArrayKingosStep2 = step2.some(item => {
-          if (/^E/i.test(item.value)) {
-            return inventoryKingo.includes(item.value);
-          } else if (/^A/i.test(item.value)) {
-            console.log(inventoryAddon);
-            return inventoryAddon.includes(item.value);
-          } else return false;
-        });
+        if (step2.length > 0) {
+          // is different to pickup
+          validArrayKingosStep2 = step2.some(item => {
+            if (/^E/i.test(item.value)) {
+              return inventoryKingo.includes(item.value);
+            } else if (/^A/i.test(item.value)) {
+              console.log(inventoryAddon);
+              return inventoryAddon.includes(item.value);
+            } else return false;
+          });
+        } else {
+          validArrayKingosStep2 = true;
+          validArrayAddonsStep2 = true;
+        }
       } else {
         validArrayKingosStep2 = true;
         validArrayAddonsStep2 = true;
@@ -495,134 +502,155 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       if (inline) {
         if (step2.length <= 0 && step4.length <= 0) {
           validArrayKingosStep2 = true
+        }
 
-          if (validArrayKingosStep2) {
-            console.log("SI ENTRO");
-            let responseCheck = await setDataTaskChecklist({step5, idTask: id});
+        if (validArrayKingosStep2) {
+          console.log("SI ENTRO");
+          let responseCheck = await setDataTaskChecklist({step5, idTask: id});
+          setIsAlert(false);
+          setTimeout(() => {
+            setTitleAlert('Válidando checklist');
+            setMessageAlert('');
+            setIsAlert(true);
+          }, 300);
+          if (responseCheck?.status) {
+            console.log("[RESPUESTA DEL CHECKLIST] >>>", responseCheck);
+            let taskStatus = null;
             setIsAlert(false);
             setTimeout(() => {
-              setTitleAlert('Válidando checklist');
+              setTitleAlert('Cargando Datos, Espere por favor');
               setMessageAlert('');
               setIsAlert(true);
-            }, 300);
-            if (responseCheck?.status) {
-              console.log("[RESPUESTA DEL CHECKLIST] >>>", responseCheck);
-              let taskStatus = null;
-              setIsAlert(false);
-              setTimeout(() => {
-                setTitleAlert('Cargando Datos, Espere por favor');
-                setMessageAlert('');
-                setIsAlert(true);
-              }, 200);
-              switch (type) {
-                case 1:
-                case 2:
-                  taskStatus = await setDataAllTaskInstall({
-                    step1,
-                    step2,
-                    step3: null,
-                    step4,
-                    step5,
-                    idTask: id,
-                  });
-                  break;
-                case 6:
-                  taskStatus = await setDataAllTaskSwap({
-                    step1,
-                    step2,
-                    step3: evidences,
-                    step4,
-                    step5,
-                    idTask: id,
-                  });
-                  break;
-                case 7:
-                  taskStatus = await setDataAllTaskPickup({
-                    step1,
-                    step2,
-                    step3: evidences,
-                    step4,
-                    step5,
-                    idTask: id,
-                  });
-                  break;
-                case 10:
-                case 11:
-                  taskStatus = await setDataAllTaskMigration({
-                    step1,
-                    step2,
-                    step3: evidences,
-                    step4,
-                    step5,
-                    idTask: id,
-                    availableDays: dataAvailableDays
-                  });
-                  break;
-                default:
-                  console.log("No se puede procesar, problemas con el tipo de tarea");
-                  setIsAlert(false);
-                  setTimeout(() => {
-                    setTitleAlert('¡Atención!');
-                    setMessageAlert(
-                      'No se puede procesar, problemas con el tipo de tarea',
-                    );
-                    setShowAlert(true);
-                  }, 150);
-              }
-
-              if (taskStatus?.status) {
+            }, 200);
+            switch (type) {
+              case 1:
+              case 2:
+                taskStatus = await setDataAllTaskInstall({
+                  step1,
+                  step2,
+                  step3: null,
+                  step4,
+                  step5,
+                  idTask: id,
+                });
+                break;
+              case 3:
+              case 4:
+                taskStatus = await setDataAllTaskMaintenance({
+                  step1,
+                  step2,
+                  step3: null,
+                  step4,
+                  step5,
+                  idTask: id,
+                });
+                break;
+              case 5:
+                taskStatus = await setDataAllTaskProspect({
+                  step1,
+                  step2,
+                  step3: null,
+                  step4,
+                  step5,
+                  idTask: id,
+                });
+                break;
+              case 6:
+                taskStatus = await setDataAllTaskSwap({
+                  step1,
+                  step2,
+                  step3: evidences,
+                  step4,
+                  step5,
+                  idTask: id,
+                });
+                break;
+              case 7:
+                taskStatus = await setDataAllTaskPickup({
+                  step1,
+                  step2,
+                  step3: evidences,
+                  step4,
+                  step5,
+                  idTask: id,
+                });
+                break;
+              case 10:
+              case 11:
+                taskStatus = await setDataAllTaskMigration({
+                  step1,
+                  step2,
+                  step3: evidences,
+                  step4,
+                  step5,
+                  idTask: id,
+                  availableDays: dataAvailableDays
+                });
+                break;
+              default:
+                console.log("No se puede procesar, problemas con el tipo de tarea");
                 setIsAlert(false);
                 setTimeout(() => {
-                  setShowProgressAlert(true);
-                }, 300);
-
-                for (let i = 0; i < evidences.length; i++) {
-                  const item = evidences[i];
-                  let photosReq = await setDataTaskPhotos({
-                    step3: [item],
-                    idTask: id,
-                  });
-                  console.log('[ UPLOAD PHOTO ]', photosReq);
-                  setTotalUpload(prev => prev + 1);
-                  setProgressAlert(prev => prev + 100 / evidences.length / 100);
-                }
-
-                await deleteStep('task', id);
-                setShowProgressAlert(false);
-                navigation.navigate('Task', {taskStatus});
-              } else {
-                setIsAlert(false);
-                setTimeout(() => {
-                  setTitleAlert('Error');
+                  setTitleAlert('¡Atención!');
                   setMessageAlert(
-                    taskStatus?.message ||
-                      'No se puedieron cargar los datos de la tarea.',
+                    'No se puede procesar, problemas con el tipo de tarea',
                   );
                   setShowAlert(true);
                 }, 150);
+            }
+
+            if (taskStatus?.status) {
+              setIsAlert(false);
+              setTimeout(() => {
+                setShowProgressAlert(true);
+              }, 300);
+
+              for (let i = 0; i < evidences.length; i++) {
+                const item = evidences[i];
+                let photosReq = await setDataTaskPhotos({
+                  step3: [item],
+                  idTask: id,
+                });
+                console.log('[ UPLOAD PHOTO ]', photosReq);
+                setTotalUpload(prev => prev + 1);
+                setProgressAlert(prev => prev + 100 / evidences.length / 100);
               }
+
+              await deleteStep('task', id);
+              setShowProgressAlert(false);
+              navigation.navigate('Task', {taskStatus});
             } else {
               setIsAlert(false);
               setTimeout(() => {
-                setTitleAlert('¡Atención!');
+                setTitleAlert('Error');
                 setMessageAlert(
-                  'Debes cargar datos antes de salir a realizar una tarea.',
+                  taskStatus?.message ||
+                    'No se puedieron cargar los datos de la tarea.',
                 );
                 setShowAlert(true);
               }, 150);
             }
           } else {
-            console.log("[VALOR DE validArrayKingosStep2]", validArrayAddonsStep2);
-            console.log("Alguno de los barcodes que ingresaste no existen en tu bodega.");
             setIsAlert(false);
             setTimeout(() => {
-              setTitleAlert('Error');
+              setTitleAlert('¡Atención!');
               setMessageAlert(
-                'Alguno de los barcodes que ingresaste no existen en tu bodega.',
+                'Debes cargar datos antes de salir a realizar una tarea.',
               );
               setShowAlert(true);
             }, 150);
           }
+        } else {
+          console.log("[VALOR DE validArrayKingosStep2]", validArrayAddonsStep2);
+          console.log("Alguno de los barcodes que ingresaste no existen en tu bodega.");
+          setIsAlert(false);
+          setTimeout(() => {
+            setTitleAlert('Error');
+            setMessageAlert(
+              'Alguno de los barcodes que ingresaste no existen en tu bodega.',
+            );
+            setShowAlert(true);
+          }, 150);
         }
       } else {
         console.log('...............................[TaskComplete]............................', {
