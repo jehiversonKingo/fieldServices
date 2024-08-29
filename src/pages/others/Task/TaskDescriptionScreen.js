@@ -51,6 +51,8 @@ import {
   setDataTaskChecklist,
   setDataTaskEvidens,
   setDataTaskPhotos,
+  setDataAllTaskMaintenance,
+  setDataAllTaskProspect,
 } from '../../../services/task.services';
 import {colorsTheme} from '../../../configurations/configStyle';
 
@@ -526,6 +528,27 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                     idTask: id,
                   });
                   break;
+                  case 3:
+                  case 4:
+                    taskStatus = await setDataAllTaskMaintenance({
+                      step1,
+                      step2,
+                      step3: null,
+                      step4,
+                      step5,
+                      idTask: id,
+                    });
+                    break;
+                  case 5:
+                    taskStatus = await setDataAllTaskProspect({
+                      step1,
+                      step2,
+                      step3: null,
+                      step4,
+                      step5,
+                      idTask: id,
+                    });
+                    break;
                 case 6:
                   taskStatus = await setDataAllTaskSwap({
                     step1,
