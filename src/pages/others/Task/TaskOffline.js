@@ -44,7 +44,7 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep1 = ({item, index}) => {
       return(
-        <View key={`B${index}`} style={{flexDirection: "row", backgroundColor: colorsTheme.naranja20}}>
+        <View key={`B${index}`} style={{flexDirection: "row", backgroundColor: colorsTheme.verdeHybricoLight}}>
           <View key={`C${index}`}>
             <Text key={`D${index}`} style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
               {
@@ -64,7 +64,7 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep2 = ({item, index}) => {
       return(
-        <View key={`B1${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.naranja20}}>
+        <View key={`B1${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.verdeHybricoLight}}>
           <View key={`C1${index}`}>
             <Text key={`D1${index}`} style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
               {item.addon.name +': '+ item.value}
@@ -76,11 +76,11 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep3 = ({item, index}) => {
       return(
-        <View key={`B2${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.naranja20}}>
+        <View key={`B2${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.verdeHybricoLight}}>
           <View key={`C2${index}`}>
             <FitImage
                 indicator={true}
-                indicatorColor={colorsTheme.naranja}
+                indicatorColor={colorsTheme.verdeHybrico}
                 indicatorSize="large"
                 source={{ uri: 'file://' + item.photo.path }}
                 resizeMode="stretch"
@@ -93,7 +93,7 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep4 = ({item, index}) => {
       return(
-        <View key={`B3${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.naranja20}}>
+        <View key={`B3${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.verdeHybricoLight}}>
           <View key={`C3${index}`}>
             <Text key={`D3${index}`} style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
               {item.addon.name +': '+ item.value}
@@ -116,7 +116,7 @@ const TaskOffline = ({navigation}) => {
           style={{
             padding: 12,
             margin:5,
-            borderColor: colorsTheme.naranja60,
+            borderColor: colorsTheme.verdeHybricoLight,
             borderWidth:3,
           }}
           keyExtractor={(item) => item.idTask.toString()}
@@ -139,7 +139,7 @@ const TaskOffline = ({navigation}) => {
               handleChangeOpenCollapse(!expanded[index], index);
             }}
             containerStyle={{
-              borderLeftColor: colorsTheme.naranja80,
+              borderLeftColor: colorsTheme.verdeHybricoLight,
               borderLeftWidth: 5,
               borderRadius: 5,
             }}
@@ -157,7 +157,7 @@ const TaskOffline = ({navigation}) => {
               ListHeaderComponent={
               <View
                   style={{
-                    backgroundColor: colorsTheme.naranja,
+                    backgroundColor: colorsTheme.verdeHybrico,
                     borderRadius: 5,
                     width: width * 0.76,
                     padding: 10,
@@ -197,7 +197,7 @@ const TaskOffline = ({navigation}) => {
               ListHeaderComponent={
               <View
                   style={{
-                  backgroundColor: colorsTheme.naranja,
+                  backgroundColor: colorsTheme.verdeHybrico,
                   width: width * 0.76,
                   padding: 10,
                   justifyContent:'center',
@@ -236,7 +236,7 @@ const TaskOffline = ({navigation}) => {
               ListHeaderComponent={
               <View
                   style={{
-                  backgroundColor: colorsTheme.naranja,
+                  backgroundColor: colorsTheme.verdeHybrico,
                   width: width * 0.76,
                   padding: 10,
                   justifyContent:'center',
@@ -275,7 +275,7 @@ const TaskOffline = ({navigation}) => {
               ListHeaderComponent={
               <View
                   style={{
-                  backgroundColor: colorsTheme.naranja,
+                  backgroundColor: colorsTheme.verdeHybrico,
                   width: width * 0.76,
                   padding: 10,
                   justifyContent:'center',
@@ -526,7 +526,7 @@ const TaskOffline = ({navigation}) => {
             ListHeaderComponent={
             <View
                 style={{
-                backgroundColor: colorsTheme.naranja,
+                backgroundColor: colorsTheme.verdeHybrico,
                 width: width,
                 padding: 10,
                 alignItems: 'center',
@@ -563,7 +563,7 @@ const TaskOffline = ({navigation}) => {
       {loading ?
         (
           <View style={{justifyContent: 'center', alignItems: 'center', height:height * 0.5}}>
-            <ActivityIndicator size="large" color={colorsTheme.naranja}/>
+            <ActivityIndicator size="large" color={colorsTheme.verdeHybrico}/>
           </View>
         ) : (
             <>
@@ -571,7 +571,7 @@ const TaskOffline = ({navigation}) => {
                     style={{
                         marginTop:10,
                         flexDirection: 'row',
-                        backgroundColor: colorsTheme.naranja,
+                        backgroundColor: colorsTheme.verdeHybrico,
                         borderRadius: 10,
                         width: 50,
                         height: 50,
@@ -623,7 +623,7 @@ const TaskOffline = ({navigation}) => {
                   <Progress.Bar
                     progress={progressAlert}
                     width={200}
-                    color={colorsTheme.naranja}
+                    color={colorsTheme.verdeHybrico}
                     animated={true}
                     animationType="spring"
                   />
@@ -638,7 +638,7 @@ const TaskOffline = ({navigation}) => {
 
 const styles = StyleSheet.create({
     buttonTab: {
-        backgroundColor: colorsTheme.naranja,
+        backgroundColor: colorsTheme.verdeHybrico,
         flex: 1,
         height: height * 0.06,
         paddingTop: 10,

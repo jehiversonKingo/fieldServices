@@ -124,7 +124,7 @@ const AccountStatus = ({ navigation }) => {
       {
         loading ? (
           <View style={{ justifyContent: 'center', alignItems: 'center', height: height * 0.5 }}>
-            <ActivityIndicator size="large" color={colorsTheme.naranja} />
+            <ActivityIndicator size="large" color={colorsTheme.verdeHybrico} />
           </View>
         ) : (
           <>

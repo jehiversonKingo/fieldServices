@@ -69,6 +69,7 @@
     "react-native-sqlite-storage": "^6.0.1",
     "react-native-stepper-ui": "^0.0.9",
     "react-native-svg": "^13.2.0",
+    "react-native-svg-transformer": "^1.5.0",
     "react-native-timeline-flatlist": "^0.8.0",
     "react-native-uuid": "^2.0.2",
     "react-native-vector-icons": "^10.0.2",

@@ -7,7 +7,7 @@ const TaskInfoScreen = ({data, isLoading}) => {
   return (
       <Fragment>
         <Text style={{
-            color: colorsTheme.naranja,
+            color: colorsTheme.verdeHybricoDark,
             textAlign: "center",
             fontWeight: "700",
             fontSize: 20
@@ -16,37 +16,37 @@ const TaskInfoScreen = ({data, isLoading}) => {
         {
             isLoading ? (
                 <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                    <ActivityIndicator size="large" color={colorsTheme.naranja}/>
+                    <ActivityIndicator size="large" color={colorsTheme.verdeHybrico}/>
                 </View>
             ) : (
                 <Fragment>
                     <View style={{...styles.container.background}}>
                         <Text style={{color: colorsTheme.gris80}}>   
-                            <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
+                            <Text style={{color: colorsTheme.verdeHybrico, fontWeight: "700"}}>
                                 {"Fecha de expiración: "}
                             </Text>{moment(data.expirationDate ?? "").format("MM-DD-YYYY")}
                         </Text>
 
                         <Text style={{color: colorsTheme.gris80}}>
-                            <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
+                            <Text style={{color: colorsTheme.verdeHybrico, fontWeight: "700"}}>
                                 {"Tendero: "}
                             </Text>{data?.ticket?.customer.name ?? ""}  
                         </Text>
 
                         <Text style={{color: colorsTheme.gris80}}>
-                            <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
+                            <Text style={{color: colorsTheme.verdeHybrico, fontWeight: "700"}}>
                                 {"Teléfono: "}
                             </Text>{data?.ticket?.customer.phone ?? ""}
                         </Text>
 
                         <Text style={{color: colorsTheme.gris80}}>
-                            <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
+                            <Text style={{color: colorsTheme.verdeHybrico, fontWeight: "700"}}>
                                 {"Descripción: "}
                             </Text>{data?.ticket?.description ?? ""}
                         </Text>
 
                         <Text style={{color: colorsTheme.gris80}}>
-                            <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
+                            <Text style={{color: colorsTheme.verdeHybrico, fontWeight: "700"}}>
                                 {"Tipo: "}
                             </Text>{data?.ticket?.ticketCategory.name ?? ""}  
                         </Text>
@@ -54,7 +54,7 @@ const TaskInfoScreen = ({data, isLoading}) => {
 
                     <View style={{...styles.container.background}}>
                         <Text style={{
-                            color: colorsTheme.naranja,
+                            color: colorsTheme.verdeHybrico,
                             textAlign: "center",
                             fontWeight: "700"
                         }}>
@@ -85,7 +85,7 @@ const TaskInfoScreen = ({data, isLoading}) => {
                     
                     <View style={{...styles.container.background}}>
                         <Text style={{
-                            color: colorsTheme.naranja,
+                            color: colorsTheme.verdeHybrico,
                             textAlign: "center",
                             fontWeight: "700"
                         }}>

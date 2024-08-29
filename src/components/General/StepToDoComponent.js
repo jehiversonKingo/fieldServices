@@ -23,7 +23,7 @@ const StepToDoComponent = ({item, index, onClickValidate, onClickStep}) => {
         <TouchableOpacity
           onPress={onClickValidate}
           style={{
-            backgroundColor: colorsTheme.naranja,
+            backgroundColor: colorsTheme.verdeHybrico,
             paddingVertical: 5,
             borderBottomRightRadius: 10,
             borderTopEndRadius: 10,

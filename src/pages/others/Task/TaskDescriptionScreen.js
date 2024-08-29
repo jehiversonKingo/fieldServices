@@ -211,7 +211,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         <TouchableOpacity style={{width: width * 0.3, margin: 1}}>
           <FitImage
             indicator={true}
-            indicatorColor={colorsTheme.naranja}
+            indicatorColor={colorsTheme.verdeHybrico}
             indicatorSize="large"
             source={{uri: 'file://' + item.path}}
             resizeMode="contain"
@@ -264,9 +264,9 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 <View style={styles.check}>
                   <BouncyCheckbox
                     size={25}
-                    fillColor={colorsTheme.naranja}
+                    fillColor={colorsTheme.verdeHybrico}
                     unFillColor="#FFFFFF"
-                    iconStyle={{borderColor: colorsTheme.naranja}}
+                    iconStyle={{borderColor: colorsTheme.verdeHybrico}}
                     innerIconStyle={{borderWidth: 2}}
                     textStyle={{fontFamily: 'JosefinSans-Regular'}}
                     hitSlop={{top: 30, bottom: 30, left: 50, right: 50}}
@@ -287,7 +287,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   const RenderTransactionList = ({item, index}) => (
     <>
       {item.types.includes(typeTask) && (
-        <View style={{ flex: 3, borderWidth: 2, borderColor: colorsTheme.naranja, padding: 10, margin: 5, borderRadius: 10 }}>
+        <View style={{ flex: 3, borderWidth: 2, borderColor: colorsTheme.verdeHybrico, padding: 10, margin: 5, borderRadius: 10 }}>
           <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center" }}>
             <AntDesignIcon size={30} color="black" name={item.icon} />
           </View>
@@ -913,7 +913,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           .then(res => {
             console.log('Servidor detenido', res);
             setStatusServer('Servidor detenido');
-            setStatusServerColor(colorsTheme.naranja60);
+            setStatusServerColor(colorsTheme.verdeHybricoLight);
             setIsRunning(false);
           })
           .catch(error => console.error('Error al detener el servidor', error));
@@ -930,11 +930,11 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       <Header isLeft={true} navigation={navigation} />
       <View style={{flex: 1, marginHorizontal: 20}}>
         <ProgressSteps
-          completedProgressBarColor={colorsTheme.naranja}
-          activeStepIconBorderColor={colorsTheme.naranja}
-          activeStepIconColor={colorsTheme.naranja}
-          activeLabelColor={colorsTheme.naranja}
-          completedStepIconColor={colorsTheme.naranja}
+          completedProgressBarColor={colorsTheme.verdeHybrico}
+          activeStepIconBorderColor={colorsTheme.verdeHybrico}
+          activeStepIconColor={colorsTheme.verdeHybrico}
+          activeLabelColor={colorsTheme.verdeHybrico}
+          completedStepIconColor={colorsTheme.verdeHybrico}
           labelFontSize={13}
           activeLabelFontSize={15}
           activeStepNumColor={colorsTheme.blanco}
@@ -949,7 +949,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                   alignItems: 'center',
                   height: height * 0.5,
                 }}>
-                <ActivityIndicator size="large" color={colorsTheme.naranja} />
+                <ActivityIndicator size="large" color={colorsTheme.verdeHybrico} />
               </View>
             ) : (
                 <FlatList
@@ -1055,7 +1055,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                   <View>
                     <Text
                       style={{
-                        backgroundColor: colorsTheme.naranja,
+                        backgroundColor: colorsTheme.verdeHybrico,
                         padding: 15,
                         margin: 3,
                         borderRadius: 10,
@@ -1207,7 +1207,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             <Progress.Bar
               progress={progressAlert}
               width={200}
-              color={colorsTheme.naranja}
+              color={colorsTheme.verdeHybrico}
               animated={true}
               animationType="spring"
             />
@@ -1220,7 +1220,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             <View style={{alignItems: 'center'}}>
               <Text
                 style={{
-                  color: colorsTheme.naranja,
+                  color: colorsTheme.verdeHybrico,
                   fontWeight: '700',
                   fontSize: 20,
                 }}>
@@ -1247,7 +1247,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 <Text
                   style={{
                     borderWidth: 1,
-                    backgroundColor: colorsTheme.naranja,
+                    backgroundColor: colorsTheme.verdeHybrico,
                     borderColor: colorsTheme.blanco,
                     color: colorsTheme.blanco,
                     borderRadius: 8,
@@ -1280,7 +1280,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                       <Text
                         style={{
                           borderWidth: 1,
-                          backgroundColor: colorsTheme.naranja,
+                          backgroundColor: colorsTheme.verdeHybrico,
                           borderColor: colorsTheme.blanco,
                           color: colorsTheme.blanco,
                           borderRadius: 8,
@@ -1324,7 +1324,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   buttonTextStyle: {
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderRadius: 5,
     padding: 15,
     position: 'absolute',
@@ -1334,7 +1334,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     borderRadius: 10,
-    borderLeftColor: colorsTheme.naranja60,
+    borderLeftColor: colorsTheme.verdeHybricoLight,
     borderLeftWidth: 5,
     backgroundColor: colorsTheme.blanco,
     shadowColor: colorsTheme.gris80,
@@ -1366,7 +1366,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   tranferTitleActive: {
-    color: colorsTheme.naranja,
+    color: colorsTheme.verdeHybrico,
     fontWeight: '700',
     fontSize: 18,
   },

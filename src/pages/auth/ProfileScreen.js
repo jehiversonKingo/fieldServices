@@ -74,7 +74,7 @@ const ProfileScreen = ({navigation}) => {
             </>
           ) : (
             <View style={{ralignItems: 'center', flex: 1}}>
-              <ActivityIndicator size="large" color={colorsTheme.naranja}/>
+              <ActivityIndicator size="large" color={colorsTheme.verdeHybrico}/>
             </View>
           )
         }
@@ -119,13 +119,13 @@ const styles = StyleSheet.create({
     color: colorsTheme.negro,
     marginBottom: 10,
     backgroundColor: colorsTheme.blanco,
-    borderColor:colorsTheme.naranja,
+    borderColor:colorsTheme.verdeHybrico,
     borderWidth:1,
     borderRadius: 10,
   },
   buttonLogin: {
     margin: 50,
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeFuerte,
   },
 });
 

@@ -12,7 +12,7 @@ import DeviceInfo from 'react-native-device-info';
 import {colorsTheme} from '../../configurations/configStyle';
 
 //Images
-import Logo from '../../../assets/img/logoBlanco.png';
+import Logo from '../../../assets/img/hybrico-logo-blanco.svg';
 
 const Header = ({
   isLeft,
@@ -56,7 +56,8 @@ const Header = ({
           )}
         </View>
         <View style={styles.containerLogo}>
-          <Image source={Logo} style={styles.imgLogo} />
+          {/* <Image source={Logo} style={styles.imgLogo} /> */}
+          <Logo height={"30"} width={"90"} />
           <Text style={{color: colorsTheme.blanco}}>{process.env.ENVIROMENT}. {DeviceInfo.getVersion()}</Text>
         </View>
         <View style={styles.containerProfile}>
@@ -83,7 +84,7 @@ const Header = ({
 const styles = StyleSheet.create({
   container: {
     height: 70,
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     flexDirection: 'row',
   },
   containerBack: {

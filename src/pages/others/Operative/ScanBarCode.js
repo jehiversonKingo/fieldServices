@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   userData: {
     flexDirection: 'row',
     marginBottom: 10,
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderTopColor: colorsTheme.gris80,
     borderTopWidth: 1,
     borderBottomColor: colorsTheme.gris80,
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     },
     icon: {
       paddingRight: 15,
-      color: colorsTheme.naranja,
+      color: colorsTheme.verdeHybrico,
     },
   },
   rnholeView: {

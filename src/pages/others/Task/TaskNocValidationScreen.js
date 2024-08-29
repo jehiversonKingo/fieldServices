@@ -79,7 +79,7 @@ const TaskNocValidationScreen = ({navigation, route}) => {
           <Button
             title="Validar"
             size="lg"
-            buttonStyle={{backgroundColor: colorsTheme.naranja, borderRadius: 30}}
+            buttonStyle={{backgroundColor: colorsTheme.verdeHybrico, borderRadius: 30}}
             containerStyle={{
               marginHorizontal: 50,
               marginVertical: 10,
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   buttonTextStyle: {
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderRadius: 5,
     padding: 15,
     position: 'absolute',

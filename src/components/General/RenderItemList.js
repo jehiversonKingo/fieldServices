@@ -20,7 +20,7 @@ const RenderItemList = ({item, goTo, onLongPress}) => {
     let sizeAlert = '';
     switch (item.task.taskPriority.name) {
       case 'Alta':
-        color = colorsTheme.naranja;
+        color = colorsTheme.rojo80;
         colorLabel = colorsTheme.blanco;
         icon = 'warning-outline';
         sizeAlert = 85;
@@ -32,7 +32,7 @@ const RenderItemList = ({item, goTo, onLongPress}) => {
         sizeAlert = 90;
         break;
       case 'Baja':
-        color = colorsTheme.verdeFuerte;
+        color = colorsTheme.verdeHybricoDark;
         colorLabel = colorsTheme.blanco;
         icon = 'checkmark-circle-outline';
         sizeAlert = 85;
@@ -43,7 +43,7 @@ const RenderItemList = ({item, goTo, onLongPress}) => {
       <TouchableOpacity
         style={{
           ...styles.containerList.background,
-          backgroundColor: moment().isAfter(moment(item.task.expirationDate)) ? colorsTheme.naranja20 : colorsTheme.blanco
+          backgroundColor: moment().isAfter(moment(item.task.expirationDate)) ? colorsTheme.verdeHybricoLight : colorsTheme.blanco
         }}
         onLongPress={() => onLongPress(item.idTask)}
         onPress={() =>
@@ -62,7 +62,7 @@ const RenderItemList = ({item, goTo, onLongPress}) => {
           <View
             style={{
               flex: 0.4,
-              backgroundColor: item.task.taskState.idTaskState !== 3 ? colorsTheme.naranja : colorsTheme.verdeFuerte,
+              backgroundColor: item.task.taskState.idTaskState !== 3 ? colorsTheme.verdeHybrico : colorsTheme.verdeFuerte,
               justifyContent: 'center',
               alignItems: 'center',
               alignContent: 'center',
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
         width: width * 0.95,
         margin: 4,
         backgroundColor: colorsTheme.blanco,
-        borderLeftColor: colorsTheme.naranja60,
+        borderLeftColor: colorsTheme.verdeHybricoLight,
         borderLeftWidth: 5,
         borderRadius: 5,
         padding: 5,

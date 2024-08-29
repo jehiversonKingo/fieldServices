@@ -87,7 +87,6 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
       setData(newValue2);
     } else setData(newValue);
   };
-  console.log(isScanned, device != null, hasPermission);
   return (
     <SafeAreaView style={{ backgroundColor: colorsTheme.negro }}>
       <View>
@@ -126,7 +125,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
             style={{
               marginTop: 10,
               flexDirection: 'row',
-              backgroundColor: colorsTheme.naranja,
+              backgroundColor: colorsTheme.verdeHybrico,
               borderRadius: 10,
               width: 100,
               height: 40,
@@ -149,7 +148,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
               <View style={{ justifyContent: 'center' }}>
                 <FitImage
                   indicator={true}
-                  indicatorColor={colorsTheme.naranja}
+                  indicatorColor={colorsTheme.verdeHybrico}
                   indicatorSize="large"
                   source={{
                     uri:
@@ -228,7 +227,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
                         onPress={() => handleShowImage(item, index)}>
                         <FitImage
                           indicator={true}
-                          indicatorColor={colorsTheme.naranja}
+                          indicatorColor={colorsTheme.verdeHybrico}
                           indicatorSize="large"
                           source={{
                             uri:
@@ -273,7 +272,7 @@ const styles = StyleSheet.create({
   },
   camInternalButton: {
     flexDirection: 'row',
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderRadius: 100,
     width: 60,
     height: 60,
@@ -292,7 +291,7 @@ const styles = StyleSheet.create({
   },
   camCancelButton: {
     flexDirection: 'row',
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderRadius: 10,
     width: 150,
     height: 60,

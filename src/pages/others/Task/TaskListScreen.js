@@ -128,8 +128,9 @@ const TaskListScreen = ({ navigation, route }) => {
   const handleFilter = (value = "") => {
     setFilterTxt(value)
     let dataFilter = []
-    const regexPattern = new RegExp(value, "g");
-    dataFilter = dataTmp.filter((item => item.task.ticket.description.match(regexPattern)))
+    const regexPattern = new RegExp(value.toLocaleLowerCase(), "g");
+    dataFilter = dataTmp.filter((item => (item.task.ticket.description).toLocaleLowerCase().match(regexPattern) || item.task.idTask == value))
+    console.log(dataFilter);
     if (dataFilter.length > 0) {
       setData(dataFilter)
     } else {
@@ -168,7 +169,7 @@ const TaskListScreen = ({ navigation, route }) => {
           style={{
             ...styles.buttonTab,
             borderBottomWidth: 3,
-            borderBottomColor: active === 0 ? colorsTheme.amarillo : colorsTheme.naranja
+            borderBottomColor: active === 0 ? colorsTheme.gris20 : colorsTheme.verdeHybrico
           }}
           onPress={() => {
             setActive(0)
@@ -180,7 +181,7 @@ const TaskListScreen = ({ navigation, route }) => {
           style={{
             ...styles.buttonTab,
             borderBottomWidth: 3,
-            borderBottomColor: active === 1 ? colorsTheme.amarillo : colorsTheme.naranja
+            borderBottomColor: active === 1 ? colorsTheme.gris20 : colorsTheme.verdeHybrico
           }}
           onPress={() => {
             setActive(1)
@@ -193,7 +194,7 @@ const TaskListScreen = ({ navigation, route }) => {
         loading ?
           (
             <View style={{ justifyContent: 'center', alignItems: 'center', height: height * 0.5 }}>
-              <ActivityIndicator size="large" color={colorsTheme.naranja} />
+              <ActivityIndicator size="large" color={colorsTheme.verdeHybrico} />
             </View>
           ) : (
             <>
@@ -208,7 +209,7 @@ const TaskListScreen = ({ navigation, route }) => {
                 <TouchableOpacity style={{ justifyContent: "center", marginHorizontal: 10 }}>
                   <FontAwesome5Icon
                     name={"search"}
-                    color={colorsTheme.naranja}
+                    color={colorsTheme.verdeHybrico}
                     size={20}
                   />
                 </TouchableOpacity>
@@ -222,7 +223,7 @@ const TaskListScreen = ({ navigation, route }) => {
                 showsHorizontalScrollIndicator={false}
                 ListEmptyComponent={
                   <View style={{
-                    backgroundColor: colorsTheme.naranja60,
+                    backgroundColor: colorsTheme.verdeHybricoLight,
                     width: width * 0.90,
                     height: height * 0.05,
                     justifyContent: 'center',
@@ -245,7 +246,7 @@ const TaskListScreen = ({ navigation, route }) => {
         showCancelButton={false}
         showConfirmButton={true}
         confirmText="Aceptar"
-        confirmButtonColor={colorsTheme.rojo}
+        confirmButtonColor={colorsTheme.verdeHybricoLight}
         onConfirmPressed={() => {
           setIsAlert(false);
         }}
@@ -309,7 +310,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10
   },
   buttonTab: {
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     flex: 1,
     height: height * 0.06,
     paddingTop: 10,

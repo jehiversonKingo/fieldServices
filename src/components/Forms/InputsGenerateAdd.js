@@ -61,7 +61,7 @@ const Inputs = ({
                     setData: setInformation,
                   });
                 }}>
-                <Ionicons name={'camera'} color={colorsTheme.naranja} size={40} />
+                <Ionicons name={'camera'} color={colorsTheme.verdeHybrico} size={40} />
               </TouchableOpacity>
             </View>
             <View style={{width: `${widthScreen}` * 0.2, ...propStyleIcon}}>
@@ -81,7 +81,7 @@ const Inputs = ({
           <View>
             <FitImage
               indicator={true}
-              indicatorColor={colorsTheme.naranja}
+              indicatorColor={colorsTheme.verdeHybrico}
               indicatorSize="small"
               source={{
                 uri:
@@ -123,7 +123,7 @@ const Inputs = ({
               }}>
               <Ionicons
                 name={'barcode'}
-                color={colorsTheme.naranja}
+                color={colorsTheme.verdeHybrico}
                 size={40}
                 style={styles.icon}
               />
@@ -178,7 +178,7 @@ const Inputs = ({
 const styles = StyleSheet.create({
   icon: {
     marginTop: 20,
-    color: colorsTheme.naranja,
+    color: colorsTheme.verdeHybrico,
     marginRight: 5,
   },
   colorText: {

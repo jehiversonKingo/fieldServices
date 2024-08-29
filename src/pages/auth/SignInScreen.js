@@ -13,7 +13,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import DeviceInfo from 'react-native-device-info';
 
 //Images
-import Logo from '../../../assets/img/logoNaranja.png';
+import Logo from '../../../assets/img/hybrico-logo.svg';
 
 //Context
 import { Context as AuthContext } from '../../context/AuthContext';
@@ -60,7 +60,8 @@ const SignInScreen = ({ }) => {
     <View style={styles.container}>
       <View style={styles.formLogin}>
         <View style={styles.imgContainer}>
-          <Image source={Logo} style={styles.imgLogin} />
+          {/* <Image source={Logo} style={styles.imgLogin} /> */}
+          <Logo height={120} width={250} />
         </View>
         <Text style={styles.colorText}>Usuario</Text>
         <TextInput
@@ -84,7 +85,7 @@ const SignInScreen = ({ }) => {
             title={isLoading ? "cargando..." : "Ingresar"}
             disabled={isLoading}
             size="lg"
-            buttonStyle={{ backgroundColor: colorsTheme.naranja, borderRadius: 30 }}
+            buttonStyle={{ backgroundColor: colorsTheme.verdeHybrico, borderRadius: 30 }}
             containerStyle={{
               marginHorizontal: 50,
               marginVertical: 10,
@@ -146,13 +147,13 @@ const styles = StyleSheet.create({
     color: colorsTheme.negro,
     marginBottom: 10,
     backgroundColor: colorsTheme.blanco,
-    borderColor: colorsTheme.naranja,
+    borderColor: colorsTheme.verdeHybrico,
     borderWidth: 1,
     borderRadius: 10,
   },
   buttonLogin: {
     margin: 50,
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
   },
 });
 

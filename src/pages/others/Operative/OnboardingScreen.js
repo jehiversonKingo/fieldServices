@@ -8,8 +8,8 @@ import { getStep} from '../../../functions/fncSqlite';
 
 import {colorsTheme} from '../../../configurations/configStyle';
 import {Context as AuthContext} from '../../../context/AuthContext';
-import Logo from '../../../../assets/img/Isotipo-Kingo.png';
-
+import Logo from '../../../../assets/img/hybrico-logo-blanco.svg';
+//CAMBIAR ISOTIPO
 const OnboardingComponent = ({navigation, route}) => {
   const onboardingRef = useRef(null);
   const {idStep} = route.params;
@@ -111,7 +111,8 @@ const OnboardingComponent = ({navigation, route}) => {
         {
           backgroundColor: colorsTheme.blanco,
           //image: <Image source={{uri: instruction.file}} style={{ height: 300, width:300}}/>,
-          image: <Image source={Logo} style={{ height: 300, width:300}} />,
+          // image: <Image source={Logo} style={{ height: 300, width:300}} />,
+          image: <Logo height={300} width={300}/>,
           title: instruction.title,
           subtitle: instruction.description,
         }
@@ -134,7 +135,7 @@ const OnboardingComponent = ({navigation, route}) => {
       SkipButtonComponent={Skip}
       NextButtonComponent={Next}
       bottomBarHighlight={false}
-      bottomBarColor={colorsTheme.naranja}
+      bottomBarColor={colorsTheme.verdeHybrico}
       pages={data}
       DotComponent={Square}
     />

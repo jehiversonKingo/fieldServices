@@ -24,4 +24,9 @@ export const colorsTheme = {
   naranja80: '#f3864f',
   negro:'#000000',
   blanco:'#ffff',
+  // HYBRICO
+  verdeHybrico: '#42683C',
+  verdeHybricoDark: '#1B2A18',
+  verdeHybricoLight: '#c2ccaf',
+
 };

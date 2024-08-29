@@ -26,8 +26,6 @@ import CameraMultiShotScreen from './src/pages/others/Operative/CameraMultiShotS
 import ScanBarCodeScreen from './src/pages/others/Operative/ScanBarCode';
 import OnboardingScreen from './src/pages/others/Operative/OnboardingScreen';
 import ImageFullScreen from './src/pages/others/Operative/ImageFullScreen';
-import HandshakeServerScreen from './src/pages/others/Sync/HandshakeServerScreen';
-import HandshakeClientScreen from './src/pages/others/Operative/HandshakeClientScreen';
 import BankPayScreen from './src/pages/others/Bank/BankPayScreen';
 import VoucherScreen from './src/pages/others/Bank/VoucherScreen';
 import AccountStatus from './src/pages/others/Bank/AccountStatusScreen';
@@ -161,38 +159,8 @@ const HomeFlow = () => {
         options={{ headerShown: false }}
       />
       <HomeStack.Screen
-        name="HandshakeServer"
-        component={HandshakeServerScreen}
-        options={{ headerShown: false }}
-      />
-      <HomeStack.Screen
-        name="HandshakeClient"
-        component={HandshakeClientScreen}
-        options={{ headerShown: false }}
-      />
-      <HomeStack.Screen
-        name="BankPay"
-        component={BankPayScreen}
-        options={{ headerShown: false }}
-      />
-      <HomeStack.Screen
-        name="VoucherScreen"
-        component={VoucherScreen}
-        options={{ headerShown: false }}
-      />
-      <HomeStack.Screen
-        name="AccountStatus"
-        component={AccountStatus}
-        options={{ headerShown: false }}
-      />
-      <HomeStack.Screen
         name="VisitScreen"
         component={VisitScreen}
-        options={{ headerShown: false }}
-      />
-      <HomeStack.Screen
-        name="DownloadData"
-        component={DownloadOfflineDataScreen}
         options={{ headerShown: false }}
       />
       <HomeStack.Screen
@@ -203,6 +171,11 @@ const HomeFlow = () => {
       <HomeStack.Screen
         name="SyncDataScreen"
         component={SyncDataScreen}
+        options={{ headerShown: false }}
+      />
+      <HomeStack.Screen
+        name="DownloadData"
+        component={DownloadOfflineDataScreen}
         options={{ headerShown: false }}
       />
     </HomeStack.Navigator>

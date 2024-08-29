@@ -77,7 +77,7 @@ const InventoryScreen = ({navigation}) => {
             margin:5,
             padding: 15,
             borderRadius:10,
-            borderLeftColor: colorsTheme.naranja60,
+            borderLeftColor: colorsTheme.verdeHybricoLight,
             borderLeftWidth: 5,
             backgroundColor: colorsTheme.blanco,
             shadowColor: colorsTheme.gris80,
@@ -119,7 +119,7 @@ const InventoryScreen = ({navigation}) => {
         ListHeaderComponent={
         <View
             style={{
-            backgroundColor: colorsTheme.naranja,
+            backgroundColor: colorsTheme.verdeFuerte,
             padding: 10,
             alignItems: 'center',
             }}>
@@ -156,7 +156,7 @@ const InventoryScreen = ({navigation}) => {
           style={{
             ...styles.buttonTab,
             borderBottomWidth: 3,
-            borderBottomColor: active === 0 ? colorsTheme.amarillo:colorsTheme.naranja
+            borderBottomColor: active === 0 ? colorsTheme.amarillo:colorsTheme.verdeHybrico
           }}
           onPress={() => {
             setActive(0)
@@ -168,7 +168,7 @@ const InventoryScreen = ({navigation}) => {
           style={{
             ...styles.buttonTab,
             borderBottomWidth: 3,
-            borderBottomColor: active === 1 ? colorsTheme.amarillo:colorsTheme.naranja
+            borderBottomColor: active === 1 ? colorsTheme.amarillo:colorsTheme.verdeHybrico
           }}
           onPress={() => {
             setActive(1)
@@ -180,7 +180,7 @@ const InventoryScreen = ({navigation}) => {
       {loading ?
         (
           <View style={{justifyContent: 'center', alignItems: 'center', height:height * 0.5}}>
-            <ActivityIndicator size="large" color={colorsTheme.naranja}/>
+            <ActivityIndicator size="large" color={colorsTheme.verdeHybrico}/>
           </View>
         ) : (
           <>
@@ -195,7 +195,7 @@ const InventoryScreen = ({navigation}) => {
               <TouchableOpacity style={{justifyContent: "center", marginHorizontal: 10}}>
                 <FontAwesome5
                   name={"search"}
-                  color={colorsTheme.naranja}
+                  color={colorsTheme.verdeHybrico}
                   size={20}
                 />
               </TouchableOpacity>
@@ -209,7 +209,7 @@ const InventoryScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   buttonTab: {
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     flex: 1,
     height: height * 0.06,
     paddingTop: 10,

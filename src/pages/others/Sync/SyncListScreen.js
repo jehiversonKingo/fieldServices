@@ -8,7 +8,6 @@ import { getStep } from '../../../functions/fncSqlite';
 
 const menuItems = [
   { icon: 'cloud-upload', text: 'Sincronizar Tareas', screen: 'TaskOffline' },
-  { icon: 'handshake-o', text: 'Handshake', screen: 'HandshakeServer' },
   { icon: 'refresh', text: 'Cargar Datos', screen: 'SyncDataScreen' },
 ];
 
@@ -19,7 +18,7 @@ const SyncListScreen = ({ navigation }) => {
       onPress={() => navigation.navigate(item.screen)}>
       <FontAwesome
         name={item.icon}
-        color={colorsTheme.naranja}
+        color={colorsTheme.verdeHybrico}
         size={30}
         style={styles.icon}
       />
@@ -69,7 +68,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.34,
     shadowRadius: 6.27,
     elevation: 6,
-    borderLeftColor: colorsTheme.naranja,
+    borderLeftColor: colorsTheme.verdeHybrico,
     borderLeftWidth:4,
   },
   icon: {

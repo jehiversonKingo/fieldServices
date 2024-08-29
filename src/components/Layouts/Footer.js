@@ -17,7 +17,7 @@ const Footer = ({styleCustomer}) => {
 
 const styles = StyleSheet.create({
   containerLogo: {
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     flexDirection: 'row',
     height: 80,
     width: width,

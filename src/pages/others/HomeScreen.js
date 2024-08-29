@@ -40,7 +40,7 @@ const HomeScreen = ({navigation}) => {
       onPress={() => goTo(item.module.screen)}>
        <FontAwesome5
         name={item.module.icon}
-        color={colorsTheme.naranja}
+        color={colorsTheme.verdeHybrico}
         size={item.module.size}
         style={styles.bottomMenu.icon}
       />
@@ -133,11 +133,11 @@ const HomeScreen = ({navigation}) => {
   if (blocked || uploadSync) {
     return (
       <View style={{ justifyContent: 'center', alignItems: 'center', alignContent: "center", flex: 1 }}>
-        <Text style={{ color: colorsTheme.naranja, fontSize: 20 }}> Aplicación bloqueada</Text>
+        <Text style={{ color: colorsTheme.verdeHybrico, fontSize: 20 }}> Aplicación bloqueada</Text>
         <View style={{ marginHorizontal: 25, flexDirection: "row" }}>
           <Text style={{ color: colorsTheme.negro, fontWeight: "bold" }}>Tienes lotes de información pendiente de subir</Text>
         </View>
-        <TouchableOpacity style={{ paddingHorizontal: 45, paddingVertical: 10, backgroundColor: colorsTheme.naranja, borderRadius: 15, marginTop: 10, flexDirection: "row" }}
+        <TouchableOpacity style={{ paddingHorizontal: 45, paddingVertical: 10, backgroundColor: colorsTheme.verdeHybrico, borderRadius: 15, marginTop: 10, flexDirection: "row" }}
           onPress={() => navigation.navigate("SyncDataScreen")}
         >
           <FontAwesome5 name='cloud-upload-alt' color={colorsTheme.blanco} size={20} style={{ marginRight: 5 }} />
@@ -152,7 +152,7 @@ const HomeScreen = ({navigation}) => {
       <Header />
       <View>
         <View style={{padding: 20}}>
-          <View style={{backgroundColor: colorsTheme.naranja, alignItems: 'center', shadowColor: colorsTheme.gris80,
+          <View style={{backgroundColor: colorsTheme.verdeHybrico, alignItems: 'center', shadowColor: colorsTheme.gris80,
             shadowOffset: {
               width: 0,
               height: 5,
@@ -171,7 +171,7 @@ const HomeScreen = ({navigation}) => {
             {
               isLoading ? (
                 <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
-                  <ActivityIndicator size="large" color={colorsTheme.naranja}/>
+                  <ActivityIndicator size="large" color={colorsTheme.verdeHybrico}/>
                 </View>
               ) : (
                 menu.length > 0 ? (
@@ -184,7 +184,7 @@ const HomeScreen = ({navigation}) => {
                   })
                 ) : (
                   <View style={{
-                    backgroundColor: colorsTheme.naranja60,
+                    backgroundColor: colorsTheme.verdeHybricoLight,
                     flex: 1,
                     justifyContent:'center',
                     alignItems: 'center',
@@ -207,7 +207,7 @@ const HomeScreen = ({navigation}) => {
       </View>
       <SpeedDial
         isOpen={open}
-        color={colorsTheme.naranja}
+        color={colorsTheme.verdeHybrico}
         icon={{ name: 'dns', color: '#fff' }}
         openIcon={{ name: 'close', color: '#fff' }}
         onOpen={() => setOpen(!open)}
@@ -215,13 +215,13 @@ const HomeScreen = ({navigation}) => {
       >
         <SpeedDial.Action
           icon={{ name: 'person', color: '#fff' }}
-          color={colorsTheme.naranja}
+          color={colorsTheme.verdeHybrico}
           title="Perfil"
           onPress={() => navigation.navigate('Profile')}
         />
         <SpeedDial.Action
           icon={{ name: 'power-off', color: '#fff' }}
-          color={colorsTheme.naranja}
+          color={colorsTheme.verdeHybrico}
           title="Cerrar Sesión"
           onPress={() => fncSingOut()}
         />
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   userData: {
     flexDirection: 'row',
     marginBottom: 10,
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
   },
   textInformation: {color: colorsTheme.blanco},
   bottomMenu: {
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 10,
     margin:7,
-    borderLeftColor: colorsTheme.naranja60,
+    borderLeftColor: colorsTheme.verdeHybricoLight,
     borderLeftWidth: 5,
     backgroundColor: colorsTheme.blanco,
     height: 85,
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     },
     icon: {
       paddingRight: 15,
-      color: colorsTheme.naranja,
+      color: colorsTheme.verdeHybricoLight,
     },
     shadowColor: colorsTheme.gris80,
         shadowOffset: {

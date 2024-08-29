@@ -122,7 +122,7 @@ const CameraScreen = ({navigation, route}) => {
               <View>
                 <FitImage
                   indicator={true}
-                  indicatorColor={colorsTheme.naranja}
+                  indicatorColor={colorsTheme.verdeHybrico}
                   indicatorSize="large"
                   source={{uri: 'file://' + photoData.path}}
                   style={{width: width, height: height * 0.8}}
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   },
   camInternalButton: {
     flexDirection: 'row',
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderRadius: 100,
     width: 60,
     height: 60,
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   },
   camConfirmationButton: {
     flexDirection: 'row',
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderRadius: 10,
     width: 230,
     height: 60,
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   },
   camCancelButton: {
     flexDirection: 'row',
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderRadius: 10,
     width: 230,
     height: 60,

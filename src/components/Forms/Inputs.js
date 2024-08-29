@@ -4,7 +4,6 @@ import PhoneInput from 'react-native-phone-number-input';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FitImage from 'react-native-fit-image';
-import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { handleIsValidUrl, handleCutString } from '../../functions/fncGeneral';
 
@@ -160,14 +159,14 @@ const Inputs = ({
                         </View>
                         <View style={{ width: `${width}` * 0.3, marginTop: 20 }}>
                             <TouchableOpacity onPress={() => { handleClickPhoto(); }}>
-                                <Ionicons name={'camera'} color={colorsTheme.naranja} size={40} />
+                                <Ionicons name={'camera'} color={colorsTheme.verdeHybrico} size={40} />
                             </TouchableOpacity>
                         </View>
                     </View>
                     <View>
                         <FitImage
                             indicator={true}
-                            indicatorColor={colorsTheme.naranja}
+                            indicatorColor={colorsTheme.verdeHybrico}
                             indicatorSize="small"
                             source={{
                                 uri:
@@ -196,7 +195,7 @@ const Inputs = ({
                     </View>
                     <View style={{ width: `${width}` * 0.1, marginTop: 20 }}>
                         <TouchableOpacity onPress={() => { handleClickBarcode(); }}>
-                            <Ionicons name={'barcode'} color={colorsTheme.naranja} size={40} style={styles.icon} />
+                            <Ionicons name={'barcode'} color={colorsTheme.verdeHybrico} size={40} style={styles.icon} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -227,7 +226,7 @@ const Inputs = ({
                     </View>
                     <View style={{ width: `${width}` * 0.106, marginTop: 20 }}>
                         <TouchableOpacity onPress={() => { handleClickLocation(); }}>
-                            <Ionicons name={'location'} color={colorsTheme.naranja} size={40} style={styles.icon} />
+                            <Ionicons name={'location'} color={colorsTheme.verdeHybrico} size={40} style={styles.icon} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -282,7 +281,7 @@ const Inputs = ({
                     {console.log("SCREEN ELEMENT", item)}
                     <Text style={styles.colorText}>{item?.addon ? item.addon.name : (item.screenElement?.label ?? item.label)}</Text>
                     <Dropdown
-                        style={[styles.dropdown, isFocus && { borderColor: colorsTheme.naranja }]}
+                        style={[styles.dropdown, isFocus && { borderColor: colorsTheme.verdeHybrico }]}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
                         inputSearchStyle={styles.inputSearchStyle}
@@ -303,7 +302,7 @@ const Inputs = ({
                         renderLeftIcon={() => (
                             <AntDesign
                                 style={styles.icon}
-                                color={isFocus ? colorsTheme.naranja : colorsTheme.gris80}
+                                color={isFocus ? colorsTheme.verdeHybrico : colorsTheme.gris80}
                                 name="Safety"
                                 size={20}
                             />
@@ -324,7 +323,7 @@ const Inputs = ({
                             />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={toggleCamera} style={{ justifyContent: 'center', alignItems: 'center' }}>
-                            <Ionicons name={'camera'} color={colorsTheme.naranja} size={40} style={styles.icon} />
+                            <Ionicons name={'camera'} color={colorsTheme.verdeHybrico} size={40} style={styles.icon} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -334,7 +333,7 @@ const Inputs = ({
 
 const styles = StyleSheet.create({
     icon: {
-        color: colorsTheme.naranja,
+        color: colorsTheme.verdeHybrico,
         marginRight: 5,
     },
     colorText: {

@@ -18,14 +18,14 @@ const ButtonProgressStep = ({text = 'text', onPress = () => {}, type}) => (
 
 const styles = StyleSheet.create({
   buttonRightTextStyle: {
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderRadius: 5,
     padding: 15,
     position: 'absolute',
     right: 0,
   },
   buttonLeftTextStyle: {
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderRadius: 5,
     padding: 15,
     position: 'absolute',

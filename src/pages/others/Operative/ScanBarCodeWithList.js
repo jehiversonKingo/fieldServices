@@ -176,7 +176,7 @@ const ScanBarCodeWithList = ({navigation, route}) => {
             <Button
               title="X"
               size="xs"
-              buttonStyle={{backgroundColor: colorsTheme.naranja, borderRadius: 5}}
+              buttonStyle={{backgroundColor: colorsTheme.verdeHybrico, borderRadius: 5}}
               containerStyle={{
                 marginHorizontal: 50,
                 marginVertical: 10,
@@ -190,7 +190,7 @@ const ScanBarCodeWithList = ({navigation, route}) => {
               <View
                 style={{
                   padding: 12,
-                  backgroundColor: colorsTheme.naranja60,
+                  backgroundColor: colorsTheme.verdeHybricoLight,
                   borderBottomColor: colorsTheme.negro,
                   borderBottomWidth: 0.8,
                 }}
@@ -235,7 +235,7 @@ const ScanBarCodeWithList = ({navigation, route}) => {
             ListHeaderComponent={
               <View
                 style={{
-                  backgroundColor: colorsTheme.naranja,
+                  backgroundColor: colorsTheme.verdeHybrico,
                   width: width,
                   padding: 10,
                   alignItems: 'center',
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   userData: {
     flexDirection: 'row',
     marginBottom: 10,
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     borderTopColor: colorsTheme.gris80,
     borderTopWidth: 1,
     borderBottomColor: colorsTheme.gris80,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     },
     icon: {
       paddingRight: 15,
-      color: colorsTheme.naranja,
+      color: colorsTheme.verdeHybrico,
     },
   },
   rnholeView: {
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   },
   camInternalButton: {
     flexDirection: 'row',
-    backgroundColor: colorsTheme.naranja,
+    backgroundColor: colorsTheme.verdeHybrico,
     width: 150,
     height: 60,
     margin: 3,
