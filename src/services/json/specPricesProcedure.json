@@ -1,0 +1,29 @@
+{
+    "_id": "spec-prices-procedure",
+    "activation": {
+        "first": {
+            "Kingo 100": 0,
+            "Kingo 15": 0,
+            "Kingo TV": 0,
+            "Kingo Hogar": 0,
+            "Kingo Basico": 0,
+            "Kingo - Basico": 0,
+            "Kingo - Luz": 0,
+            "Kingo - TV": 0,
+            "Kingo - Hogar": 0,
+            "Kingo 7": 0
+        },
+        "replacement": {
+            "Kingo 100": 0,
+            "Kingo 15": 0,
+            "Kingo TV": 0,
+            "Kingo Hogar": 0,
+            "Kingo Basico": 0,
+            "Kingo - Basico": 0,
+            "Kingo - Luz": 0,
+            "Kingo - TV": 0,
+            "Kingo - Hogar": 0,
+            "Kingo 7": 0
+        }
+    }
+ }

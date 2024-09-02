@@ -19,6 +19,7 @@ import OrdersDescriptionAddScreen from './src/pages/others/Orders/OrdersDescript
 import OrdersDescriptionToDoScreen from './src/pages/others/Orders/OrdersDescriptionToDoScreen';
 import OrdersDescriptionUpdateScreen from './src/pages/others/Orders/OrdersDescriptionUpdateScreen';
 import InventoryScreen from './src/pages/others/Inventory/InventoryScreen';
+import SettingsMenuScreen from './src/pages/others/SettingsB2C/SettingsMenu'
 
 //Operatives
 import CameraScreen from './src/pages/others/Operative/CameraScreen';
@@ -40,6 +41,12 @@ import VisitScreen from './src/pages/others/Visit/VisitScreen';
 //Sync
 import SyncListScreen from "./src/pages/others/Sync/SyncListScreen";
 import SyncDataScreen from "./src/pages/others/Sync/SyncDataScreen";
+
+//Settings Kingo
+import SettingsKingoScreen from "./src/pages/others/SettingsB2C/SettingsKingoScreen";
+import RepositionCodeScreen from "./src/pages/others/SettingsB2C/RepositionCodeScreen";
+import GenerateCodeTypesScreen from "./src/pages/others/SettingsB2C/GenerateCodeTypesScreen";
+
 
 //Components
 import Loading from './src/components/General/Loading';
@@ -203,6 +210,26 @@ const HomeFlow = () => {
       <HomeStack.Screen
         name="SyncDataScreen"
         component={SyncDataScreen}
+        options={{ headerShown: false }}
+      />
+      <HomeStack.Screen
+        name="SettingsMenuScreen"
+        component={SettingsMenuScreen}
+        options={{ headerShown: false }}
+      />
+      <HomeStack.Screen
+        name="SettingsKingoScreen"
+        component={SettingsKingoScreen}
+        options={{ headerShown: false }}
+      />
+      <HomeStack.Screen
+        name="RepositionCodeScreen"
+        component={RepositionCodeScreen}
+        options={{ headerShown: false }}
+      />
+       <HomeStack.Screen
+        name="GenerateCodeTypesScreen"
+        component={GenerateCodeTypesScreen}
         options={{ headerShown: false }}
       />
     </HomeStack.Navigator>

@@ -1,0 +1,176 @@
+{
+    "_id": "ranges",
+    "_rev": "14-d94a0872872aa91670b6486e31f03860",
+    "gtm-pet": {
+        "1-999": "Kingo 10",
+        "1000-4999": "Kingo 15",
+        "5000-5999": "Kingo 100",
+        "6000-9999": "Kingo 15",
+        "10000-10999": "Kingo 100",
+        "11000-19999": "Kingo 15",
+        "20000-20999": "Kingo 100",
+        "21000-29999": "Kingo 15",
+        "100000-104999": "Kingo 15",
+        "105000-105999": "Kingo 100",
+        "106000-109999": "Kingo 15",
+        "110000-110999": "Kingo 100",
+        "111000-119999": "Kingo 15",
+        "120000-120999": "Kingo 100",
+        "121000-129999": "Kingo 15",
+        "200000-209999": "Kingo 15",
+        "210000-210999": "Kingo 100",
+        "211000-219999": "Kingo 15",
+        "220000-220999": "Kingo 100",
+        "221000-252669": "Kingo 15",
+        "300000-389999": "Kingo TV",
+        "390000-399999": "Kingo 200",
+        "400000-419999": "Kingo Basico",
+        "500000-539999": "Kingo 15"
+    },
+    "products": {
+        "0": "Kingo - Basico",
+        "1": "Kingo - Luz",
+        "2": "Kingo - TV",
+        "3": "Kingo 200",
+        "4": "Kingo 75",
+        "5": "Kingo 750"
+    },
+    "hardware": {
+        "1-199999": "v1",
+        "200000-209999": "v2",
+        "210000-210999": "v1",
+        "211000-219999": "v2",
+        "220000-220999": "v1",
+        "221000-389999": "v2",
+        "390000-399999": "v1",
+        "400000-419999": "fenix",
+        "420000-499999": "v2",
+        "500000-539999": "fenix"
+    },
+    "inventory": {
+        "ranges": {
+            "1-999": {
+                "set": "set-quetsol",
+                "model": "set-quetsol-1"
+            },
+            "1000-4999": {
+                "set": "set-light",
+                "model": "set-light-1"
+            },
+            "5000-5999": {
+                "set": "set-kingo-100",
+                "model": "set-kingo-100-1"
+            },
+            "6000-9999": {
+                "set": "set-light",
+                "model": "set-light-1"
+            },
+            "10000-10999": {
+                "set": "set-kingo-100",
+                "model": "set-kingo-100-1"
+            },
+            "11000-19999": {
+                "set": "set-light",
+                "model": "set-light-1"
+            },
+            "20000-20999": {
+                "set": "set-kingo-100",
+                "model": "set-kingo-100-1"
+            },
+            "21000-29999": {
+                "set": "set-light",
+                "model": "set-light-1"
+            },
+            "100000-104999": {
+                "set": "set-light",
+                "model": "set-light-1"
+            },
+            "105000-105999": {
+                "set": "set-kingo-100",
+                "model": "set-kingo-100-1"
+            },
+            "106000-109999": {
+                "set": "set-light",
+                "model": "set-light-1"
+            },
+            "110000-110999": {
+                "set": "set-kingo-100",
+                "model": "set-kingo-100-1"
+            },
+            "111000-119999": {
+                "set": "set-light",
+                "model": "set-light-1"
+            },
+            "120000-120999": {
+                "set": "set-kingo-100",
+                "model": "set-kingo-100-1"
+            },
+            "121000-129999": {
+                "set": "set-light",
+                "model": "set-light-1"
+            },
+            "200000-209999": {
+                "set": "set-light",
+                "model": "set-light-2"
+            },
+            "210000-210999": {
+                "set": "set-kingo-100",
+                "model": "set-kingo-100-1"
+            },
+            "211000-219999": {
+                "set": "set-light",
+                "model": "set-light-2"
+            },
+            "220000-220999": {
+                "set": "set-kingo-100",
+                "model": "set-kingo-100-1"
+            },
+            "221000-252669": {
+                "set": "set-light",
+                "model": "set-light-2"
+            },
+            "300000-389999": {
+                "set": "set-tv",
+                "model": "set-tv-2"
+            },
+            "390000-399999": {
+                "set": "set-200w",
+                "model": "set-200w-3"
+            },
+            "400000-419999": {
+                "set": "set-basic",
+                "model": "set-basic-f"
+            },
+            "500000-539999": {
+                "set": "set-basic",
+                "model": "set-basic-f"
+            }
+        },
+        "products": {
+            "0": {
+                "set": "set-basic",
+                "model": "set-basic-3"
+            },
+            "1": {
+                "set": "set-light",
+                "model": "set-light-3"
+            },
+            "2": {
+                "set": "set-tv",
+                "model": "set-tv-3"
+            },
+            "3": {
+                "set": "set-tv",
+                "model": "set-tv+"
+            },
+            "4": {
+                "set": "set-tv",
+                "model": "set-tv+-3"
+            },
+            "5": {
+                "set": "set-fridge",
+                "model": "set-fridge100-3"
+            }
+        }
+    }
+ }
