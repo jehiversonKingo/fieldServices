@@ -72,7 +72,7 @@ const VisitScreen = ({ navigation, route }) => {
 
   return (
     <>
-      <Header isLeft={true} navigation={navigation} title={'Listado De Ordenes'} />
+      <Header isLeft={true} navigation={navigation} title={'Tareas'} />
       <View style={styles.priorityContainer}>
         <View style={[styles.priorityBox, { backgroundColor: colorsTheme.rojo }]}>
           <Text style={styles.priorityText}>Alta</Text>

@@ -267,7 +267,6 @@ const styles = StyleSheet.create({
   textInformation: {color: colorsTheme.blanco},
   bottomMenu: {
     flex: 1,
-    flexDirection: 'row',
     borderRadius: 10,
     margin:7,
     borderLeftColor: colorsTheme.naranja60,

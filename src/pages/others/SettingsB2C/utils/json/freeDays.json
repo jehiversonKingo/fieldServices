@@ -1,0 +1,11 @@
+{
+    "_id": "free-days",
+    "gtm-pet": {
+        "3": "3"
+    },
+    "kingo_swap": {
+        "model_change": 30,
+        "model_same": 30
+    },
+    "generate_activation": false
+ }

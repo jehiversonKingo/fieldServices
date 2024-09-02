@@ -1,0 +1,26 @@
+{
+    "_id": "spec-code-plan",
+    "plan": {
+        "jarvis": 0,
+        "general_diagnostic": 1,
+        "remote_diagnostic": 2,
+        "firmware_update": 3,
+        "antihack_mode": 4,
+        "sale_mode": 5,
+        "service_mode": 6,
+        "admin_mode": 7,
+        "factory_mode": 8,
+        "workshop_mode": 9,
+        "hour": 10,
+        "day": 11,
+        "three_days": 12,
+        "five_days": 13,
+        "week": 14,
+        "fortnight": 15,
+        "month": 16,
+        "quarter": 17,
+        "semester": 18,
+        "year": 19,
+        "activation": 63
+    }
+ }
