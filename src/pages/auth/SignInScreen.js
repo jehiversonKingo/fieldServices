@@ -38,6 +38,7 @@ const SignInScreen = ({ }) => {
       console.log('entro');
       setAlertMessage("Debes completar todos los campos.");
       setShowAlert(true);
+      setIsLoading(false);
       return;
     }
 
@@ -52,6 +53,7 @@ const SignInScreen = ({ }) => {
       setShowAlert(true);
       setTimeout(() => {
         setShowAlert(false);
+        setIsLoading(false);
       }, 2000);
     }
   }, [state]);
@@ -93,7 +95,7 @@ const SignInScreen = ({ }) => {
             onPress={() => logIn()}
           />
         </TouchableOpacity>
-        <Text style={{ ...styles.colorText, textAlign: "center" }}>{process.env.ENVIROMENT}. {`${DeviceInfo.getVersion()}`}</Text>
+        <Text style={{ ...styles.colorText, textAlign: "center" }}>Field Service {`${DeviceInfo.getVersion()}`}</Text>
       </View>
       <AwesomeAlert
         show={showAlert}

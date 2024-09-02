@@ -213,12 +213,12 @@ const HomeScreen = ({navigation}) => {
         onOpen={() => setOpen(!open)}
         onClose={() => setOpen(!open)}
       >
-        <SpeedDial.Action
+        {/* <SpeedDial.Action
           icon={{ name: 'person', color: '#fff' }}
           color={colorsTheme.verdeHybrico}
           title="Perfil"
           onPress={() => navigation.navigate('Profile')}
-        />
+        /> */}
         <SpeedDial.Action
           icon={{ name: 'power-off', color: '#fff' }}
           color={colorsTheme.verdeHybrico}
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 10,
     margin:7,
-    borderLeftColor: colorsTheme.verdeHybricoLight,
+    borderLeftColor: colorsTheme.verdeHybrico,
     borderLeftWidth: 5,
     backgroundColor: colorsTheme.blanco,
     height: 85,
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     },
     icon: {
       paddingRight: 15,
-      color: colorsTheme.verdeHybricoLight,
+      color: colorsTheme.verdeHybrico,
     },
     shadowColor: colorsTheme.gris80,
         shadowOffset: {

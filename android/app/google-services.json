@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "252920987865",
-    "project_id": "stack-hybrico-a68e6",
-    "storage_bucket": "stack-hybrico-a68e6.appspot.com"
+    "project_number": "688881510776",
+    "project_id": "stack-ant-hybrico",
+    "storage_bucket": "stack-ant-hybrico.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:252920987865:android:c3f3f9661e39a6ea58fec8",
+        "mobilesdk_app_id": "1:688881510776:android:8f3047f7fd4aadf855808d",
         "android_client_info": {
           "package_name": "com.antfieldservice"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBQ2ZtNoCwxQe1OmaQ8xxUotPgFEyPsQNU"
+          "current_key": "AIzaSyBx1maebmxvIyClPEl4pVL9PfZjawYbCaE"
         }
       ],
       "services": {

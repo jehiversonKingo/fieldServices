@@ -44,7 +44,7 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep1 = ({item, index}) => {
       return(
-        <View key={`B${index}`} style={{flexDirection: "row", backgroundColor: colorsTheme.verdeHybricoLight}}>
+        <View key={`B${index}`} style={{flexDirection: "row", backgroundColor: colorsTheme.verdeHybrico}}>
           <View key={`C${index}`}>
             <Text key={`D${index}`} style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
               {
@@ -64,7 +64,7 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep2 = ({item, index}) => {
       return(
-        <View key={`B1${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.verdeHybricoLight}}>
+        <View key={`B1${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.verdeHybrico}}>
           <View key={`C1${index}`}>
             <Text key={`D1${index}`} style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
               {item.addon.name +': '+ item.value}
@@ -76,7 +76,7 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep3 = ({item, index}) => {
       return(
-        <View key={`B2${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.verdeHybricoLight}}>
+        <View key={`B2${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.verdeHybrico}}>
           <View key={`C2${index}`}>
             <FitImage
                 indicator={true}
@@ -93,7 +93,7 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep4 = ({item, index}) => {
       return(
-        <View key={`B3${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.verdeHybricoLight}}>
+        <View key={`B3${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.verdeHybrico}}>
           <View key={`C3${index}`}>
             <Text key={`D3${index}`} style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
               {item.addon.name +': '+ item.value}
@@ -116,7 +116,7 @@ const TaskOffline = ({navigation}) => {
           style={{
             padding: 12,
             margin:5,
-            borderColor: colorsTheme.verdeHybricoLight,
+            borderColor: colorsTheme.verdeHybrico,
             borderWidth:3,
           }}
           keyExtractor={(item) => item.idTask.toString()}
@@ -197,7 +197,7 @@ const TaskOffline = ({navigation}) => {
               ListHeaderComponent={
               <View
                   style={{
-                  backgroundColor: colorsTheme.verdeHybrico,
+                  backgroundColor: colorsTheme.verdeHybricoLight,
                   width: width * 0.76,
                   padding: 10,
                   justifyContent:'center',
@@ -236,7 +236,7 @@ const TaskOffline = ({navigation}) => {
               ListHeaderComponent={
               <View
                   style={{
-                  backgroundColor: colorsTheme.verdeHybrico,
+                  backgroundColor: colorsTheme.verdeHybricoLight,
                   width: width * 0.76,
                   padding: 10,
                   justifyContent:'center',
@@ -275,7 +275,7 @@ const TaskOffline = ({navigation}) => {
               ListHeaderComponent={
               <View
                   style={{
-                  backgroundColor: colorsTheme.verdeHybrico,
+                  backgroundColor: colorsTheme.verdeHybricoLight,
                   width: width * 0.76,
                   padding: 10,
                   justifyContent:'center',
