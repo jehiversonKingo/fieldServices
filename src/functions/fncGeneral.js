@@ -107,15 +107,18 @@ export const handleValidDataStepTask = async (step) => {
 
 export const handleValidDataStep = async (step) => {
   let isValid = true;
+  console.log(step);
   if (step.length === 0) {
     isValid = false;
   } else {
     step.map(element => {
-      if (element.value === '' || element.value === null || element.file === '') {
+      console.log(element.screenElement?.elementType.name, element.value);
+      if (element.screenElement?.elementType.name === 'cellphone' && element.value.length < 12) {
         isValid = false;
         return;
       }
-      if (element.screenElement?.elementType.name === 'cellphone' && element.value.length < 12) {
+
+      if (element.value === '' || element.value === null || element.file === '') {
         isValid = false;
         return;
       }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import {
   View,
   StyleSheet,
@@ -21,6 +21,7 @@ import { colorsTheme } from '../../../configurations/configStyle';
 
 //functions
 import { handleIsValidUrl } from '../../../functions/fncGeneral';
+import {Context as AuthContext} from '../../../context/AuthContext';
 
 const CameraMultiShotScreen = ({ navigation, route }) => {
   const { setData, data, idTaskStep } = route.params;
@@ -34,6 +35,9 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
   const [isScanned, setIsScanned] = useState(true);
   const [torch, setTorch] = useState("off");
   const camera = useRef(null);
+
+  const {state} = useContext(AuthContext);
+  const {inline} = state;
 
   useEffect(() => {
     checkCameraPermission();
@@ -75,12 +79,13 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
       },
     });
     const base64 = await RNFS.readFile(`file://${photo.path}`, 'base64');
-    console.log("[ SDFASDF ] => ", photo);
-    let newValue = [...photos, { photo, idTaskStep }];
-    let newValue2 = [...photosBase64, { photo: `data:image/jpg;base64,${base64}`, idTaskStep, path: photo.path }];
-    setPhotos(newValue);
+    // console.log("[ SDFASDF ] => ", photo);
+    let newValue = [...photos, { photo, idTaskStep, path: photo.path }];
+    let newValue2 = [...photosBase64, { photo: `data:image/jpg;base64,${base64}`, idTaskStep, path: photo.path }];    setPhotos(newValue);
     setPhotosBase64(newValue2);
-    setData(newValue2);
+    if (inline) {
+      setData(newValue2);
+    } else setData(newValue);
   };
   console.log(isScanned, device != null, hasPermission);
   return (

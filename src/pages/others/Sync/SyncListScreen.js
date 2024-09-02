@@ -4,6 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { colorsTheme } from '../../../configurations/configStyle';
 import Header from '../../../components/Layouts/Header';
+import { getStep } from '../../../functions/fncSqlite';
 
 const menuItems = [
   { icon: 'cloud-upload', text: 'Sincronizar Tareas', screen: 'TaskOffline' },
@@ -12,7 +13,6 @@ const menuItems = [
 ];
 
 const SyncListScreen = ({ navigation }) => {
-
   const RenderMenuItem = ({ item }) => (
     <TouchableOpacity
       style={styles.bottomMenu}

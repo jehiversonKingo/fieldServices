@@ -20,6 +20,8 @@ import {getListEquipment, getListAddon} from '../../services/inventory.services'
 import {getStep, updateStep} from '../../functions/fncSqlite';
 import { getAllCommunities, getModulesByRole } from '../../services/settings.services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDebetAgent } from '../../services/sales.services';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const HomeScreen = ({navigation}) => {
@@ -27,10 +29,10 @@ const HomeScreen = ({navigation}) => {
   const {inline} = state;
   const [open, setOpen] = React.useState(false);
   const [menu, setMenu] = React.useState([]);
+  const [blocked, setBlocked] = React.useState(false);
+  const [uploadSync, setUploadSync] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
-  const goTo = route => {
-    navigation.navigate(route);
-  };
+  const goTo = route => navigation.navigate(route);
 
   const RenderMenu = ({item}) => (
     <TouchableOpacity
@@ -64,33 +66,86 @@ const HomeScreen = ({navigation}) => {
       const data = JSON.parse(await AsyncStorage.getItem('@user'));
       let options = [];
       if (inline) {
-        options = await getModulesByRole(data.user.idRole)
-        await updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0);
+        options = await getModulesByRole(data.user.idRole);
+        console.log("OPTIONS", options);
+        const [getAddon, getKingo, getCommunities] = await Promise.all([
+          getListAddon(),
+          getListEquipment(),
+          getAllCommunities()
+        ]);
 
-        getAddon = await getListAddon();
-        await updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0);
-
-        getKingo = await getListEquipment();
-        await updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0);
-        
-        let getCommunities = await getAllCommunities();
-        await updateStep('communities', 1, JSON.stringify(getCommunities), 0);
+        await Promise.all([
+          updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0),
+          updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0),
+          updateStep('communities', 1, JSON.stringify(getCommunities), 0),
+          updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0),
+        ]);
       } else {
-        options = JSON.parse(await getStep('menuOptions', data.user.idRole, 0));
+        const storedOptions = JSON.parse(await getStep('menuOptions', data.user.idRole, 0));
+        console.log('[ OFFLINE ] ............', storedOptions);
+        if (storedOptions) options = storedOptions.filter((item) => item.offline);
       }
-      console.log("OPTIONS", options);
-      setMenu(options);
-      setIsLoading(false);
+      console.log('[ INLINE ] ............', inline);
+      options.map(item => console.log(item))
+      setMenu(options.sort((a,b) => a.module.text - b.module.text));
     } catch (error) {
-      console.log("[ GET MENU OPITONS ]", error)
-      setMenu([]);
+      console.error("[ GET MENU OPTIONS ]", error);
+    } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleValidBlocked = async() => {
+    setUploadSync(false);
+    setBlocked(false);
+    let getDebt = await getDebetAgent();
+    let debtUser = JSON.parse(await getStep('debtUser', 0, 0));
+    let getWalletCustomers = JSON.parse(await getStep('customersOfflineData', 0, 0));
+    console.log('[ DEBET USER OFFLINE ]', parseFloat(debtUser.amount).toFixed(2));
+    console.log('[ DEBET USER ]', parseFloat(getDebt.amount).toFixed(2))
+    // if (debtUser && getDebt) {
+    //   if (parseFloat(debtUser.amount).toFixed(2) !== parseFloat(getDebt.amount).toFixed(2)) {
+    //     setBlocked(true)
+    //   }
+    // }
+
+    if(getWalletCustomers) {
+      if(getWalletCustomers.customers.length > 0) {
+        setUploadSync(true);
+      }
+    }
+
+    setIsLoading(false);
   }
 
   useEffect(() => {
+    handleValidBlocked();
     getMenuOptions();
-  }, [])
+  }, [inline])
+
+  useFocusEffect(
+    React.useCallback(() => {
+      handleValidBlocked();
+      getMenuOptions();
+    }, [inline])
+  );
+
+  if (blocked || uploadSync) {
+    return (
+      <View style={{ justifyContent: 'center', alignItems: 'center', alignContent: "center", flex: 1 }}>
+        <Text style={{ color: colorsTheme.naranja, fontSize: 20 }}> Aplicación bloqueada</Text>
+        <View style={{ marginHorizontal: 25, flexDirection: "row" }}>
+          <Text style={{ color: colorsTheme.negro, fontWeight: "bold" }}>Tienes lotes de información pendiente de subir</Text>
+        </View>
+        <TouchableOpacity style={{ paddingHorizontal: 45, paddingVertical: 10, backgroundColor: colorsTheme.naranja, borderRadius: 15, marginTop: 10, flexDirection: "row" }}
+          onPress={() => navigation.navigate("SyncDataScreen")}
+        >
+          <FontAwesome5 name='cloud-upload-alt' color={colorsTheme.blanco} size={20} style={{ marginRight: 5 }} />
+          <Text style={{ color: "white", fontSize: 15, marginTop: 3 }}>Subir información</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
   return (
     <SafeAreaView style={{flex:1}}>
@@ -98,16 +153,17 @@ const HomeScreen = ({navigation}) => {
       <View>
         <View style={{padding: 20}}>
           <View style={{backgroundColor: colorsTheme.naranja, alignItems: 'center', shadowColor: colorsTheme.gris80,
-        shadowOffset: {
-          width: 0,
-          height: 5,
-        },
-        shadowOpacity: 0.34,
-        shadowRadius: 6.27,
-        elevation: 6,}}>
+            shadowOffset: {
+              width: 0,
+              height: 5,
+            },
+            shadowOpacity: 0.34,
+            shadowRadius: 6.27,
+            elevation: 6,}}
+          >
             <Text style={styles.bottomMenu.text}>Menu Principal</Text>
           </View>
-          <ScrollView 
+          <ScrollView
           contentContainerStyle={{
               flexDirection: 'row',
               flexWrap: 'wrap'}}
@@ -120,13 +176,11 @@ const HomeScreen = ({navigation}) => {
               ) : (
                 menu.length > 0 ? (
                   menu.map((item, index) => {
-                    if (item.offline) {
-                      return (
-                        <View key={'_'+index} style={{width : '50%', flexDirection : "row"}}>
-                          <RenderMenu key={index} item={item} />
-                        </View>
-                      );
-                    }
+                    return (
+                      <View key={'_'+index} style={{width : '50%', flexDirection : "row"}}>
+                        <RenderMenu key={index} item={item} />
+                      </View>
+                    );
                   })
                 ) : (
                   <View style={{

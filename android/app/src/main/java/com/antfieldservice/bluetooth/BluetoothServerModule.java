@@ -21,7 +21,7 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 import org.json.JSONException;
-import org.json.JSONObject;  // Añade esta línea para importar JSONObject y JSONException
+import org.json.JSONObject;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;

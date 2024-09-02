@@ -32,7 +32,7 @@
       <meta-data
         android:name="com.google.mlkit.vision.DEPENDENCIES"
         android:value="barcode"/>
-        <meta-data
+      <meta-data
         android:name="com.google.android.geo.API_KEY"
         android:value="AIzaSyCaevETEBSfKf98blT_oW-d-48Zs5EYzBw"/>
       <activity
