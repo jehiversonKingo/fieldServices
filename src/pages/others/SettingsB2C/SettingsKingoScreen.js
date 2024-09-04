@@ -55,6 +55,7 @@ const SettingsKingoScreen = ({ navigation }) => {
                 setError(true);
             }
         } catch (error) {
+            console.log('[ ERROR CATCH ]', error)
             setTextMessage("Error al validar código");
             setError(true);
         }

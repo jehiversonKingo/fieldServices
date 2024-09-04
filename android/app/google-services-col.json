@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "887309062739",
+    "project_id": "stack-ant-kingo-co",
+    "storage_bucket": "stack-ant-kingo-co.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:887309062739:android:6852c4d2cd24e36630aca6",
+        "android_client_info": {
+          "package_name": "com.antfieldservice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgQAPsxvihwHryiV7TlG-hrrj3UvRCpmw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

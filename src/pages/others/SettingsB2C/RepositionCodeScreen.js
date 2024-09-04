@@ -64,7 +64,7 @@ const RepositionCodeScreen = ({ navigation }) => {
                 setError(true);
             }
         } catch (error) {
-            console.log("WHA",error)
+            console.log('[ ERROR CATCH ]', error)
             setTextMessage("Error al validar código");
             setError(true);
         }

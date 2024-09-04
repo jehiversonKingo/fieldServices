@@ -279,8 +279,6 @@ const SyncDataScreen = ({ navigation }) => {
           let salesCustomer = await getSaleCustomer(customer);
           let creditCustomer = await getCreditsCustomer(customer);
 
-          if (customer == 284) console.log("[ BALANCE ] >>>>>> ", balanceCustomer);
-
           customersData.push(customerData)
           walletsData.push(walletCustomer);
           transactionData.push(transactionCustomer);
