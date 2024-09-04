@@ -230,23 +230,35 @@ public class KingoModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getKingoCodeV5(String region, String model, int kingoID, int second, int minute, int hour,  int dayOfYear, int year, int plan, boolean generateToken, ReadableMap secretsDoc, Promise promise) {
-        try {
-            int initCode = 2;
-            Log.d("CARLOS", Integer.toString(1));
-            JSONObject codeJson = new JSONObject();
-            String initMask = getInitMask(region, model, Integer.toString(kingoID), initCode, secretsDoc);
-            Log.d("CARLOS", Integer.toString(2));
-            initMask = initMask.replace(" ", "");
-            Log.d("CARLOS", Integer.toString(3));
-            String code = leftPad(GenerateCodeV5(kingoID, second, minute, hour, dayOfYear, year, plan, initMask));
-            Log.d("CARLOS", Integer.toString(4));
-            Log.d("CARLOS", code);
-            promise.resolve(code);
-         } catch (Exception e) {
-            promise.reject("ERROR", e.getMessage());
-        }
+public void getKingoCodeV5(String region, String model, int kingoID, int second, int minute, int hour, int dayOfYear, int year, int plan, boolean generateToken, ReadableMap secretsDoc, Promise promise) {
+    try {
+        int initCode = 2;
+        Log.d("CARLOS", Integer.toString(1));
+
+        // Crear un JSONObject
+        JSONObject codeJson = new JSONObject();
+
+        // Obtener la máscara inicial
+        String initMask = getInitMask(region, model, Integer.toString(kingoID), initCode, secretsDoc);
+        Log.d("CARLOS", Integer.toString(2));
+        initMask = initMask.replace(" ", "");
+        Log.d("CARLOS", Integer.toString(3));
+
+        // Generar el código
+        String code = leftPad(GenerateCodeV5(kingoID, second, minute, hour, dayOfYear, year, plan, initMask));
+        Log.d("CARLOS", Integer.toString(4));
+        Log.d("CARLOS", code);
+
+        // Agregar los valores al JSONObject
+        codeJson.put("code", code);
+        codeJson.put("initMask", initMask);
+
+        // Resolver la promesa con el JSONObject convertido a cadena
+        promise.resolve(codeJson.toString());
+    } catch (Exception e) {
+        promise.reject("ERROR", e.getMessage());
     }
+}
 
     private native int GetToken(int second, int minute, int hour, int dayOfYear);
     private native String GenerateCreditV5(int destination_id, int credit_type, int amount, int origin_id, int count_codes, int year_mod, int day, String maskS);

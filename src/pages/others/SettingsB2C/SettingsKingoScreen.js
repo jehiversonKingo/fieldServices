@@ -33,14 +33,16 @@ const SettingsKingoScreen = ({ navigation }) => {
                 const user = JSON.parse(await AsyncStorage.getItem('@user'));
                 const { seconds, minutes, hour, day, year } = getCodesV5Time(now);
                 const codeAdmin = await KingoModule.getKingoCodeV5(selectCountry, model, parseInt(idKingo), seconds, minutes, hour, day, year, 7, false, jsonSecrets);
-                const codeHour = await KingoModule.getKingoCodeV5(selectCountry, model, parseInt(idKingo), seconds, minutes, hour, day, year, 10, false, jsonSecrets);
-                setData({ model, idKingo, codeAdmin, codeHour });
+                console.log(`codeAdmin===>`,JSON.parse(codeAdmin), typeof codeAdmin);
+                const codeHour= await KingoModule.getKingoCodeV5(selectCountry, model, parseInt(idKingo), seconds, minutes, hour, day, year, 10, false, jsonSecrets);
+                setData({ model, idKingo, codeAdmin:JSON.parse(codeAdmin), codeHour:JSON.parse(codeHour) });
                 await setCollection({
                     "collection":"settingsKingo",
                     "documentRef":`${idKingo}`,
                     "data":{
-                        "codeAdmin": `${codeAdmin}`,
+                        "codeAdmin": `${JSON.parse(codeAdmin).code}`,
                         "codeHour": `${codeHour}`,
+                        "initMask": `${JSON.parse(codeAdmin).initMask}`,
                         "kingo": idKingo,
                         "user": user,
                         "createAt": new Date()
@@ -151,12 +153,16 @@ const SettingsKingoScreen = ({ navigation }) => {
                         <Text style={{ color: colorsTheme.negro }}>{data.model}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', padding: 5, marginHorizontal: 25, justifyContent: 'space-between', borderBottomWidth: 1 }}>
+                        <Text style={{ fontWeight: 'bold', color: colorsTheme.negro }}>Inicializador:</Text>
+                        <Text style={{ color: colorsTheme.negro }}>{formatCodeKingo(data.codeAdmin.initMask)}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', padding: 5, marginHorizontal: 25, justifyContent: 'space-between', borderBottomWidth: 1 }}>
                         <Text style={{ fontWeight: 'bold', color: colorsTheme.negro }}>Modo Administrador:</Text>
-                        <Text style={{ color: colorsTheme.negro }}>{formatCodeKingo(data.codeAdmin)}</Text>
+                        <Text style={{ color: colorsTheme.negro }}>{formatCodeKingo(data.codeAdmin.code)}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', padding: 5, marginHorizontal: 25, justifyContent: 'space-between', borderBottomWidth: 1 }}>
                         <Text style={{ fontWeight: 'bold', color: colorsTheme.negro }}>Hora:</Text>
-                        <Text style={{ color: colorsTheme.negro }}>{formatCodeKingo(data.codeHour)}</Text>
+                        <Text style={{ color: colorsTheme.negro }}>{formatCodeKingo(data.codeHour.code)}</Text>
                     </View>
                 </View>
             )}
