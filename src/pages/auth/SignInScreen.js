@@ -25,7 +25,7 @@ const { width } = Dimensions.get('screen');
 
 const SignInScreen = ({ }) => {
   const [user, setUser] = useState('jehiverson.rodriguez@kingoenergy.com');
-  const [password, setPassword] = useState('130318');
+  const [password, setPassword] = useState('221144');
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle] = useState('¡Atención!');
   const [alertMessage, setAlertMessage] = useState('');
