@@ -24,8 +24,8 @@ import { ThemeConsumer } from '@rneui/themed';
 const { width } = Dimensions.get('screen');
 
 const SignInScreen = ({ }) => {
-  const [user, setUser] = useState('jehiverson.rodriguez@kingoenergy.com');
-  const [password, setPassword] = useState('221144');
+  const [user, setUser] = useState('carlos.lara@kingoenergy.com');
+  const [password, setPassword] = useState('LaraSolano1_');
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle] = useState('¡Atención!');
   const [alertMessage, setAlertMessage] = useState('');

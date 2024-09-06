@@ -207,9 +207,16 @@ const SyncDataScreen = ({ navigation }) => {
         let getWallet = await getWallerByUser();
         let getDebt = await getDebetAgent();
         let getTransaction = await getTransactionAgent();
-        console.log("////////--1--//////////", getWallet)
+        console.log("////////--1--//////////", await getStep('debtUser', 0, 0))
         await updateStep('walletUser', 0, JSON.stringify(getWallet), 0);
-        await updateStep('debtUser', 0, JSON.stringify(getDebt), 0);
+        if (typeof await getStep('debtUser', 0, 0) === 'object') {
+          await updateStep('debtUser', 0, JSON.stringify(getDebt), 0);
+        } else {
+          let debtlocalUser = JSON.parse(await getStep('debtUser', 0, 0));
+          if (parseFloat(getDebt.amount).toFixed(2) === parseFloat(debtlocalUser.amount).toFixed(2)) {
+            await updateStep('debtUser', 0, JSON.stringify(getDebt), 0);
+          }
+        }
         await updateStep('transactionUser', 0, JSON.stringify(getTransaction), 0);
         setListItem(prevState => prevState.map(item =>
           item.title === 'Billetera' ? { ...item, counter: item.counter + 1 } : item
@@ -233,7 +240,7 @@ const SyncDataScreen = ({ navigation }) => {
           !customersId.includes(dataTicket.idCustomer) && customersId.push(dataTicket.idCustomer);
 
           setListItem(prevState => prevState.map(item =>
-            item.title === 'Tareas' ? { ...item, counter: Number(valueCustomer.toFixed(2)).toFixed(2) } : item
+            item.title === 'Tareas' ? { ...item, counter: Number(valueCustomer.toFixed(2)) } : item
           ));
           valueCustomer = valueCustomer + counterCustomer;
         }
@@ -279,7 +286,9 @@ const SyncDataScreen = ({ navigation }) => {
           let salesCustomer = await getSaleCustomer(customer);
           let creditCustomer = await getCreditsCustomer(customer);
 
-          customersData.push(customerData)
+          console.log('[ TENDERO ] --> ', {...customerData.customer, currency: customerData.currency})
+
+          customersData.push({customer: customerData.customer, currency: customerData.currency})
           walletsData.push(walletCustomer);
           transactionData.push(transactionCustomer);
           debetData.push(debetCustomer);
@@ -320,7 +329,7 @@ const SyncDataScreen = ({ navigation }) => {
           ));
 
           valueWalletCustomer = valueWalletCustomer + counterWalletCustomer;
-          await updateStep('customers', customer, JSON.stringify(customerData), 0);
+          await updateStep('customers', customer, JSON.stringify({...customerData.customer, currency: customerData.currency}), 0);
           await updateStep('customersWallets', customer, JSON.stringify(walletCustomer), 0);
           await updateStep('transactionWallets', customer, JSON.stringify(transactionCustomer), 0);
           await updateStep('debetWallets', customer, JSON.stringify(debetCustomer), 0);
