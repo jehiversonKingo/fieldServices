@@ -74,3 +74,15 @@ export const getAllPlans = async () => {
             return e;
         })
 }
+
+export const getCurrency = async () => {
+    return axiosInstanceShopkeeper
+        .get(`settings/currency/2`)
+        .then(response => {
+            return response.data
+        })
+        .catch((e) => {
+            console.log("[ ERROR getAllBanks ]", e);
+            return e;
+        })
+}

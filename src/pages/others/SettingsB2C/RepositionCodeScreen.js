@@ -25,7 +25,7 @@ const RepositionCodeScreen = ({ navigation }) => {
     const dropdownRef = useRef(null); // Create a reference for the dropdown
     const dropdownRef1 = useRef(null); // Create a reference for the dropdown
 
-    const countries = [{ value: 'gtm-pet', label: 'Guatemala' }, { value: 'gtm-col', label: 'Colombia' }];
+    const countries = [{ value: 'gtm-pet', label: 'Guatemala' }, { value: 'col-lag', label: 'Colombia' }];
     const plans = [{value: 'day', label:'Dia'}, {value: 'week', label:'Semana'}, {value: 'month', label:'Mes'}, {value: 'quarter', label:'Trimestre'}, {value: 'semester', label:'Semestre'}, {value: 'year', label:'Año'}]
     
     const handleGenerateCode = async () => {
@@ -42,9 +42,9 @@ const RepositionCodeScreen = ({ navigation }) => {
                 setData({ model, idKingo, code });
                 await setCollection({
                   "collection":"repositionGenerateCodeKingo",
-                  "documentRef":`${code}`,
+                  "documentRef":`${JSON.parse(code).code}`,
                   "data":{
-                      "code": `${code}`,
+                      "code": `${JSON.parse(code).code}`,
                       "kingo": idKingo,
                       "reason": reason,
                       "user": user,
@@ -185,7 +185,7 @@ const RepositionCodeScreen = ({ navigation }) => {
                     </View>
                     <View style={styles.infoRow}>
                         <Text style={styles.infoLabel}>Código:</Text>
-                        <Text style={styles.infoText}>{formatCodeKingo(data.code)}</Text>
+                        <Text style={styles.infoText}>{formatCodeKingo(JSON.parse(code).code)}</Text>
                     </View>
                 </View>
             )}
