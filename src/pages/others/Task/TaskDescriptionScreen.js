@@ -61,6 +61,7 @@ const {width, height} = Dimensions.get('screen');
 import {Context as AuthContext} from '../../../context/AuthContext';
 import {getAllCommunities} from '../../../services/settings.services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import HandshakeServerScreen from '../Sync/HandshakeServerScreen';
 
 
 const TRANSACTION_LIST = [
@@ -927,37 +928,35 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
   useEffect(() => {
     try {
-      const dataReceivedListener = eventEmitter.addListener(
-        'DATA_SERVER_RECEIVED',
-        event => {
-          console.log('[ BLUETOOTH DATA 1] =>', event);
-          handleReceivedData(event);
-        },
-      );
-
-      return () => {
-        // Cuando se desmonta el componente, detener el servidor y eliminar el suscriptor del evento
-        BluetoothServerModule.stopServer()
-          .then(res => {
-            console.log('Servidor detenido', res);
-            setStatusServer('Servidor detenido');
-            setStatusServerColor(colorsTheme.naranja60);
-            setIsRunning(false);
-          })
-          .catch(error => console.error('Error al detener el servidor', error));
-        dataReceivedListener.remove();
-        // dataBlueReceivedListener.remove();
-      };
+      if (typeTask == 10 || typeTask == 11) {
+        const dataReceivedListener = eventEmitter.addListener(
+          'DATA_SERVER_RECEIVED',
+          event => {
+            console.log('[ BLUETOOTH DATA 1] =>', event);
+            handleReceivedData(event);
+          },
+        );
+        return () => {
+          // Cuando se desmonta el componente, detener el servidor y eliminar el suscriptor del evento
+          BluetoothServerModule.stopServer()
+            .then(res => {
+              console.log('Servidor detenido', res);
+              setStatusServer('Servidor detenido');
+              setStatusServerColor(colorsTheme.naranja60);
+              setIsRunning(false);
+            })
+            .catch(error => console.error('Error al detener el servidor', error));
+          dataReceivedListener.remove();
+          // dataBlueReceivedListener.remove();
+        };
+      }
     } catch (error) {
       console.log(error)
     }
   }, []);
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Header isLeft={true} navigation={navigation} />
-      <View style={{flex: 1, marginHorizontal: 20}}>
-        <ProgressSteps
+  const DefaultSteps = () => (
+    <ProgressSteps
           completedProgressBarColor={colorsTheme.naranja}
           activeStepIconBorderColor={colorsTheme.naranja}
           activeStepIconColor={colorsTheme.naranja}
@@ -1198,6 +1197,225 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             />
           </ProgressStep>
         </ProgressSteps>
+  )
+
+  const VisitSteps = () => (
+    <ProgressSteps
+          completedProgressBarColor={colorsTheme.naranja}
+          activeStepIconBorderColor={colorsTheme.naranja}
+          activeStepIconColor={colorsTheme.naranja}
+          activeLabelColor={colorsTheme.naranja}
+          completedStepIconColor={colorsTheme.naranja}
+          labelFontSize={13}
+          activeLabelFontSize={15}
+          activeStepNumColor={colorsTheme.blanco}
+          marginBottom={35}
+          activeStep={active}>
+          {/* Pantalla Uno */}
+          <ProgressStep label="Datos" scrollable={false} removeBtnRow={true}>
+            {loading ? (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: height * 0.5,
+                }}>
+                <ActivityIndicator size="large" color={colorsTheme.naranja} />
+              </View>
+            ) : (
+                <FlatList
+                  key={'FlatList-1'}
+                  data={step1}
+                  renderItem={(item, index) => InputsGenerateStep1(item, index, navigation)}
+                  keyExtractor={item => item.idScreenElement}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingBottom: '50%' }}
+                  ListEmptyComponent={<View
+                    style={{
+                      backgroundColor: colorsTheme.gris80,
+                      width: width,
+                      padding: 10,
+                      alignContent: 'center',
+                      alignItems: 'center',
+                      marginTop: 10,
+                    }}>
+                    <Text style={{ color: colorsTheme.blanco }}>
+                      No se han encontrado Pantalla de inicio.
+                    </Text>
+                  </View>}
+                  ListFooterComponent={<ButtonProgressStep
+                    text="Siguiente"
+                    type={'right'}
+                    onPress={() => saveTemporalData('task', step1, active)} />} />
+            )}
+          </ProgressStep>
+          {/* Pantalla Dos */}
+          <ProgressStep
+            label="Cobro"
+            scrollable={false}
+            removeBtnRow={true}>
+            <View style={{marginHorizontal: 20, alignItems: 'center'}}>
+              <View style={{height: '100%', width: '100%'}}>
+                <HandshakeServerScreen header={false} />
+              </View>
+            </View>
+          </ProgressStep>
+          {/* Pantalla Tre */}
+          <ProgressStep
+            label="Sincronización"
+            scrollable={false}
+            removeBtnRow={true}>
+            <FlatList
+              data={step4}
+              renderItem={InputsGenerateStep4}
+              keyExtractor={item => item.idReceivedAddon}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{paddingBottom: '20%'}}
+              ListEmptyComponent={
+                <View
+                  style={{
+                    backgroundColor: colorsTheme.gris80,
+                    width: width,
+                    padding: 10,
+                    alignContent: 'center',
+                    alignItems: 'center',
+                    marginTop: 10,
+                  }}>
+                  <Text style={{color: colorsTheme.blanco}}>
+                    No se han encontrado Equipo.
+                  </Text>
+                </View>
+              }
+              ListFooterComponent={
+                <View style={{flexDirection: 'row', marginTop: 15}}>
+                  <ButtonProgressStep
+                    text="Anterior"
+                    type={'left'}
+                    onPress={() => setActive(prev => prev - 1)}
+                  />
+                  <ButtonProgressStep
+                    text="Siguiente"
+                    type={'complete'}
+                    onPress={() => saveTemporalData('task', step4, active)}
+                  />
+                </View>
+              }
+            />
+          </ProgressStep>
+          {/* Pantalla Cuatro */}
+          <ProgressStep
+            label="Actividades a realizar"
+            scrollable={false}
+            removeBtnRow={true}>
+            <FlatList
+              style={{marginTop: 15}}
+              data={step3}
+              renderItem={InputsGenerateStep3}
+              keyExtractor={item => item.idTaskStep}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{paddingBottom: '20%'}}
+              ListEmptyComponent={
+                <View
+                  style={{
+                    backgroundColor: colorsTheme.gris80,
+                    width: width,
+                    padding: 10,
+                    alignContent: 'center',
+                    alignItems: 'center',
+                    marginTop: 10,
+                  }}>
+                  <Text style={{color: colorsTheme.blanco}}>
+                    {'No se han encontrado pasos.'}
+                  </Text>
+                </View>
+              }
+              ListHeaderComponent={
+                <View>
+                  <View>
+                    <Text
+                      style={{
+                        backgroundColor: colorsTheme.naranja,
+                        padding: 15,
+                        margin: 3,
+                        borderRadius: 10,
+                        flex: 8,
+                        color: colorsTheme.blanco,
+                        fontWeight: '700',
+                      }}>
+                      Actividades
+                    </Text>
+                  </View>
+                </View>
+              }
+              ListFooterComponent={
+                <View style={{flexDirection: 'row', marginTop: 15}}>
+                  <ButtonProgressStep
+                    text="Anterior"
+                    type={'left'}
+                    onPress={() => setActive(prev => prev - 1)}
+                  />
+                  <ButtonProgressStep
+                    text="Siguiente"
+                    type={'right'}
+                    onPress={() => saveTemporalData('task', evidences, active)}
+                  />
+                </View>
+              }
+            />
+          </ProgressStep>
+          {/* Pantalla Cinco */}
+          <ProgressStep label={'Checklist'} removeBtnRow={true}>
+            <FlatList
+              data={step5}
+              key={'Check-FlatList-1'}
+              renderItem={InputsGenerateStep5}
+              // keyExtractor={item => item.idReceivedAddon}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{paddingBottom: '20%'}}
+              ListEmptyComponent={
+                <View
+                  style={{
+                    backgroundColor: colorsTheme.gris80,
+                    width: width,
+                    padding: 10,
+                    alignContent: 'center',
+                    alignItems: 'center',
+                    marginTop: 10,
+                  }}>
+                  <Text style={{color: colorsTheme.blanco}}>
+                    No se han encontrado Equipo.
+                  </Text>
+                </View>
+              }
+              ListFooterComponent={
+                <View style={{flexDirection: 'row', marginTop: 15}}>
+                  <ButtonProgressStep
+                    text="Anterior"
+                    type={'left'}
+                    onPress={() => setActive(prev => prev - 1)}
+                  />
+                  <ButtonProgressStep
+                    text="Completar"
+                    type={'complete'}
+                    onPress={() => saveTemporalData('task', step5, active)}
+                  />
+                  {/* <ButtonProgressStep text="Completar" type={'complete'} onPress={() => handleConsole()} /> */}
+                </View>
+              }
+            />
+          </ProgressStep>
+        </ProgressSteps>
+  )
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header isLeft={true} navigation={navigation} />
+      <View style={{flex: 1, marginHorizontal: 20}}>
+        {typeTask === 12 ? VisitSteps() : DefaultSteps()}
       </View>
       <AwesomeAlert
         show={isAlert}
@@ -1340,6 +1558,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colorsTheme.blanco
   },
   colorText: {
     color: colorsTheme.gris80,

@@ -23,7 +23,7 @@ import { findInArray, findIndexArray } from '../../../functions/fncGeneral';
 
 const eventEmitter = new NativeEventEmitter(NativeModules.ServerSocketModule);
 const { ServerSocketModule, BluetoothServerModule } = NativeModules;
-const HandshakeServerScreen = ({ navigation, route }) => {
+const HandshakeServerScreen = ({ navigation, route, header = true }) => {
     const [receivedData, setReceivedData] = useState([]);
     const [statusServer, setStatusServer] = useState('El servidor esta apagado');
     const [statusServerColor, setStatusServerColor] = useState(colorsTheme.rojo);
@@ -480,7 +480,7 @@ const HandshakeServerScreen = ({ navigation, route }) => {
 
     return (
         <>
-            <Header isLeft={true} navigation={navigation} title={'Handshake'} />
+            {header && <Header isLeft={true} navigation={navigation} title={'Handshake'} />}
             <View style={{ flex: 1, backgroundColor: colorsTheme.blanco }}>
                 <Text
                     style={{
