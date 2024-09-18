@@ -244,10 +244,8 @@ export const setDataTaskPhotos = async (params) => {
 
 export const setCodeNoc = async (data) => {
   const headers = await customHeadersAuth();
-  const {code, idTask} = data;
-
   return await axiosInstance
-    .post('/task/completeTask', {code, idTask}, headers)
+    .post('/task/completeTask', data, headers)
     .then(task => {
       return task.data;
     })
