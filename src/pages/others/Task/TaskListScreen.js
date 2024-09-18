@@ -132,6 +132,7 @@ const TaskListScreen = ({ navigation, route }) => {
   }, [inline]);
 
   useEffect(() => {
+    console.log('I GET THIS', taskStatus)
     if (taskStatus.status) {
       setIsAlert(true);
       setTitleAlert(taskStatus.title);
@@ -146,6 +147,7 @@ const TaskListScreen = ({ navigation, route }) => {
         isLeft={true}
         navigation={navigation}
         route={'Principal'}
+        isRoute={true}
         title={'Listado De Tareas'}
         isOpen={open}
         isOpenFunction={isOpen}

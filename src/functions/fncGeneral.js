@@ -113,7 +113,7 @@ export const handleValidDataStep = async (step) => {
   } else {
     step.map(element => {
       console.log(element.screenElement?.elementType.name, element.value);
-      if (element.screenElement?.elementType.name === 'cellphone' && element.value.length < 12) {
+      if (element.screenElement?.elementType.name === 'cellphone' && element?.value?.length < 12) {
         isValid = false;
         return;
       }

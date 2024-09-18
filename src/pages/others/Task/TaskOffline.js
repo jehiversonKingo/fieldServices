@@ -406,6 +406,17 @@ const TaskOffline = ({navigation}) => {
                   idTask,
                 });
                 break;
+                case 10:
+                console.log('EN EL 10 estoy');
+                taskStatus = await setDataAllTaskMigration({
+                  step1,
+                  step2,
+                  step3: evidences,
+                  step4,
+                  step5,
+                  idTask,
+                  blockDays: availableDays
+                });
               case 11:
                 console.log('EN EL 10 estoy');
                 taskStatus = await setDataAllTaskMigration({
@@ -465,9 +476,6 @@ const TaskOffline = ({navigation}) => {
                   let dataStepsToDo = await getStepInstruction(step.idStep)
                   await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
                 });
-                let dataTicket = await getTicketById(task.task.idTicket);
-
-                !customersId.includes(dataTicket.idCustomer) && customersId.push(dataTicket.idCustomer);
               }
 
               setShowProgressAlert(false);

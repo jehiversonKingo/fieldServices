@@ -224,6 +224,7 @@ const SyncDataScreen = ({ navigation }) => {
         ));
 
         let getTaskData = await getTasks();
+        console.log("DATOS DE LAS TAREAS QUE ME SALEN", getTaskData)
         await updateStep('taskList', 0, JSON.stringify(getTaskData), 0);
         let customersId = [];
         let counterCustomer = (1 / getTaskData.length);
@@ -245,7 +246,7 @@ const SyncDataScreen = ({ navigation }) => {
           valueCustomer = valueCustomer + counterCustomer;
 
           setListItem(prevState => prevState.map(item =>
-            item.title === 'Tareas' ? { ...item, counter: valueCustomer.toFixed(2) } : item
+            item.title === 'Tareas' ? { ...item, counter: Number(valueCustomer.toFixed(2)) } : item
           ));
         }
       /*   setListItem(prevState => prevState.map(item =>

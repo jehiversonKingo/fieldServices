@@ -344,6 +344,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     } else {
       const comm = await getStep('communities', 1, 0);
       getDataScreen = JSON.parse(await getStep('taskDescription', id, 0));
+      console.log("TASK DESCRIPTION_()_)_))_)_)_)_))", getDataScreen)
       if (comm.length > 0) getCommunities = JSON.parse(comm);
     }
 
@@ -355,6 +356,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
     const {screen, addon, steps, addonReceived, stepsChecks} = getDataScreen;
 
+
+    console.log("****************", screen,addon,steps ,addonReceived,stepsChecks)
     if (!screen || !addon || !steps || !addonReceived || !stepsChecks) {
       setShowAlert(true);
       setTitleAlert('¡Atención!');
@@ -368,6 +371,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       1,
     );
     const newDataAddon = handleValidExist(addon, step2, 'idTaskAddon', 2);
+    console.log("PPPPPPPPPPPPPP", newDataAddon)
     const newDataSteps = handleValidExist(steps, step3, 'idTaskStep', 3);
     const newDataAddonReceived = handleValidExist(
       addonReceived,
@@ -377,9 +381,9 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     );
     const newDataChecks = handleValidExist(stepsChecks, step5, 'idTaskStep', 5);
 
-    if (newDataAddon.length == 0) setStepFlag2(true);
+    /*if (newDataAddon.length == 0) setStepFlag2(true);
     if (newDataAddonReceived.length == 0) setStepFlag4(true);
-    if (newDataChecks.length == 0) setStepFlag5(true);
+    if (newDataChecks.length == 0) setStepFlag5(true); */
 
     setStep1(orderBy(newDataScreen, ['order'], ['asc']));
     setStep2(orderBy(newDataAddon, ['order'], ['asc']));
@@ -401,8 +405,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
 const saveTemporalData = async (dbTable, step, active) => {
   try {
-    console.log("Entramos");
-    
+    console.log("Entramos", active);
+    setIsProcessing(false);
     if (isProcessing) return;
     setIsProcessing(true);
 
@@ -412,37 +416,38 @@ const saveTemporalData = async (dbTable, step, active) => {
 
     isValid = await handleValidDataStep(step);
 
-    console.log("[ -------isValid ] >", isValid, active);
+    console.log("[ -------isValid ] >", isValid, active, stepFlag2);
     
     if (active === 0) {
-      console.log("[ Active es 0, validación inicial ]");
       isValid = await handleValidDataStep(step);
       if (isValid) {
         setActive(prev => prev + 1);
       }
       setIsProcessing(false);
-      return;
     }
 
-    if ((active === 1 && stepFlag2) || (active === 3 && stepFlag4)) {
-      isValid = true;
-      setActive(prev => prev + 1);
+    if ((active === 1) || (active === 3)) {
+      const flagValid = step.some(objeto => objeto.value !== null);
+      if(flagValid || step.length == 0){
+        isValid = true;
+        setActive(prev => prev + 1);
+      }
     }
 
     if (active === 2) {
       let samePhotos = await handleValidDataPhotos(step3, evidences);
-      if (samePhotos.length === 0 && isValid === true) {
+      if (samePhotos?.length === 0 && isValid === true) {
         setActive(prev => prev + 1);
       }
     }
 
     if (active === 4) {
-      if (step5.length === 0) {
+      if (step5?.length === 0) {
         isValid = true;
       } else {
         step5.forEach(item => {
           const agentChecks = item.taskStepChecks.filter(check => check.access === 'Agente');
-          if (agentChecks.length > 0) {
+          if (agentChecks?.length > 0) {
             agentChecks.forEach(check => {
               if (!check.checked) isValid = false;
             });
@@ -451,14 +456,12 @@ const saveTemporalData = async (dbTable, step, active) => {
           }
         });
       }
-      setActive(prev => prev + 1);
     }
 
     if (!isValid) {
       setShowAlert(true);
       setTitleAlert('¡Atención!');
       setMessageAlert('Debes ingresar todos los datos');
-      setTimeout(() => setShowAlert(false), 2000);
       setIsProcessing(false);
       return;
     }
@@ -467,6 +470,7 @@ const saveTemporalData = async (dbTable, step, active) => {
 
     if (active === 4) {
       console.log('[ UPLOAD TASK ]');
+      setIsProcessing(false);
       completeTask();
     }
 
@@ -490,7 +494,7 @@ const saveTemporalData = async (dbTable, step, active) => {
       setMessageAlert('');
       let dataKingos = JSON.parse(await getStep('warehouseEquipment', 0, 0));
       let dataAddons = JSON.parse(await getStep('warehouseAddon', 0, 0));
-
+      console.log("^^^^^^^^", dataKingos, dataAddons)
       let inventoryKingo =
         dataKingos.length > 0 ? dataKingos.map(item => item.barcode) : [];
       let inventoryAddon =
@@ -503,13 +507,25 @@ const saveTemporalData = async (dbTable, step, active) => {
         if (step2.length > 0) {
           // is different to pickup
           validArrayKingosStep2 = step2.some(item => {
-            if (/^E/i.test(item.value)) {
-              return inventoryKingo.includes(item.value);
-            } else if (/^A/i.test(item.value)) {
-              console.log(inventoryAddon);
-              return inventoryAddon.includes(item.value);
-            } else return false;
+            const itemValue = item.value.trim(); // Elimina espacios innecesarios
+            console.log("Buscando:", itemValue);
+          
+            if (/^E/i.test(itemValue)) {
+              console.log("Buscando en inventoryKingo:", inventoryKingo);
+              const foundInKingo = inventoryKingo.some(kingoItem => kingoItem.trim() === itemValue); // Trim en ambos lados
+              console.log("¿Encontrado en inventoryKingo?:", foundInKingo);
+              return foundInKingo;
+            } else if (/^A/i.test(itemValue)) {
+              console.log("Buscando en inventoryAddon:", inventoryAddon);
+              const foundInAddon = inventoryAddon.some(addonItem => addonItem.trim() === itemValue); // Trim en ambos lados
+              console.log("¿Encontrado en inventoryAddon?:", foundInAddon);
+              return foundInAddon;
+            } else {
+              return false;
+            }
           });
+          console.log("AAAAA", validArrayKingosStep2)
+          
         } else {
           validArrayKingosStep2 = true;
           validArrayAddonsStep2 = true;
@@ -520,7 +536,7 @@ const saveTemporalData = async (dbTable, step, active) => {
       }
 
       if (inline) {
-        if (step2.length <= 0 && step4.length <= 0) {
+        if (step2.length <= 0 || step4.length <= 0) {
           validArrayKingosStep2 = true
         }
 
@@ -537,6 +553,7 @@ const saveTemporalData = async (dbTable, step, active) => {
               setTitleAlert('Cargando Datos, Espere por favor');
               setMessageAlert('');
               setIsAlert(true);
+              console.log("TIIIIIIIIIIIIIIIPO", type)
             switch (type) {
               case 1:
                 taskStatus = await setDataAllTaskInstall({
@@ -607,6 +624,17 @@ const saveTemporalData = async (dbTable, step, active) => {
                   idTask: id,
                 });
                 break;
+              case 10:
+                taskStatus = await setDataAllTaskMigration({
+                  step1,
+                  step2,
+                  step3: evidences,
+                  step4,
+                  step5,
+                  idTask: id,
+                  availableDays: dataAvailableDays
+                });
+                break;
               case 11:
                 taskStatus = await setDataAllTaskMigration({
                   step1,
@@ -672,11 +700,16 @@ const saveTemporalData = async (dbTable, step, active) => {
               setShowAlert(true);
             }, 150);
           }
-        } else {
+        } else {        
+          setIsAlert(false);
+          setTimeout(() => {
           setTitleAlert('Error');
           setMessageAlert(
             'Alguno de los barcodes que ingresaste no existen en tu bodega.',
           );
+          
+          setShowAlert(true);
+        }, 150);
         }
       } else {
         console.log('...............................[TaskComplete]............................', {
@@ -688,41 +721,57 @@ const saveTemporalData = async (dbTable, step, active) => {
           idTask: id,
           typeTask: type
         });
-        await updateStep(
-          'TaskComplete',
-          id,
-          JSON.stringify({
-            step1,
-            step2,
-            evidences,
-            step4,
-            step5,
-            idTask: id,
-            typeTask: type,
-            availableDays: dataAvailableDays
-          }),
-          0,
-        );
-        console.log(validArrayKingosStep2, validArrayAddonsStep2);
-        if (step2.length <= 0 && step4.length <= 0) {
+        
+        console.log(validArrayKingosStep2, validArrayAddonsStep2, step2.length, step4.length );
+        if (step2.length <= 0 || step4.length <= 0) {
           validArrayAddonsStep2 = true;
         }
-        if (validArrayKingosStep2 || validArrayAddonsStep2) {
-          setTimeout(() => {
+
+        if (validArrayKingosStep2) {
+          
+          /* HERE */
+
+          await updateStep(
+            'TaskComplete',
+            id,
+            JSON.stringify({
+              step1,
+              step2,
+              evidences,
+              step4,
+              step5,
+              idTask: id,
+              typeTask: type,
+              availableDays: dataAvailableDays
+            }),
+            0,
+          );
+
+          let dataTaskList = await getStep('taskList', 0, 0);
+          getTaskData = JSON.parse(dataTaskList);
+          console.log("TAAAAAAAASKKKKK", getTaskData.length, id)
+          const filteredTasks = getTaskData.filter((item) => item.idTask != id);
+          await updateStep(
+            'taskList',
+            0,
+            JSON.stringify(filteredTasks),
+            0,
+          );
+
+          setShowProgressAlert(false);
             setIsAlert(false);
             navigation.navigate('Task', {
               status: true,
               title: 'Tarea completada',
               message: 'Los datos de la tarea fueron almacendos, cuando recuperes la conexión a internet debes sincronizar para procesar la tarea.',
             });
-          }, 2500);
+
         } else {
           setIsAlert(false);
-          console.log("Debes cargar datos antes de salir a realizar una tarea.");
           setTimeout(() => {
             setTitleAlert('¡Atención!');
             setMessageAlert(
-              'Debes cargar datos antes de salir a realizar una tarea.',
+              'No se encontraron datos para realizar la tarea. Debes sincronizar los datos.',
             );
             setShowAlert(true);
           }, 150);
