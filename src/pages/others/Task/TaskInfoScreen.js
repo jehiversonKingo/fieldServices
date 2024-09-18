@@ -58,7 +58,7 @@ const TaskInfoScreen = ({data, isLoading}) => {
                             textAlign: "center",
                             fontWeight: "700"
                         }}>
-                            {"AddOns requeridos"}
+                            {"Complementos requeridos"}
                         </Text>
                         <View>
                             {
@@ -108,7 +108,7 @@ const TaskInfoScreen = ({data, isLoading}) => {
                                         )}
                                     />
                                 ) : (
-                                    <Text style={{color: colorsTheme.gris80, textAlign: "center"}}>{"Esta tarea no tiene addons asignados"}</Text>
+                                    <Text style={{color: colorsTheme.gris80, textAlign: "center"}}>{"Esta tarea no tiene complementos asignados"}</Text>
                                 )
                             }
                         </View>

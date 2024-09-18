@@ -22,6 +22,7 @@ import { getAllCommunities, getModulesByRole } from '../../services/settings.ser
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDebetAgent } from '../../services/sales.services';
 import { useFocusEffect } from '@react-navigation/native';
+import AlertShow from '../../components/General/AlertShow';
 
 
 const HomeScreen = ({navigation}) => {
@@ -33,6 +34,8 @@ const HomeScreen = ({navigation}) => {
   const [blockedForTask, setBlockedTask] = React.useState(false);
   const [uploadSync, setUploadSync] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [dataVisible, setDataVisible] = React.useState(false);
   const goTo = route => navigation.navigate(route);
 
   const RenderMenu = ({item}) => (
@@ -108,11 +111,21 @@ const HomeScreen = ({navigation}) => {
     let getWalletCustomers = JSON.parse(await getStep('customersOfflineData', 0, 0));
     console.log('[ DEBET USER OFFLINE ]', parseFloat(debtUser.amount).toFixed(2));
     console.log('[ DEBET USER ]', parseFloat(getDebt.amount).toFixed(2))
-    // if (debtUser && getDebt) {
-    //   if (parseFloat(debtUser.amount).toFixed(2) !== parseFloat(getDebt.amount).toFixed(2)) {
-    //     setBlocked(true)
-    //   }
-    // }
+    if (debtUser && getDebt) {
+      if (parseFloat(debtUser.amount).toFixed(2) !== parseFloat(getDebt.amount).toFixed(2)) {
+        setDataVisible({
+          type: "info",
+          title: "¡Atención!",
+          subTitle: "Realizaste un cobro y aún no sincronizas datos. Por favor sincroniza lo antes posible de lo contrario corres el riesgo de no poder realizar más cobros.",
+          secondButton: true,
+          secondAction: () => {
+            setIsVisible(false)
+          },
+          blocked: true
+        })
+        setIsVisible(true)
+      }
+    }
 
     if(getWalletCustomers) {
       if(getWalletCustomers.customers.length > 0) {
@@ -250,6 +263,7 @@ const HomeScreen = ({navigation}) => {
           onPress={() => fncSingOut()}
         />
       </SpeedDial>
+      <AlertShow isVisible={isVisible} setIsVisible={setIsVisible} data={dataVisible} />
     </SafeAreaView>
   );
 };

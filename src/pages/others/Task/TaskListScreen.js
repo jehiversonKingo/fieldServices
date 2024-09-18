@@ -8,9 +8,6 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { Checkbox } from 'react-native-paper';
-import { Button } from '@rneui/base';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import orderBy from 'lodash/orderBy';
 
@@ -35,7 +32,6 @@ import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 const TaskListScreen = ({ navigation, route }) => {
   const { taskStatus } = route.params;
   const [open, isOpen] = useState(false);
-  const [checked, setChecked] = useState(false);
   const [active, setActive] = useState(0);
   const [data, setData] = useState([]);
   const [dataTmp, setDataTmp] = useState([]);
@@ -52,15 +48,6 @@ const TaskListScreen = ({ navigation, route }) => {
 
   const { state } = useContext(AuthContext);
   const { inline } = state;
-
-  const sheetRef = useRef(null);
-  const snapPoints = useMemo(
-    () => [height * 0.4, height * 0.8, height * 0.9],
-    [],
-  );
-  const handleSheetChange = useCallback(() => {
-    console.log('handleSheetChange');
-  }, []);
 
   const goTo = (route, data) => {
     navigation.navigate(route, data);
@@ -94,8 +81,7 @@ const TaskListScreen = ({ navigation, route }) => {
       if (inline) {
         console.log('[ TASK INLINE ]');
         getTaskData = await getTasks();
-        await updateStep('taskList', 0, JSON.stringify(getTaskData), 0);
-        for (const task of getTaskData) {
+       /*  for (const task of getTaskData) {
           const [dataTask, infoTask] = await Promise.all([
             getElemetScreen(task.idTask),
             getTaskById(task.idTask)
@@ -110,7 +96,8 @@ const TaskListScreen = ({ navigation, route }) => {
             const dataStepsToDo = await getStepInstruction(step.idStep);
             await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
           }
-        }
+        } */
+        //await updateStep('taskList', 0, JSON.stringify(getTaskData), 0);
       } else {
         console.log('[ TASK OFF LINE ]');
         const dataTaskList = await getStep('taskList', 0, 0);
@@ -123,7 +110,6 @@ const TaskListScreen = ({ navigation, route }) => {
       console.error("[ handleDataList TASK ]", error);
     }
   };
-
 
   const handleFilter = (value = "") => {
     setFilterTxt(value)
@@ -143,7 +129,7 @@ const TaskListScreen = ({ navigation, route }) => {
   useEffect(() => {
     handleDataList(1);
     return () => handleDataList(1);
-  }, []);
+  }, [inline]);
 
   useEffect(() => {
     if (taskStatus.status) {

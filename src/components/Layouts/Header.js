@@ -57,8 +57,8 @@ const Header = ({
         </View>
         <View style={styles.containerLogo}>
           <Image source={Logo} style={styles.imgLogo} />
-          <Text style={{color: colorsTheme.blanco}}>{process.env.ENVIROMENT}. {DeviceInfo.getVersion()}</Text>
-        </View>
+          <Text style={{color: colorsTheme.blanco}}>{process.env.REACT_APP_ENVIROMENT} {DeviceInfo.getVersion()}</Text> 
+        </View> 
         <View style={styles.containerProfile}>
           {isRight && (
             <TouchableOpacity

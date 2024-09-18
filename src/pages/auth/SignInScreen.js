@@ -24,8 +24,8 @@ import { ThemeConsumer } from '@rneui/themed';
 const { width } = Dimensions.get('screen');
 
 const SignInScreen = ({ }) => {
-  const [user, setUser] = useState('jehiverson.rodriguez@kingoenergy.com');
-  const [password, setPassword] = useState('221144');
+  const [user, setUser] = useState('');
+  const [password, setPassword] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle] = useState('¡Atención!');
   const [alertMessage, setAlertMessage] = useState('');
@@ -92,11 +92,11 @@ const SignInScreen = ({ }) => {
             onPress={() => logIn()}
           />
         </TouchableOpacity>
-        <Text style={{ ...styles.colorText, textAlign: "center" }}>{process.env.ENVIROMENT}. {`${DeviceInfo.getVersion()}`}</Text>
-      </View>
+        <Text style={{ ...styles.colorText, textAlign: "center" }}>{process.env.REACT_APP_ENVIROMENT} {`${DeviceInfo.getVersion()}`}</Text>
+      </View> 
       <AwesomeAlert
-        show={showAlert}
-        title={alertTitle}
+        show={showAlert} 
+        title={alertTitle} 
         message={alertMessage}
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}

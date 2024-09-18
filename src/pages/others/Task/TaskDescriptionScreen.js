@@ -114,6 +114,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   const [step5, setStep5] = useState([]);
   const [stepFlag5, setStepFlag5] = useState(false);
   const [idTaskSteps, setIdTaskSteps] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const {state} = useContext(AuthContext);
   const {inline} = state;
@@ -325,6 +326,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   };
 
   const handleDataList = async () => {
+    setIsAlert(false);
     console.log('[ PARAMS ]', route.params);
 
     const {id} = route.params;
@@ -356,7 +358,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     if (!screen || !addon || !steps || !addonReceived || !stepsChecks) {
       setShowAlert(true);
       setTitleAlert('¡Atención!');
-      setMessageAlert('Error en la estructura de los datos obtenidos.');
+      setMessageAlert('Error, detectamos que los datos de la tarea no fueron cargados correctamente.');
     }
 
     const newDataScreen = handleValidExist(
@@ -397,65 +399,85 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     setLoading(false);
   };
 
-  const saveTemporalData = async (dbTable, step, active) => {
-    try {
-      console.log("[ STEP ] >", step);
-      const {id} = route.params;
-      let isValid = false;
+const saveTemporalData = async (dbTable, step, active) => {
+  try {
+    console.log("Entramos");
+    
+    if (isProcessing) return;
+    setIsProcessing(true);
 
+    console.log("[ -------ACTIVE ] >", active);
+    const { id } = route.params;
+    let isValid = false;
+
+    isValid = await handleValidDataStep(step);
+
+    console.log("[ -------isValid ] >", isValid, active);
+    
+    if (active === 0) {
+      console.log("[ Active es 0, validación inicial ]");
       isValid = await handleValidDataStep(step);
-
-      if ((active === 1 && stepFlag2) || (active === 3 && stepFlag4)) {
-        isValid = true;
+      if (isValid) {
+        setActive(prev => prev + 1);
       }
-
-      if (active == 2) {
-        let samephotos = await handleValidDataPhotos(step3, evidences);
-        samephotos.length == 0 && isValid == true;
-      }
-
-      if (active === 4) {
-        if (step5.length == 0) {
-          isValid = true;
-        } else {
-          step5.forEach(item => {
-              if (item.taskStepChecks.filter(item => item.access === 'Agente')) {
-                item.taskStepChecks
-                  .filter(item => item.access === 'Agente')
-                  .forEach(check => {
-                    if (!check.checked) {
-                      isValid = false;
-                    }
-                  });
-              } else isValid = true;
-            });
-        }
-      }
-
-      if (isValid === false) {
-        setShowAlert(true);
-        setTitleAlert('¡Atención!');
-        setMessageAlert('Debes ingresar todos los datos');
-        setTimeout(() => {
-          setShowAlert(false);
-        }, 2000);
-        return;
-      } else {
-        await updateStep(dbTable, id, step, active);
-      }
-
-      if (active === 4) {
-        console.log('[ UPLOAD TASK ]');
-        console.log("[ACTIVE] >", active);
-        completeTask();
-        return;
-      }
-
-      setActive(prev => prev + 1);
-    } catch (error) {
-      console.log('[ ERROR SAVE TEMPORAL DATA ] => ', error);
+      setIsProcessing(false);
+      return;
     }
-  };
+
+    if ((active === 1 && stepFlag2) || (active === 3 && stepFlag4)) {
+      isValid = true;
+      setActive(prev => prev + 1);
+    }
+
+    if (active === 2) {
+      let samePhotos = await handleValidDataPhotos(step3, evidences);
+      if (samePhotos.length === 0 && isValid === true) {
+        setActive(prev => prev + 1);
+      }
+    }
+
+    if (active === 4) {
+      if (step5.length === 0) {
+        isValid = true;
+      } else {
+        step5.forEach(item => {
+          const agentChecks = item.taskStepChecks.filter(check => check.access === 'Agente');
+          if (agentChecks.length > 0) {
+            agentChecks.forEach(check => {
+              if (!check.checked) isValid = false;
+            });
+          } else {
+            isValid = true;
+          }
+        });
+      }
+      setActive(prev => prev + 1);
+    }
+
+    if (!isValid) {
+      setShowAlert(true);
+      setTitleAlert('¡Atención!');
+      setMessageAlert('Debes ingresar todos los datos');
+      setTimeout(() => setShowAlert(false), 2000);
+      setIsProcessing(false);
+      return;
+    }
+
+    await updateStep(dbTable, id, step, active);
+
+    if (active === 4) {
+      console.log('[ UPLOAD TASK ]');
+      completeTask();
+    }
+
+    setIsProcessing(false);
+  } catch (error) {
+    console.log('[ ERROR SAVE TEMPORAL DATA ] => ', error);
+    setIsProcessing(false);
+  }
+};
+
+
   /**
    * COMPLETAR LA TAREA >>>>
    */
@@ -497,33 +519,35 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         validArrayAddonsStep2 = true;
       }
 
-
-
       if (inline) {
         if (step2.length <= 0 && step4.length <= 0) {
           validArrayKingosStep2 = true
         }
 
         if (validArrayKingosStep2) {
-          console.log("SI ENTRO");
+          console.log("SI ENTRO"); 
           let responseCheck = await setDataTaskChecklist({step5, idTask: id});
-          setIsAlert(false);
-          setTimeout(() => {
+            setIsAlert(false);
             setTitleAlert('Válidando checklist');
             setMessageAlert('');
             setIsAlert(true);
-          }, 300);
           if (responseCheck?.status) {
             console.log("[RESPUESTA DEL CHECKLIST] >>>", responseCheck);
             let taskStatus = null;
-            setIsAlert(false);
-            setTimeout(() => {
               setTitleAlert('Cargando Datos, Espere por favor');
               setMessageAlert('');
               setIsAlert(true);
-            }, 200);
             switch (type) {
               case 1:
+                taskStatus = await setDataAllTaskInstall({
+                  step1,
+                  step2,
+                  step3: null,
+                  step4,
+                  step5,
+                  idTask: id,
+                });
+                break;
               case 2:
                 taskStatus = await setDataAllTaskInstall({
                   step1,
@@ -535,6 +559,14 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 });
                 break;
               case 3:
+                taskStatus = await setDataAllTaskMaintenance({
+                  step1,
+                  step2,
+                  step3: null,
+                  step4,
+                  step5,
+                  idTask: id,
+                });
               case 4:
                 taskStatus = await setDataAllTaskMaintenance({
                   step1,
@@ -575,7 +607,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                   idTask: id,
                 });
                 break;
-              case 10:
               case 11:
                 taskStatus = await setDataAllTaskMigration({
                   step1,
@@ -621,6 +652,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               navigation.navigate('Task', {taskStatus});
             } else {
               setIsAlert(false);
+              setShowProgressAlert(false);
               setTimeout(() => {
                 setTitleAlert('Error');
                 setMessageAlert(
@@ -641,16 +673,10 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             }, 150);
           }
         } else {
-          console.log("[VALOR DE validArrayKingosStep2]", validArrayAddonsStep2);
-          console.log("Alguno de los barcodes que ingresaste no existen en tu bodega.");
-          setIsAlert(false);
-          setTimeout(() => {
-            setTitleAlert('Error');
-            setMessageAlert(
-              'Alguno de los barcodes que ingresaste no existen en tu bodega.',
-            );
-            setShowAlert(true);
-          }, 150);
+          setTitleAlert('Error');
+          setMessageAlert(
+            'Alguno de los barcodes que ingresaste no existen en tu bodega.',
+          );
         }
       } else {
         console.log('...............................[TaskComplete]............................', {
@@ -705,11 +731,9 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     } catch (error) {
       console.log(error)
       setIsAlert(false);
-      setTimeout(() => {
         setTitleAlert('Error');
         setMessageAlert(error.message || 'Ha ocurrido un error.');
         setShowAlert(true);
-      }, 150);
     }
   };
 
@@ -1009,7 +1033,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           </ProgressStep>
           {/* Pantalla Dos */}
           <ProgressStep
-            label="AddOns       kingo"
+            label="Equipo y Complementos"
             scrollable={false}
             removeBtnRow={true}>
             <FlatList
@@ -1052,7 +1076,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           </ProgressStep>
           {/* Pantalla Tres */}
           <ProgressStep
-            label="Actividades a realizar"
+            label="Actividades"
             scrollable={false}
             removeBtnRow={true}>
             <FlatList
@@ -1114,7 +1138,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           </ProgressStep>
           {/* Pantalla Cuatro */}
           <ProgressStep
-            label="Equipo Recorgido"
+            label="Retirar De Tendero"
             scrollable={false}
             removeBtnRow={true}>
             <FlatList
@@ -1156,7 +1180,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             />
           </ProgressStep>
           {/* Pantalla Cinco */}
-          <ProgressStep label={'Checklist'} removeBtnRow={true}>
+          <ProgressStep label={'Listado De Control'} removeBtnRow={true}>
             <FlatList
               data={step5}
               key={'Check-FlatList-1'}

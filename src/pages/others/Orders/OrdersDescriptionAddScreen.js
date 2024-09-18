@@ -175,7 +175,7 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
 
   const completeOrder = async () => {
     setIsAlert(true);
-    setTitleAlert('Comprobando Addons');
+    setTitleAlert('Comprobando Complementos');
     let validAddons = await getValidAddonOrEquipmentAsigned(step2);
     if (validAddons.status) {
       setTitleAlert('Cargando datos, espere por favor');
@@ -280,7 +280,7 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
             }
           </ProgressStep>
           <ProgressStep
-            label="AddOns y Equipo kingo"
+            label="Equipos Y Complementos"
             scrollable={false}
             removeBtnRow={true}>
             <Button

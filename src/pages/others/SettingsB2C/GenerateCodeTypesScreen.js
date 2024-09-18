@@ -64,6 +64,7 @@ const GenerateCodeTypesScreen = ({ navigation }) => {
                 setError(true);
             }
         } catch (error) {
+            console.log('[ ERROR CATCH ]', error)
             setTextMessage("Error al validar código");
             setError(true);
         }
@@ -88,14 +89,13 @@ const GenerateCodeTypesScreen = ({ navigation }) => {
         const typesFilters = types.filter(item => !['hour', 'day', 'three_days', 'five_days', 'week', 'fortnight', 'month', 'quarter', 'semester', 'year'].includes(item.label));
 
         setTypeCode(typesFilters);
+        console.log('typeCode:', typesFilters);
         setLoading(false);
     }
 
     useEffect(() => {
         getData();
     }, []);
-
-    console.log('typeCode:', typeCode);
 
     if (loading) {
         return (

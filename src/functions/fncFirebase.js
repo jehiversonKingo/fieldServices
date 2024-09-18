@@ -12,12 +12,12 @@ export const handleUpdateImage = async (label, area, imgFile) => {
   //const reference = storage().ref(name);
         let flag = await new Promise(async (response, reject) =>{
           const reference = firebase.app().storage(`${process.env.REACT_APP_BUCKET}/${area}`).ref(name);
-          const task = reference.putFile(`file://${imgFile.path}`);
+          const task = reference.putFile(`file://${imgFile.path}`); 
           task.on('state_changed', taskSnapshot => {
             console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
           });
-
-          task.then(async() => {
+ 
+          task.then(async() => { 
             const url = await firebase.app().storage(`${process.env.REACT_APP_BUCKET}/${area}`).ref(name).getDownloadURL();
             response(url);
           });
@@ -41,10 +41,10 @@ export const handleUpdateImageVoucher = async (label, area, imgFile) => {
               console.log(`${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`);
             });
   
-            task.then(async() => {
+            task.then(async() => { 
               const url = await firebase.app().storage(`${process.env.REACT_APP_BUCKET_VOUCHER}/${area}`).ref(name).getDownloadURL();
               response(url);
-            });
+            }); 
   
             task.catch(() => {
               reject(false);

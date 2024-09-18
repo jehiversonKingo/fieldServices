@@ -39,6 +39,7 @@ const RepositionCodeScreen = ({ navigation }) => {
                 const user = JSON.parse(await AsyncStorage.getItem('@user'));
                 const { seconds, minutes, hour, day, year } = getCodesV5Time(now);
                 const code = await KingoModule.getKingoCodeV5(selectCountry, model, parseInt(idKingo), seconds, minutes, hour, day, year, planCode, false, jsonSecrets);
+                console.log("[COOOODE]", code)
                 setData({ model, idKingo, code });
                 await setCollection({
                   "collection":"repositionGenerateCodeKingo",
@@ -64,7 +65,7 @@ const RepositionCodeScreen = ({ navigation }) => {
                 setError(true);
             }
         } catch (error) {
-            console.log("WHA",error)
+            console.log('[ ERROR CATCH ]', error)
             setTextMessage("Error al validar código");
             setError(true);
         }
@@ -185,7 +186,7 @@ const RepositionCodeScreen = ({ navigation }) => {
                     </View>
                     <View style={styles.infoRow}>
                         <Text style={styles.infoLabel}>Código:</Text>
-                        <Text style={styles.infoText}>{formatCodeKingo(JSON.parse(code).code)}</Text>
+                        <Text style={styles.infoText}>{formatCodeKingo(JSON.parse(data.code).code)}</Text>
                     </View>
                 </View>
             )}
