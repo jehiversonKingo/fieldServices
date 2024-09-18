@@ -45,11 +45,14 @@ public class KingoModule extends ReactContextBaseJavaModule {
     }
 
     private JSONObject getMask(String region, String model, String id, ReadableMap secretsDoc) {
+        Log.d("[FOLLOW UP region getMask]", region);
+        Log.d("[FOLLOW UP model getMask]", model);
+
         int len;
         String type = Arrays.asList(model.split(" ")).get(0).toLowerCase();
+        Log.d("[FOLLOW UP type getMask]", type);
         JSONObject maskResult = getLegacyMask(region, type, id, secretsDoc);
         Boolean legacyValue = (Boolean) maskResult.get("legacy");
-
         if (legacyValue != null && legacyValue.booleanValue()) {
             return maskResult;
         } else if (model.equals("pos")) {
@@ -98,15 +101,21 @@ public class KingoModule extends ReactContextBaseJavaModule {
         JSONObject result = new JSONObject();
 
         try {
+            Log.d("[ ERROR MASK GENERATE]", "INIT MASK LEGACY");
             JSONObject masks = (JSONObject) secretsDoc.getMap("masks");
+            Log.d("[ ERROR MASK GENERATE]", "0.1");
             JSONObject masksByRegion = (JSONObject) masks.get(region);
+            Log.d("[ ERROR MASK GENERATE]", "0.2");
             JSONObject masksByRegionType = (JSONObject) masksByRegion.get(type);
+            Log.d("[ ERROR MASK GENERATE]", "0.3");
             String mask = (String) masksByRegionType.get(id);
-
+            Log.d("[ ERROR MASK GENERATE]", "1");
             if (mask != null) {
+                Log.d("[ ERROR MASK GENERATE]", "2");
                 result.put("key", mask);
                 result.put("legacy", true);
             } else {
+                Log.d("[ ERROR MASK GENERATE]", "3");
                 result.put("key", "");
                 result.put("legacy", true);
             }
@@ -180,6 +189,10 @@ public class KingoModule extends ReactContextBaseJavaModule {
     }
 
     public String getInitMask(String region, String model, String id, int initVersion, ReadableMap secretsDoc) {
+        Log.d("[FOLLOW UP region]", region);
+        Log.d("[FOLLOW UP model]", model);
+        Log.d("[FOLLOW UP id]", id);
+        Log.d("[FOLLOW UP initVersion]", Integer.toString(initVersion));
         JSONObject maskRes = getMask(region, model, id, secretsDoc);
         String m = (String) maskRes.get("key");
 

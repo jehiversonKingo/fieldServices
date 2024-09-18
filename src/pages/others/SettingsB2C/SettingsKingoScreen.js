@@ -21,12 +21,12 @@ const SettingsKingoScreen = ({ navigation }) => {
     const [error, setError] = useState(false); 
     const dropdownRef = useRef(null); // Create a reference for the dropdown
 
-    const countries = [{ value: 'gtm-pet', label: 'Guatemala' }, { value: 'gtm-col', label: 'Colombia' }];
+    const countries = [{ value: 'gtm-pet', label: 'Guatemala' }, { value: 'col-lag', label: 'Colombia' }];
     
     const handleGetCode = async () => {
         try {
             cleanData();
-            const model = await getModel(idKingo);
+            const model = await getModel(idKingo, selectCountry);
             if (model !== undefined) {
                 setError(false);
                 const now = new Date();

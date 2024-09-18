@@ -92,11 +92,11 @@ const SignInScreen = ({ }) => {
             onPress={() => logIn()}
           />
         </TouchableOpacity>
-        <Text style={{ ...styles.colorText, textAlign: "center" }}>{process.env.ENVIROMENT}. {`${DeviceInfo.getVersion()}`}</Text>
-      </View>
+        <Text style={{ ...styles.colorText, textAlign: "center" }}>{process.env.REACT_APP_ENVIROMENT} {`${DeviceInfo.getVersion()}`}</Text>
+      </View> 
       <AwesomeAlert
-        show={showAlert}
-        title={alertTitle}
+        show={showAlert} 
+        title={alertTitle} 
         message={alertMessage}
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}

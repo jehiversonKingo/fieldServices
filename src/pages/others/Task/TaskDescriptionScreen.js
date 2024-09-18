@@ -115,6 +115,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   const [step5, setStep5] = useState([]);
   const [stepFlag5, setStepFlag5] = useState(false);
   const [idTaskSteps, setIdTaskSteps] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const {state} = useContext(AuthContext);
   const {inline} = state;
@@ -326,6 +327,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   };
 
   const handleDataList = async () => {
+    setIsAlert(false);
     console.log('[ PARAMS ]', route.params);
 
     const {id} = route.params;
@@ -343,6 +345,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     } else {
       const comm = await getStep('communities', 1, 0);
       getDataScreen = JSON.parse(await getStep('taskDescription', id, 0));
+      console.log("TASK DESCRIPTION_()_)_))_)_)_)_))", getDataScreen)
       if (comm.length > 0) getCommunities = JSON.parse(comm);
     }
 
@@ -354,10 +357,12 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
     const {screen, addon, steps, addonReceived, stepsChecks} = getDataScreen;
 
+
+    console.log("****************", screen,addon,steps ,addonReceived,stepsChecks)
     if (!screen || !addon || !steps || !addonReceived || !stepsChecks) {
       setShowAlert(true);
       setTitleAlert('¡Atención!');
-      setMessageAlert('Error en la estructura de los datos obtenidos.');
+      setMessageAlert('Error, detectamos que los datos de la tarea no fueron cargados correctamente.');
     }
 
     const newDataScreen = handleValidExist(
@@ -367,6 +372,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       1,
     );
     const newDataAddon = handleValidExist(addon, step2, 'idTaskAddon', 2);
+    console.log("PPPPPPPPPPPPPP", newDataAddon)
     const newDataSteps = handleValidExist(steps, step3, 'idTaskStep', 3);
     const newDataAddonReceived = handleValidExist(
       addonReceived,
@@ -376,9 +382,9 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     );
     const newDataChecks = handleValidExist(stepsChecks, step5, 'idTaskStep', 5);
 
-    if (newDataAddon.length == 0) setStepFlag2(true);
+    /*if (newDataAddon.length == 0) setStepFlag2(true);
     if (newDataAddonReceived.length == 0) setStepFlag4(true);
-    if (newDataChecks.length == 0) setStepFlag5(true);
+    if (newDataChecks.length == 0) setStepFlag5(true); */
 
     setStep1(orderBy(newDataScreen, ['order'], ['asc']));
     setStep2(orderBy(newDataAddon, ['order'], ['asc']));
@@ -398,65 +404,85 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     setLoading(false);
   };
 
-  const saveTemporalData = async (dbTable, step, active) => {
-    try {
-      console.log("[ STEP ] >", step);
-      const {id} = route.params;
-      let isValid = false;
+const saveTemporalData = async (dbTable, step, active) => {
+  try {
+    console.log("Entramos", active);
+    setIsProcessing(false);
+    if (isProcessing) return;
+    setIsProcessing(true);
 
+    console.log("[ -------ACTIVE ] >", active);
+    const { id } = route.params;
+    let isValid = false;
+
+    isValid = await handleValidDataStep(step);
+
+    console.log("[ -------isValid ] >", isValid, active, stepFlag2);
+    
+    if (active === 0) {
       isValid = await handleValidDataStep(step);
-
-      if ((active === 1 && stepFlag2) || (active === 3 && stepFlag4)) {
-        isValid = true;
+      if (isValid) {
+        setActive(prev => prev + 1);
       }
-
-      if (active == 2) {
-        let samephotos = await handleValidDataPhotos(step3, evidences);
-        samephotos.length == 0 && isValid == true;
-      }
-
-      if (active === 4) {
-        if (step5.length == 0) {
-          isValid = true;
-        } else {
-          step5.forEach(item => {
-              if (item.taskStepChecks.filter(item => item.access === 'Agente')) {
-                item.taskStepChecks
-                  .filter(item => item.access === 'Agente')
-                  .forEach(check => {
-                    if (!check.checked) {
-                      isValid = false;
-                    }
-                  });
-              } else isValid = true;
-            });
-        }
-      }
-
-      if (isValid === false) {
-        setShowAlert(true);
-        setTitleAlert('¡Atención!');
-        setMessageAlert('Debes ingresar todos los datos');
-        setTimeout(() => {
-          setShowAlert(false);
-        }, 2000);
-        return;
-      } else {
-        await updateStep(dbTable, id, step, active);
-      }
-
-      if (active === 4) {
-        console.log('[ UPLOAD TASK ]');
-        console.log("[ACTIVE] >", active);
-        completeTask();
-        return;
-      }
-
-      setActive(prev => prev + 1);
-    } catch (error) {
-      console.log('[ ERROR SAVE TEMPORAL DATA ] => ', error);
+      setIsProcessing(false);
     }
-  };
+
+    if ((active === 1) || (active === 3)) {
+      const flagValid = step.some(objeto => objeto.value !== null);
+      if(flagValid || step.length == 0){
+        isValid = true;
+        setActive(prev => prev + 1);
+      }
+    }
+
+    if (active === 2) {
+      let samePhotos = await handleValidDataPhotos(step3, evidences);
+      if (samePhotos?.length === 0 && isValid === true) {
+        setActive(prev => prev + 1);
+      }
+    }
+
+    if (active === 4) {
+      if (step5?.length === 0) {
+        isValid = true;
+      } else {
+        step5.forEach(item => {
+          const agentChecks = item.taskStepChecks.filter(check => check.access === 'Agente');
+          if (agentChecks?.length > 0) {
+            agentChecks.forEach(check => {
+              if (!check.checked) isValid = false;
+            });
+          } else {
+            isValid = true;
+          }
+        });
+      }
+    }
+
+    if (!isValid) {
+      setShowAlert(true);
+      setTitleAlert('¡Atención!');
+      setMessageAlert('Debes ingresar todos los datos');
+      setIsProcessing(false);
+      return;
+    }
+
+    await updateStep(dbTable, id, step, active);
+
+    if (active === 4) {
+      console.log('[ UPLOAD TASK ]');
+      setIsProcessing(false);
+      completeTask();
+    }
+
+    setIsProcessing(false);
+  } catch (error) {
+    console.log('[ ERROR SAVE TEMPORAL DATA ] => ', error);
+    setIsProcessing(false);
+  }
+};
+
+
   /**
    * COMPLETAR LA TAREA >>>>
    */
@@ -469,7 +495,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       setMessageAlert('');
       let dataKingos = JSON.parse(await getStep('warehouseEquipment', 0, 0));
       let dataAddons = JSON.parse(await getStep('warehouseAddon', 0, 0));
-
+      console.log("^^^^^^^^", dataKingos, dataAddons)
       let inventoryKingo =
         dataKingos.length > 0 ? dataKingos.map(item => item.barcode) : [];
       let inventoryAddon =
@@ -482,13 +508,25 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         if (step2.length > 0) {
           // is different to pickup
           validArrayKingosStep2 = step2.some(item => {
-            if (/^E/i.test(item.value)) {
-              return inventoryKingo.includes(item.value);
-            } else if (/^A/i.test(item.value)) {
-              console.log(inventoryAddon);
-              return inventoryAddon.includes(item.value);
-            } else return false;
+            const itemValue = item.value.trim(); // Elimina espacios innecesarios
+            console.log("Buscando:", itemValue);
+          
+            if (/^E/i.test(itemValue)) {
+              console.log("Buscando en inventoryKingo:", inventoryKingo);
+              const foundInKingo = inventoryKingo.some(kingoItem => kingoItem.trim() === itemValue); // Trim en ambos lados
+              console.log("¿Encontrado en inventoryKingo?:", foundInKingo);
+              return foundInKingo;
+            } else if (/^A/i.test(itemValue)) {
+              console.log("Buscando en inventoryAddon:", inventoryAddon);
+              const foundInAddon = inventoryAddon.some(addonItem => addonItem.trim() === itemValue); // Trim en ambos lados
+              console.log("¿Encontrado en inventoryAddon?:", foundInAddon);
+              return foundInAddon;
+            } else {
+              return false;
+            }
           });
+          console.log("AAAAA", validArrayKingosStep2)
+          
         } else {
           validArrayKingosStep2 = true;
           validArrayAddonsStep2 = true;
@@ -498,33 +536,36 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         validArrayAddonsStep2 = true;
       }
 
-
-
       if (inline) {
-        if (step2.length <= 0 && step4.length <= 0) {
+        if (step2.length <= 0 || step4.length <= 0) {
           validArrayKingosStep2 = true
         }
 
         if (validArrayKingosStep2) {
-          console.log("SI ENTRO");
+          console.log("SI ENTRO"); 
           let responseCheck = await setDataTaskChecklist({step5, idTask: id});
-          setIsAlert(false);
-          setTimeout(() => {
+            setIsAlert(false);
             setTitleAlert('Válidando checklist');
             setMessageAlert('');
             setIsAlert(true);
-          }, 300);
           if (responseCheck?.status) {
             console.log("[RESPUESTA DEL CHECKLIST] >>>", responseCheck);
             let taskStatus = null;
-            setIsAlert(false);
-            setTimeout(() => {
               setTitleAlert('Cargando Datos, Espere por favor');
               setMessageAlert('');
               setIsAlert(true);
-            }, 200);
+              console.log("TIIIIIIIIIIIIIIIPO", type)
             switch (type) {
               case 1:
+                taskStatus = await setDataAllTaskInstall({
+                  step1,
+                  step2,
+                  step3: null,
+                  step4,
+                  step5,
+                  idTask: id,
+                });
+                break;
               case 2:
                 taskStatus = await setDataAllTaskInstall({
                   step1,
@@ -536,6 +577,14 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 });
                 break;
               case 3:
+                taskStatus = await setDataAllTaskMaintenance({
+                  step1,
+                  step2,
+                  step3: null,
+                  step4,
+                  step5,
+                  idTask: id,
+                });
               case 4:
                 taskStatus = await setDataAllTaskMaintenance({
                   step1,
@@ -577,6 +626,16 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 });
                 break;
               case 10:
+                taskStatus = await setDataAllTaskMigration({
+                  step1,
+                  step2,
+                  step3: evidences,
+                  step4,
+                  step5,
+                  idTask: id,
+                  availableDays: dataAvailableDays
+                });
+                break;
               case 11:
                 taskStatus = await setDataAllTaskMigration({
                   step1,
@@ -622,6 +681,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               navigation.navigate('Task', {taskStatus});
             } else {
               setIsAlert(false);
+              setShowProgressAlert(false);
               setTimeout(() => {
                 setTitleAlert('Error');
                 setMessageAlert(
@@ -641,17 +701,16 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               setShowAlert(true);
             }, 150);
           }
-        } else {
-          console.log("[VALOR DE validArrayKingosStep2]", validArrayAddonsStep2);
-          console.log("Alguno de los barcodes que ingresaste no existen en tu bodega.");
+        } else {        
           setIsAlert(false);
           setTimeout(() => {
-            setTitleAlert('Error');
-            setMessageAlert(
-              'Alguno de los barcodes que ingresaste no existen en tu bodega.',
-            );
-            setShowAlert(true);
-          }, 150);
+          setTitleAlert('Error');
+          setMessageAlert(
+            'Alguno de los barcodes que ingresaste no existen en tu bodega.',
+          );
+          
+          setShowAlert(true);
+        }, 150);
         }
       } else {
         console.log('...............................[TaskComplete]............................', {
@@ -663,41 +722,57 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           idTask: id,
           typeTask: type
         });
-        await updateStep(
-          'TaskComplete',
-          id,
-          JSON.stringify({
-            step1,
-            step2,
-            evidences,
-            step4,
-            step5,
-            idTask: id,
-            typeTask: type,
-            availableDays: dataAvailableDays
-          }),
-          0,
-        );
-        console.log(validArrayKingosStep2, validArrayAddonsStep2);
-        if (step2.length <= 0 && step4.length <= 0) {
+        
+        console.log(validArrayKingosStep2, validArrayAddonsStep2, step2.length, step4.length );
+        if (step2.length <= 0 || step4.length <= 0) {
           validArrayAddonsStep2 = true;
         }
-        if (validArrayKingosStep2 || validArrayAddonsStep2) {
-          setTimeout(() => {
+
+        if (validArrayKingosStep2) {
+          
+          /* HERE */
+
+          await updateStep(
+            'TaskComplete',
+            id,
+            JSON.stringify({
+              step1,
+              step2,
+              evidences,
+              step4,
+              step5,
+              idTask: id,
+              typeTask: type,
+              availableDays: dataAvailableDays
+            }),
+            0,
+          );
+
+          let dataTaskList = await getStep('taskList', 0, 0);
+          getTaskData = JSON.parse(dataTaskList);
+          console.log("TAAAAAAAASKKKKK", getTaskData.length, id)
+          const filteredTasks = getTaskData.filter((item) => item.idTask != id);
+          await updateStep(
+            'taskList',
+            0,
+            JSON.stringify(filteredTasks),
+            0,
+          );
+
+          setShowProgressAlert(false);
             setIsAlert(false);
             navigation.navigate('Task', {
               status: true,
               title: 'Tarea completada',
               message: 'Los datos de la tarea fueron almacendos, cuando recuperes la conexión a internet debes sincronizar para procesar la tarea.',
             });
-          }, 2500);
+
         } else {
           setIsAlert(false);
-          console.log("Debes cargar datos antes de salir a realizar una tarea.");
           setTimeout(() => {
             setTitleAlert('¡Atención!');
             setMessageAlert(
-              'Debes cargar datos antes de salir a realizar una tarea.',
+              'No se encontraron datos para realizar la tarea. Debes sincronizar los datos.',
             );
             setShowAlert(true);
           }, 150);
@@ -706,11 +781,9 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     } catch (error) {
       console.log(error)
       setIsAlert(false);
-      setTimeout(() => {
         setTitleAlert('Error');
         setMessageAlert(error.message || 'Ha ocurrido un error.');
         setShowAlert(true);
-      }, 150);
     }
   };
 
@@ -1008,7 +1081,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           </ProgressStep>
           {/* Pantalla Dos */}
           <ProgressStep
-            label="AddOns       kingo"
+            label="Equipo y Complementos"
             scrollable={false}
             removeBtnRow={true}>
             <FlatList
@@ -1051,7 +1124,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           </ProgressStep>
           {/* Pantalla Tres */}
           <ProgressStep
-            label="Actividades a realizar"
+            label="Actividades"
             scrollable={false}
             removeBtnRow={true}>
             <FlatList
@@ -1113,7 +1186,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           </ProgressStep>
           {/* Pantalla Cuatro */}
           <ProgressStep
-            label="Equipo Recorgido"
+            label="Retirar De Tendero"
             scrollable={false}
             removeBtnRow={true}>
             <FlatList
@@ -1155,7 +1228,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             />
           </ProgressStep>
           {/* Pantalla Cinco */}
-          <ProgressStep label={'Checklist'} removeBtnRow={true}>
+          <ProgressStep label={'Listado De Control'} removeBtnRow={true}>
             <FlatList
               data={step5}
               key={'Check-FlatList-1'}

@@ -9,11 +9,12 @@ import * as RNFS from 'react-native-fs';
 
 //Components
 import Header from '../../../components/Layouts/Header';
-import { setDataAllTask, setDataAllTaskInstall, setDataAllTaskMigration, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskChecklist, setDataTaskPhotos } from '../../../services/task.services';
-import {getAllDataStep, deleteStep, getStep} from '../../../functions/fncSqlite';
+import { getTasks, getTaskById, setDataAllTaskInstall, getStepInstruction, getElemetScreen, setDataAllTaskMigration, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskChecklist, setDataTaskPhotos } from '../../../services/task.services';
+import { getTicketById } from '../../../services/ticket.services';
+import {getAllDataStep, deleteStep} from '../../../functions/fncSqlite';
 import {handleGetLocationReturnValue} from '../../../functions/fncLocation';
 import {colorsTheme} from '../../../configurations/configStyle';
-import { handleChangeArray } from '../../../functions/functionChangeValue';
+import { getStep, updateStep } from '../../../functions/fncSqlite';
 import {Context as AuthContext} from '../../../context/AuthContext';
 
 const {width, height} = Dimensions.get('screen');
@@ -204,7 +205,7 @@ const TaskOffline = ({navigation}) => {
                   alignItems: 'center',
                   marginTop: 10,
                   }}>
-                  <Text style={{color: colorsTheme.blanco}}>Addons y Equipo</Text>
+                  <Text style={{color: colorsTheme.blanco}}>Equipo Y Complementos</Text>
               </View>
               }
               ListEmptyComponent={
@@ -218,7 +219,7 @@ const TaskOffline = ({navigation}) => {
                   marginTop: 10,
                   }}>
                   <Text style={{color: colorsTheme.blanco}}>
-                  No se han encontrado Addons ni Equipos.
+                  No se han encontrado Equipos o Complementos.
                   </Text>
               </View>
               }
@@ -282,7 +283,7 @@ const TaskOffline = ({navigation}) => {
                   alignItems: 'center',
                   marginTop: 10,
                   }}>
-                  <Text style={{color: colorsTheme.blanco}}>Addons y equipo recogido</Text>
+                  <Text style={{color: colorsTheme.blanco}}>Equipo y Complementos recogido</Text>
               </View>
               }
               ListEmptyComponent={
@@ -296,7 +297,7 @@ const TaskOffline = ({navigation}) => {
                   marginTop: 10,
                   }}>
                   <Text style={{color: colorsTheme.blanco}}>
-                  No se han encontrado datos sobre addons y equipos recogidos.
+                  No se han encontrado datos sobre Equipos o Complementos recogidos.
                   </Text>
               </View>
               }
@@ -366,6 +367,15 @@ const TaskOffline = ({navigation}) => {
             }, 200);
             switch (typeTask) {
               case 1:
+                taskStatus = await setDataAllTaskInstall({
+                  step1,
+                  step2,
+                  step3: null,
+                  step4,
+                  step5,
+                  idTask,
+                });
+                break;
               case 2:
                 taskStatus = await setDataAllTaskInstall({
                   step1,
@@ -396,7 +406,17 @@ const TaskOffline = ({navigation}) => {
                   idTask,
                 });
                 break;
-              case 10:
+                case 10:
+                console.log('EN EL 10 estoy');
+                taskStatus = await setDataAllTaskMigration({
+                  step1,
+                  step2,
+                  step3: evidences,
+                  step4,
+                  step5,
+                  idTask,
+                  blockDays: availableDays
+                });
               case 11:
                 console.log('EN EL 10 estoy');
                 taskStatus = await setDataAllTaskMigration({
@@ -441,10 +461,28 @@ const TaskOffline = ({navigation}) => {
 
               await deleteStep('TaskComplete', idTask);
               await deleteStep('taskInfo', idTask);
+              
+
+              let getTaskData = await getTasks();
+              await updateStep('taskList', 0, JSON.stringify(getTaskData), 0);
+              
+              for (let task of getTaskData) {
+                let dataTask = await getElemetScreen(task.idTask);
+                const { steps } = dataTask;
+                const infoTask = await getTaskById(task.idTask)
+                await updateStep('taskDescription', task.idTask, JSON.stringify(dataTask), 0);
+                await updateStep('taskInfo', task.idTask, JSON.stringify(infoTask), 0)
+                steps.forEach(async (step) => {
+                  let dataStepsToDo = await getStepInstruction(step.idStep)
+                  await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
+                });
+              }
+
               setShowProgressAlert(false);
               navigation.navigate('Task', {taskStatus});
             } else {
               setIsAlert(false);
+              setShowProgressAlert(false);
               setTimeout(() => {
                 setTitleAlert('Error');
                 setMessageAlert(

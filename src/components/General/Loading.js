@@ -14,7 +14,7 @@ function Loading() {
             {/* <Progress.Bar size={30} indeterminate={true} color={colorsTheme.naranja}/> */}
         </View>
     );
-}
+} 
 
 const styles = StyleSheet.create({
     container: {

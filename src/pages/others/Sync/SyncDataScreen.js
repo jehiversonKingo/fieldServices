@@ -24,7 +24,7 @@ import {
   getCreditsCustomer,
   getDataCustomerById
 } from '../../../services/sales.services';
-import { getTasks, getElemetScreen, getStepInstruction } from '../../../services/task.services';
+import { getTasks, getElemetScreen, getStepInstruction, getTaskById } from '../../../services/task.services';
 import { getTicketById } from '../../../services/ticket.services';
 import { uploatDataOffline, deleteStorageCollection } from '../../../services/offline.services';
 import {findIndexArray, findInArray} from '../../../functions/fncGeneral';
@@ -212,8 +212,9 @@ const SyncDataScreen = ({ navigation }) => {
         if (typeof await getStep('debtUser', 0, 0) === 'object') {
           await updateStep('debtUser', 0, JSON.stringify(getDebt), 0);
         } else {
+          console.log("***)***")
           let debtlocalUser = JSON.parse(await getStep('debtUser', 0, 0));
-          if (parseFloat(getDebt.amount).toFixed(2) === parseFloat(debtlocalUser.amount).toFixed(2)) {
+          if (parseFloat(getDebt?.amount).toFixed(2) === parseFloat(debtlocalUser?.amount || 0).toFixed(2)) {
             await updateStep('debtUser', 0, JSON.stringify(getDebt), 0);
           }
         }
@@ -223,6 +224,7 @@ const SyncDataScreen = ({ navigation }) => {
         ));
 
         let getTaskData = await getTasks();
+        console.log("DATOS DE LAS TAREAS QUE ME SALEN", getTaskData)
         await updateStep('taskList', 0, JSON.stringify(getTaskData), 0);
         let customersId = [];
         let counterCustomer = (1 / getTaskData.length);
@@ -230,7 +232,9 @@ const SyncDataScreen = ({ navigation }) => {
         for (let task of getTaskData) {
           let dataTask = await getElemetScreen(task.idTask);
           const { steps } = dataTask;
+          const infoTask = await getTaskById(task.idTask)
           await updateStep('taskDescription', task.idTask, JSON.stringify(dataTask), 0);
+          await updateStep('taskInfo', task.idTask, JSON.stringify(infoTask), 0)
           steps.forEach(async (step) => {
             let dataStepsToDo = await getStepInstruction(step.idStep)
             await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
@@ -239,15 +243,16 @@ const SyncDataScreen = ({ navigation }) => {
 
           !customersId.includes(dataTicket.idCustomer) && customersId.push(dataTicket.idCustomer);
 
+          valueCustomer = valueCustomer + counterCustomer;
+
           setListItem(prevState => prevState.map(item =>
             item.title === 'Tareas' ? { ...item, counter: Number(valueCustomer.toFixed(2)) } : item
           ));
-          valueCustomer = valueCustomer + counterCustomer;
         }
-        setListItem(prevState => prevState.map(item =>
+      /*   setListItem(prevState => prevState.map(item =>
           item.title === 'Tareas' ? { ...item, counter: item.counter + 1 } : item
-        ));
-        console.log("[ CUSTOMER IDS ] >> ", customersId);
+        )); */
+        console.log("[ CUSTOMER IDS ] >> ", customersId, counterCustomer, getTaskData);
         //Customer Informacion
         let getRules = await getAllRules();
         await updateStep('customerRules', 0, JSON.stringify(getRules), 0);
@@ -278,6 +283,7 @@ const SyncDataScreen = ({ navigation }) => {
         let counterWalletCustomer = (1 / customersId.length);
         let valueWalletCustomer = 0;
         for (let customer of customersId) {
+          valueWalletCustomer = valueWalletCustomer + counterWalletCustomer;
           let customerData = await getDataCustomerById(customer);
           let walletCustomer = await getWallerByCustomer(customer);
           let transactionCustomer = await getTransactionCarriedOut(customer);
@@ -324,11 +330,7 @@ const SyncDataScreen = ({ navigation }) => {
             item.title === 'Compras Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
           ));
 
-          setListItem(prevState => prevState.map(item =>
-            item.title === 'Tenderos' ? { ...item, counter: Number(valueWalletCustomer.toFixed(2)) } : item
-          ));
-
-          valueWalletCustomer = valueWalletCustomer + counterWalletCustomer;
+          
           await updateStep('customers', customer, JSON.stringify({...customerData.customer, currency: customerData.currency}), 0);
           await updateStep('customersWallets', customer, JSON.stringify(walletCustomer), 0);
           await updateStep('transactionWallets', customer, JSON.stringify(transactionCustomer), 0);
@@ -337,34 +339,6 @@ const SyncDataScreen = ({ navigation }) => {
           await updateStep('saleWallets', customer, JSON.stringify(salesCustomer), 0);
           await updateStep('creditWallets', customer, JSON.stringify(creditCustomer), 0);
         }
-
-        setListItem(prevState => prevState.map(item =>
-          item.title === 'Tenderos' ? { ...item, counter: item.counter + 1 } : item
-        ));
-
-        setListItem(prevState => prevState.map(item =>
-          item.title === 'Billeteras Tenderos' ? { ...item, counter: item.counter + 1 } : item
-        ));
-
-        setListItem(prevState => prevState.map(item =>
-          item.title === 'Transacciones Tenderos' ? { ...item, counter: item.counter + 1 } : item
-        ));
-
-        setListItem(prevState => prevState.map(item =>
-          item.title === 'Deudas Tenderos' ? { ...item, counter: item.counter + 1 } : item
-        ));
-
-        setListItem(prevState => prevState.map(item =>
-          item.title === 'Balance Tenderos' ? { ...item, counter: item.counter + 1 } : item
-        ));
-
-        setListItem(prevState => prevState.map(item =>
-          item.title === 'Ventas Tenderos' ? { ...item, counter: item.counter + 1 } : item
-        ));
-
-        setListItem(prevState => prevState.map(item =>
-          item.title === 'Compras Tenderos' ? { ...item, counter: item.counter + 1 } : item
-        ));
 
         await updateStep('customersOfflineData', 0, JSON.stringify({
           "customers": []

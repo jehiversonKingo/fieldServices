@@ -42,9 +42,9 @@ const GenerateCodeTypesScreen = ({ navigation }) => {
                 setData({ model, idKingo, user, code });
                 await setCollection({
                     "collection":"settingsGenerateCode",
-                    "documentRef":`${code}`,
+                    "documentRef":`${JSON.parse(code).code}`,
                     "data":{
-                        "code": `${code}`,
+                        "code": `${JSON.parse(code).code}`,
                         "kingo": idKingo,
                         "reason": reason,
                         "user": user,
@@ -89,14 +89,13 @@ const GenerateCodeTypesScreen = ({ navigation }) => {
         const typesFilters = types.filter(item => !['hour', 'day', 'three_days', 'five_days', 'week', 'fortnight', 'month', 'quarter', 'semester', 'year'].includes(item.label));
 
         setTypeCode(typesFilters);
+        console.log('typeCode:', typesFilters);
         setLoading(false);
     }
 
     useEffect(() => {
         getData();
     }, []);
-
-    console.log('typeCode:', typeCode);
 
     if (loading) {
         return (
@@ -207,7 +206,7 @@ const GenerateCodeTypesScreen = ({ navigation }) => {
                     </View>
                     <View style={{ flexDirection: 'row', padding: 5, marginHorizontal: 25, justifyContent: 'space-between', borderBottomWidth: 1 }}>
                         <Text style={{ fontWeight: 'bold', color: colorsTheme.negro }}>Código:</Text>
-                        <Text style={{ color: colorsTheme.negro }}>{formatCodeKingo(data.code)}</Text>
+                        <Text style={{ color: colorsTheme.negro }}>{formatCodeKingo(JSON.parse(data.code).code)}</Text>
                     </View>
                 </View>
             )}

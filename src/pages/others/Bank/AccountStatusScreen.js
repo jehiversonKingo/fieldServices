@@ -9,6 +9,7 @@ import {
   FlatList,
   ActivityIndicator
 } from "react-native"
+import moment from "moment/moment";
 
 import { Context as AuthContext } from '../../../context/AuthContext';
 import Header from "../../../components/Layouts/Header"
@@ -16,8 +17,9 @@ import { colorsTheme } from "../../../configurations/configStyle";
 import { getDataUser } from "../../../functions/fncGeneral";
 import { getStep } from '../../../functions/fncSqlite';
 import { getDebetAgent, getTransactionAgent, getWallerByUser } from "../../../services/sales.services";
-import moment from "moment/moment";
+
 import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getCurrency } from "../../../services/settings.services";
 
 const { width, height, fontScale } = Dimensions.get('window')
 const AccountStatus = ({ navigation }) => {
@@ -29,6 +31,7 @@ const AccountStatus = ({ navigation }) => {
   const [transactions, setTransactions] = useState([])
   const [walletData, setWalletData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [optionsCurrency, setOptionsCurrency] = useState({});
 
   const getData = async () => {
     try {
@@ -39,6 +42,7 @@ const AccountStatus = ({ navigation }) => {
         const reqTransactions = await getTransactionAgent();
         const reqDebet = await getDebetAgent();
         const wallet = await getWallerByUser();
+        const currency = await getCurrency();
         console.log("[ WALLET ] >>", wallet);
 
         if (reqTransactions) {
@@ -52,13 +56,32 @@ const AccountStatus = ({ navigation }) => {
         if (wallet) {
           setWalletData(wallet)
         }
+
+        if(currency){
+          setOptionsCurrency({
+            style: 'currency',
+            currency: currency.isoCode || '',
+            minimumFractionDigits: 2,
+          });
+        }else{
+          setOptionsCurrency({
+            style: 'currency',
+            currency: '',
+            minimumFractionDigits: 2,
+          });
+        }
+
       }else{
         console.log("OOOOOFFFFFLINE")
         const reqTransactions = await getStep('transactionUser',0,0);
         const reqDebet = await getStep('debtUser',0,0);
         const wallet = await getStep('walletUser',0,0);
         console.log("[ WALLET - reqTransactions ] >>", reqDebet, typeof reqDebet );
-
+        setOptionsCurrency({
+          style: 'currency',
+          currency: '',
+          minimumFractionDigits: 2,
+        });
         if (reqTransactions) {
           //console.log("[ TRANSACTIONS ] => ", reqTransactions);
           setTransactions([])
@@ -107,12 +130,6 @@ const AccountStatus = ({ navigation }) => {
         </View>
     </View>
   )
-
-  const optionsCurrency = {
-    style: 'currency',
-    currency: 'GTQ',
-    minimumFractionDigits: 2,
-  };
 
   useEffect(() => {
     getData()
