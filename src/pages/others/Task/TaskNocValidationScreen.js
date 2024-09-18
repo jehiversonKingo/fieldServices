@@ -15,6 +15,7 @@ import Header from '../../../components/Layouts/Header';
 import {Context as AuthContext} from '../../../../src/context/AuthContext';
 
 import {colorsTheme} from '../../../configurations/configStyle';
+import { handleGetLocationReturnValue } from '../../../functions/fncLocation';
 
 const TaskNocValidationScreen = ({navigation, route}) => {
 
@@ -34,11 +35,13 @@ const TaskNocValidationScreen = ({navigation, route}) => {
 
   const handleSendCode = async() =>{
     setIsDisabled(true);
+    const location = await handleGetLocationReturnValue(setIsAlert, setTitleAlert, setMessageAlert);
+    console.log('[ GPS LOCATIONS ] >>> ', location);
     if (code !== '' && code !== null && code !== undefined || state.code !== '') {
       let codeValid = (code !== '' && code !== null && code !== undefined) ? code : state.code;
       setIsAlert(true);
       setTitleAlert('Validando Codigo...');
-      let taskStatus = await setCodeNoc({code: codeValid, idTask:id});
+      let taskStatus = await setCodeNoc({code: codeValid, idTask: id, gps: `${location.latitude},${location.longitude}`});
       setIsAlert(false);
       if (taskStatus.status){
         changeCodeTask(null);
