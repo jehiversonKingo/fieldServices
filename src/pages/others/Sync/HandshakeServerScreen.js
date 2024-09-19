@@ -20,10 +20,19 @@ import { colorsTheme } from '../../../configurations/configStyle';
 import Header from '../../../components/Layouts/Header';
 import { getStep, updateStep } from '../../../functions/fncSqlite';
 import { findInArray, findIndexArray } from '../../../functions/fncGeneral';
+import ButtonProgressStep from '../../../components/General/ButtonProgressStep';
 
 const eventEmitter = new NativeEventEmitter(NativeModules.ServerSocketModule);
 const { ServerSocketModule, BluetoothServerModule } = NativeModules;
-const HandshakeServerScreen = ({ navigation, route, header = true }) => {
+const HandshakeServerScreen = ({
+    navigation,
+    route,
+    header = true,
+    description = '',
+    typeScreen = 'handshake',
+    nextStep,
+    previousStep
+}) => {
     const [receivedData, setReceivedData] = useState([]);
     const [statusServer, setStatusServer] = useState('El servidor esta apagado');
     const [statusServerColor, setStatusServerColor] = useState(colorsTheme.rojo);
@@ -36,6 +45,7 @@ const HandshakeServerScreen = ({ navigation, route, header = true }) => {
     const [type, setType] = useState(1);
     const [debt, setDebt] = useState(1);
     const [dataCustomer, setDataCustomer] = useState({});
+    const [disabledButton, setDisableButton] = useState(true);
 
     const handleSaveCustomerData = async data => {
         try {
@@ -504,6 +514,11 @@ const HandshakeServerScreen = ({ navigation, route, header = true }) => {
                     />{' '}
                     {statusServer}
                 </Text>
+                <Text style={{
+                    color: colorsTheme.gris60,
+                    fontSize: 14,
+                    textAlign: 'center',
+                }}>{description}</Text>
                 {loading && (
                     <View
                         style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
@@ -523,6 +538,29 @@ const HandshakeServerScreen = ({ navigation, route, header = true }) => {
                         lineColor={colorsTheme.naranja40}
                         circleColor={colorsTheme.naranja80}
                     />
+                )}
+                {console.log('[---------------------/ [ TYPESREEN ] /----------------------]', typeScreen)}
+                {typeScreen == 'task' && (
+                    <View style={{height: 100, flexDirection: 'row', marginTop: 15}}>
+                        <ButtonProgressStep
+                            text="Anterior"
+                            type={'left'}
+                            onPress={() =>{
+                                previousStep()
+                                setReceivedData([])
+                            }}
+                        />
+                        <ButtonProgressStep
+                            text="Siguiente"
+                            type={'right'}
+                            disabled={disabledButton}
+                            onPress={() =>{
+                                nextStep()
+                                setReceivedData([])
+                                setDisableButton(true)
+                            }}
+                        />
+                    </View>
                 )}
             </View>
             <AwesomeAlert

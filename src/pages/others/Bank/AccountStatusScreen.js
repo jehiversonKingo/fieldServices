@@ -43,7 +43,6 @@ const AccountStatus = ({ navigation }) => {
         const reqDebet = await getDebetAgent();
         const wallet = await getWallerByUser();
         const currency = await getCurrency();
-        console.log("[ WALLET ] >>", wallet);
 
         if (reqTransactions) {
           console.log("[ TRANSACTIONS ] => ", reqTransactions);
@@ -56,17 +55,17 @@ const AccountStatus = ({ navigation }) => {
         if (wallet) {
           setWalletData(wallet)
         }
-
+        console.log('[ currency ]', currency)
         if(currency){
           setOptionsCurrency({
             style: 'currency',
             currency: currency.isoCode || '',
             minimumFractionDigits: 2,
           });
-        }else{
+        } else {
           setOptionsCurrency({
             style: 'currency',
-            currency: '',
+            currency: 'GTQ',
             minimumFractionDigits: 2,
           });
         }

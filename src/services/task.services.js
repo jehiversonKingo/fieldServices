@@ -182,7 +182,6 @@ export const setDataAllTaskMigration = async (data) => {
     });
 };
 
-
 export const setDataAllTaskPickup = async (data) => {
   const headers = await customHeadersAuth();
   const {step1, step2, step3, step4, idTask} = data;
@@ -199,6 +198,19 @@ export const setDataAllTaskPickup = async (data) => {
     })
     .catch(error => {
       console.log("[AXIOS PICKUP ERROR]>>", error);
+      return error;
+    });
+};
+
+export const setDataAllTaskVisit = async (data) => {
+  const headers = await customHeadersAuth();
+  return await axiosInstance
+    .post('/task/progressTask/visit', data, headers)
+    .then(task => {
+      return task.data;
+    })
+    .catch(error => {
+      console.log("[AXIOS VISIT ERROR]>>", error);
       return error;
     });
 };

@@ -1,4 +1,11 @@
-import React, {useEffect, useState, useContext, useMemo, useRef, useCallback} from 'react';
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useMemo,
+  useRef,
+  useCallback,
+} from 'react';
 import {
   View,
   StyleSheet,
@@ -30,7 +37,10 @@ import ButtonProgressStep from '../../../components/General/ButtonProgressStep';
 import StepToDoComponent from '../../../components/General/StepToDoComponent';
 import InputGenerateStep from '../../../components/General/InputGenerateStep';
 
-import {handleChange, handleChangeArray} from '../../../functions/functionChangeValue';
+import {
+  handleChange,
+  handleChangeArray,
+} from '../../../functions/functionChangeValue';
 import {updateStep, deleteStep, getStep} from '../../../functions/fncSqlite';
 import {hasCameraPermission} from '../../../functions/fncCamera';
 import {
@@ -53,6 +63,7 @@ import {
   setDataTaskPhotos,
   setDataAllTaskMaintenance,
   setDataAllTaskProspect,
+  setDataAllTaskVisit,
 } from '../../../services/task.services';
 import {colorsTheme} from '../../../configurations/configStyle';
 
@@ -62,19 +73,61 @@ import {Context as AuthContext} from '../../../context/AuthContext';
 import {getAllCommunities} from '../../../services/settings.services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HandshakeServerScreen from '../Sync/HandshakeServerScreen';
-
+import {ScrollView} from 'react-native-gesture-handler';
 
 const TRANSACTION_LIST = [
-  { id: 1, types: [10, 11], title: "Datos Tendero", icon: "filetext1", counter: 0 },
-  { id: 2, types: [10, 11], title: "Billeteras Tenderos", icon: "wallet", counter: 0 },
-  { id: 3, types: [10], title: "Balance Tendero", icon: "calculator", counter: 0 },
-  { id: 4, types: [10], title: "Transacciones Tenderos", icon: "carryout", counter: 0 },
-  { id: 5, types: [10], title: "Deudas Tenderos", icon: "creditcard", counter: 0 },
-  { id: 6, types: [10], title: "Ventas Tenderos", icon: "filetext1", counter: 0 },
-  { id: 7, types: [10], title: "Compras Tenderos", icon: "filetext1", counter: 0 },
-  { id: 8, types: [10, 11], title: "Reglas", icon: "filetext1", counter: 0 },
-  { id: 9, types: [10, 11], title: "Planes", icon: "filetext1", counter: 0 },
-  { id: 10, types: [10, 11], title: "Promociones", icon: "filetext1", counter: 0 },
+  {
+    id: 1,
+    types: [10, 11],
+    title: 'Datos Tendero',
+    icon: 'filetext1',
+    counter: 0,
+  },
+  {
+    id: 2,
+    types: [10, 11],
+    title: 'Billeteras Tenderos',
+    icon: 'wallet',
+    counter: 0,
+  },
+  {
+    id: 3,
+    types: [10],
+    title: 'Balance Tendero',
+    icon: 'calculator',
+    counter: 0,
+  },
+  {
+    id: 4,
+    types: [10],
+    title: 'Transacciones Tenderos',
+    icon: 'carryout',
+    counter: 0,
+  },
+  {
+    id: 5,
+    types: [10],
+    title: 'Deudas Tenderos',
+    icon: 'creditcard',
+    counter: 0,
+  },
+  {id: 6, types: [10], title: 'Ventas Tenderos', icon: 'filetext1', counter: 0},
+  {
+    id: 7,
+    types: [10],
+    title: 'Compras Tenderos',
+    icon: 'filetext1',
+    counter: 0,
+  },
+  {id: 8, types: [10, 11], title: 'Reglas', icon: 'filetext1', counter: 0},
+  {id: 9, types: [10, 11], title: 'Planes', icon: 'filetext1', counter: 0},
+  {
+    id: 10,
+    types: [10, 11],
+    title: 'Promociones',
+    icon: 'filetext1',
+    counter: 0,
+  },
 ];
 
 const eventEmitter = new NativeEventEmitter(NativeModules.ServerSocketModule);
@@ -116,7 +169,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   const [stepFlag5, setStepFlag5] = useState(false);
   const [idTaskSteps, setIdTaskSteps] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  
+
   const {state} = useContext(AuthContext);
   const {inline} = state;
 
@@ -291,31 +344,52 @@ const TaskDescriptionScreen = ({navigation, route}) => {
   const RenderTransactionList = ({item, index}) => (
     <>
       {item.types.includes(typeTask) && (
-        <View style={{ flex: 3, borderWidth: 2, borderColor: colorsTheme.naranja, padding: 10, margin: 5, borderRadius: 10 }}>
-          <View style={{ justifyContent: "center", alignContent: "center", alignItems: "center" }}>
+        <View
+          style={{
+            flex: 3,
+            borderWidth: 2,
+            borderColor: colorsTheme.naranja,
+            padding: 10,
+            margin: 5,
+            borderRadius: 10,
+          }}>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignContent: 'center',
+              alignItems: 'center',
+            }}>
             <AntDesignIcon size={30} color="black" name={item.icon} />
           </View>
-          <View style={{ alignItems: "center", marginTop: 10 }}>
-            <Text style={{ color: "black", fontSize: 14, marginBottom: 5 }}>{item.title}</Text>
-            {(!successTransfer.includes(item.id) && transferStep > 0) && (
-              <View style={{ alignContent: "center" }}>
-                <ActivityIndicator size="large" color={colorsTheme.verdeClaro}/>
+          <View style={{alignItems: 'center', marginTop: 10}}>
+            <Text style={{color: 'black', fontSize: 14, marginBottom: 5}}>
+              {item.title}
+            </Text>
+            {!successTransfer.includes(item.id) && transferStep > 0 && (
+              <View style={{alignContent: 'center'}}>
+                <ActivityIndicator
+                  size="large"
+                  color={colorsTheme.verdeClaro}
+                />
               </View>
             )}
             {successTransfer.includes(item.id) && (
-              <View style={{ alignContent: "center" }}>
-                <FontAwesome5 size={20} color={colorsTheme.verdeClaro} name={'check'} />
+              <View style={{alignContent: 'center'}}>
+                <FontAwesome5
+                  size={20}
+                  color={colorsTheme.verdeClaro}
+                  name={'check'}
+                />
               </View>
             )}
           </View>
         </View>
-
       )}
     </>
   );
 
   const onClickValidate = async idTaskStep => {
-    console.log("[FUNCION onClickValidate]");
+    console.log('[FUNCION onClickValidate]');
     const hasPermission = await hasCameraPermission();
     if (hasPermission) {
       navigation.navigate('CameraMultiShot', {
@@ -345,7 +419,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     } else {
       const comm = await getStep('communities', 1, 0);
       getDataScreen = JSON.parse(await getStep('taskDescription', id, 0));
-      console.log("TASK DESCRIPTION_()_)_))_)_)_)_))", getDataScreen)
+      console.log('TASK DESCRIPTION_()_)_))_)_)_)_))', getDataScreen);
       if (comm.length > 0) getCommunities = JSON.parse(comm);
     }
 
@@ -357,12 +431,20 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
     const {screen, addon, steps, addonReceived, stepsChecks} = getDataScreen;
 
-
-    console.log("****************", screen,addon,steps ,addonReceived,stepsChecks)
+    console.log(
+      '****************',
+      screen,
+      addon,
+      steps,
+      addonReceived,
+      stepsChecks,
+    );
     if (!screen || !addon || !steps || !addonReceived || !stepsChecks) {
       setShowAlert(true);
       setTitleAlert('¡Atención!');
-      setMessageAlert('Error, detectamos que los datos de la tarea no fueron cargados correctamente.');
+      setMessageAlert(
+        'Error, detectamos que los datos de la tarea no fueron cargados correctamente.',
+      );
     }
 
     const newDataScreen = handleValidExist(
@@ -372,7 +454,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       1,
     );
     const newDataAddon = handleValidExist(addon, step2, 'idTaskAddon', 2);
-    console.log("PPPPPPPPPPPPPP", newDataAddon)
+    console.log('PPPPPPPPPPPPPP', newDataAddon);
     const newDataSteps = handleValidExist(steps, step3, 'idTaskStep', 3);
     const newDataAddonReceived = handleValidExist(
       addonReceived,
@@ -391,11 +473,14 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     setStep3(orderBy(newDataSteps, ['order'], ['asc']));
     setStep4(orderBy(newDataAddonReceived, ['order'], ['asc']));
     setStep5(orderBy(newDataChecks, ['order'], ['asc']));
-      console.log("STEP 3>>", newDataSteps);
-      const filteredTaskStep = newDataSteps.filter(taskStep => taskStep.idStep === 22);
-      const idTaskStep = filteredTaskStep.length > 0 ? filteredTaskStep[0].idTaskStep : null;
-      console.log("idTaskStep filtrado >", idTaskStep);
-      setIdTaskSteps(idTaskStep)
+    console.log('STEP 3>>', newDataSteps);
+    const filteredTaskStep = newDataSteps.filter(
+      taskStep => taskStep.idStep === 22,
+    );
+    const idTaskStep =
+      filteredTaskStep.length > 0 ? filteredTaskStep[0].idTaskStep : null;
+    console.log('idTaskStep filtrado >', idTaskStep);
+    setIdTaskSteps(idTaskStep);
     setCommunities(getCommunities);
 
     const locationExpanded = new Array(newDataAddonReceived.length).fill(false);
@@ -404,84 +489,85 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     setLoading(false);
   };
 
-const saveTemporalData = async (dbTable, step, active) => {
-  try {
-    console.log("Entramos", active);
-    setIsProcessing(false);
-    if (isProcessing) return;
-    setIsProcessing(true);
+  const saveTemporalData = async (dbTable, step, active) => {
+    try {
+      console.log('Entramos', active);
+      setIsProcessing(false);
+      if (isProcessing) return;
+      setIsProcessing(true);
 
-    console.log("[ -------ACTIVE ] >", active);
-    const { id } = route.params;
-    let isValid = false;
+      console.log('[ -------ACTIVE ] >', active);
+      const {id} = route.params;
+      let isValid = false;
 
-    isValid = await handleValidDataStep(step);
-
-    console.log("[ -------isValid ] >", isValid, active, stepFlag2);
-    
-    if (active === 0) {
       isValid = await handleValidDataStep(step);
-      if (isValid) {
-        setActive(prev => prev + 1);
+
+      console.log('[ -------isValid ] >', isValid, active, stepFlag2);
+
+      if (active === 0) {
+        isValid = await handleValidDataStep(step);
+        if (isValid) {
+          setActive(prev => prev + 1);
+        }
+        setIsProcessing(false);
       }
+
+      if (active === 1 || active === 3) {
+        const flagValid = step.some(objeto => objeto.value !== null);
+        if (flagValid || step.length == 0) {
+          isValid = true;
+          setActive(prev => prev + 1);
+        }
+      }
+
+      if (active === 2) {
+        let samePhotos = await handleValidDataPhotos(step3, evidences);
+        if (samePhotos?.length === 0 && isValid === true) {
+          setActive(prev => prev + 1);
+        }
+      }
+
+      if (active === 4) {
+        if (step5?.length === 0) {
+          isValid = true;
+        } else {
+          step5.forEach(item => {
+            const agentChecks = item.taskStepChecks.filter(
+              check => check.access === 'Agente',
+            );
+            if (agentChecks?.length > 0) {
+              agentChecks.forEach(check => {
+                if (!check.checked) isValid = false;
+              });
+            } else {
+              isValid = true;
+            }
+          });
+        }
+      }
+
+      if (!isValid) {
+        setShowAlert(true);
+        setTitleAlert('¡Atención!');
+        setMessageAlert('Debes ingresar todos los datos');
+        setIsProcessing(false);
+        return;
+      }
+
+      await updateStep(dbTable, id, step, active);
+
+      if (active === 4) {
+        console.log('[ UPLOAD TASK ]');
+        setIsProcessing(false);
+        completeTask();
+      }
+
+      setIsProcessing(false);
+    } catch (error) {
+      console.log('[ ERROR SAVE TEMPORAL DATA ] => ', error);
       setIsProcessing(false);
     }
-
-    if ((active === 1) || (active === 3)) {
-      const flagValid = step.some(objeto => objeto.value !== null);
-      if(flagValid || step.length == 0){
-        isValid = true;
-        setActive(prev => prev + 1);
-      }
-    }
-
-    if (active === 2) {
-      let samePhotos = await handleValidDataPhotos(step3, evidences);
-      if (samePhotos?.length === 0 && isValid === true) {
-        setActive(prev => prev + 1);
-      }
-    }
-
-    if (active === 4) {
-      if (step5?.length === 0) {
-        isValid = true;
-      } else {
-        step5.forEach(item => {
-          const agentChecks = item.taskStepChecks.filter(check => check.access === 'Agente');
-          if (agentChecks?.length > 0) {
-            agentChecks.forEach(check => {
-              if (!check.checked) isValid = false;
-            });
-          } else {
-            isValid = true;
-          }
-        });
-      }
-    }
-
-    if (!isValid) {
-      setShowAlert(true);
-      setTitleAlert('¡Atención!');
-      setMessageAlert('Debes ingresar todos los datos');
-      setIsProcessing(false);
-      return;
-    }
-
-    await updateStep(dbTable, id, step, active);
-
-    if (active === 4) {
-      console.log('[ UPLOAD TASK ]');
-      setIsProcessing(false);
-      completeTask();
-    }
-
-    setIsProcessing(false);
-  } catch (error) {
-    console.log('[ ERROR SAVE TEMPORAL DATA ] => ', error);
-    setIsProcessing(false);
-  }
-};
-
+  };
 
   /**
    * COMPLETAR LA TAREA >>>>
@@ -489,13 +575,13 @@ const saveTemporalData = async (dbTable, step, active) => {
   const completeTask = async () => {
     try {
       const {id, type} = route.params;
-      console.log("[TYPE TASK] >>", type);
+      console.log('[TYPE TASK] >>', type);
       setIsAlert(true);
       setTitleAlert('Iniciando proceso');
       setMessageAlert('');
       let dataKingos = JSON.parse(await getStep('warehouseEquipment', 0, 0));
       let dataAddons = JSON.parse(await getStep('warehouseAddon', 0, 0));
-      console.log("^^^^^^^^", dataKingos, dataAddons)
+      console.log('^^^^^^^^', dataKingos, dataAddons);
       let inventoryKingo =
         dataKingos.length > 0 ? dataKingos.map(item => item.barcode) : [];
       let inventoryAddon =
@@ -509,24 +595,27 @@ const saveTemporalData = async (dbTable, step, active) => {
           // is different to pickup
           validArrayKingosStep2 = step2.some(item => {
             const itemValue = item.value.trim(); // Elimina espacios innecesarios
-            console.log("Buscando:", itemValue);
-          
+            console.log('Buscando:', itemValue);
+
             if (/^E/i.test(itemValue)) {
-              console.log("Buscando en inventoryKingo:", inventoryKingo);
-              const foundInKingo = inventoryKingo.some(kingoItem => kingoItem.trim() === itemValue); // Trim en ambos lados
-              console.log("¿Encontrado en inventoryKingo?:", foundInKingo);
+              console.log('Buscando en inventoryKingo:', inventoryKingo);
+              const foundInKingo = inventoryKingo.some(
+                kingoItem => kingoItem.trim() === itemValue,
+              ); // Trim en ambos lados
+              console.log('¿Encontrado en inventoryKingo?:', foundInKingo);
               return foundInKingo;
             } else if (/^A/i.test(itemValue)) {
-              console.log("Buscando en inventoryAddon:", inventoryAddon);
-              const foundInAddon = inventoryAddon.some(addonItem => addonItem.trim() === itemValue); // Trim en ambos lados
-              console.log("¿Encontrado en inventoryAddon?:", foundInAddon);
+              console.log('Buscando en inventoryAddon:', inventoryAddon);
+              const foundInAddon = inventoryAddon.some(
+                addonItem => addonItem.trim() === itemValue,
+              ); // Trim en ambos lados
+              console.log('¿Encontrado en inventoryAddon?:', foundInAddon);
               return foundInAddon;
             } else {
               return false;
             }
           });
-          console.log("AAAAA", validArrayKingosStep2)
-          
+          console.log('AAAAA', validArrayKingosStep2);
         } else {
           validArrayKingosStep2 = true;
           validArrayAddonsStep2 = true;
@@ -538,23 +627,23 @@ const saveTemporalData = async (dbTable, step, active) => {
 
       if (inline) {
         if (step2.length <= 0 || step4.length <= 0) {
-          validArrayKingosStep2 = true
+          validArrayKingosStep2 = true;
         }
 
         if (validArrayKingosStep2) {
-          console.log("SI ENTRO"); 
+          console.log('SI ENTRO');
           let responseCheck = await setDataTaskChecklist({step5, idTask: id});
-            setIsAlert(false);
-            setTitleAlert('Válidando checklist');
+          setIsAlert(false);
+          setTitleAlert('Válidando checklist');
+          setMessageAlert('');
+          setIsAlert(true);
+          if (responseCheck?.status) {
+            console.log('[RESPUESTA DEL CHECKLIST] >>>', responseCheck);
+            let taskStatus = null;
+            setTitleAlert('Cargando Datos, Espere por favor');
             setMessageAlert('');
             setIsAlert(true);
-          if (responseCheck?.status) {
-            console.log("[RESPUESTA DEL CHECKLIST] >>>", responseCheck);
-            let taskStatus = null;
-              setTitleAlert('Cargando Datos, Espere por favor');
-              setMessageAlert('');
-              setIsAlert(true);
-              console.log("TIIIIIIIIIIIIIIIPO", type)
+            console.log('TIIIIIIIIIIIIIIIPO', type);
             switch (type) {
               case 1:
                 taskStatus = await setDataAllTaskInstall({
@@ -633,7 +722,7 @@ const saveTemporalData = async (dbTable, step, active) => {
                   step4,
                   step5,
                   idTask: id,
-                  availableDays: dataAvailableDays
+                  availableDays: dataAvailableDays,
                 });
                 break;
               case 11:
@@ -644,11 +733,21 @@ const saveTemporalData = async (dbTable, step, active) => {
                   step4,
                   step5,
                   idTask: id,
-                  availableDays: dataAvailableDays
+                  availableDays: dataAvailableDays,
+                });
+                break;
+              case 12:
+                taskStatus = await setDataAllTaskVisit({
+                  step1,
+                  step4,
+                  step5,
+                  idTask: id,
                 });
                 break;
               default:
-                console.log("No se puede procesar, problemas con el tipo de tarea");
+                console.log(
+                  'No se puede procesar, problemas con el tipo de tarea',
+                );
                 setIsAlert(false);
                 setTimeout(() => {
                   setTitleAlert('¡Atención!');
@@ -701,35 +800,42 @@ const saveTemporalData = async (dbTable, step, active) => {
               setShowAlert(true);
             }, 150);
           }
-        } else {        
+        } else {
           setIsAlert(false);
           setTimeout(() => {
-          setTitleAlert('Error');
-          setMessageAlert(
-            'Alguno de los barcodes que ingresaste no existen en tu bodega.',
-          );
-          
-          setShowAlert(true);
-        }, 150);
+            setTitleAlert('Error');
+            setMessageAlert(
+              'Alguno de los barcodes que ingresaste no existen en tu bodega.',
+            );
+
+            setShowAlert(true);
+          }, 150);
         }
       } else {
-        console.log('...............................[TaskComplete]............................', {
-          step1,
-          step2,
-          evidences,
-          step4,
-          step5,
-          idTask: id,
-          typeTask: type
-        });
-        
-        console.log(validArrayKingosStep2, validArrayAddonsStep2, step2.length, step4.length );
+        console.log(
+          '...............................[TaskComplete]............................',
+          {
+            step1,
+            step2,
+            evidences,
+            step4,
+            step5,
+            idTask: id,
+            typeTask: type,
+          },
+        );
+
+        console.log(
+          validArrayKingosStep2,
+          validArrayAddonsStep2,
+          step2.length,
+          step4.length,
+        );
         if (step2.length <= 0 || step4.length <= 0) {
           validArrayAddonsStep2 = true;
         }
 
         if (validArrayKingosStep2) {
-          
           /* HERE */
 
           await updateStep(
@@ -743,30 +849,25 @@ const saveTemporalData = async (dbTable, step, active) => {
               step5,
               idTask: id,
               typeTask: type,
-              availableDays: dataAvailableDays
+              availableDays: dataAvailableDays,
             }),
             0,
           );
 
           let dataTaskList = await getStep('taskList', 0, 0);
           getTaskData = JSON.parse(dataTaskList);
-          console.log("TAAAAAAAASKKKKK", getTaskData.length, id)
-          const filteredTasks = getTaskData.filter((item) => item.idTask != id);
-          await updateStep(
-            'taskList',
-            0,
-            JSON.stringify(filteredTasks),
-            0,
-          );
+          console.log('TAAAAAAAASKKKKK', getTaskData.length, id);
+          const filteredTasks = getTaskData.filter(item => item.idTask != id);
+          await updateStep('taskList', 0, JSON.stringify(filteredTasks), 0);
 
           setShowProgressAlert(false);
-            setIsAlert(false);
-            navigation.navigate('Task', {
-              status: true,
-              title: 'Tarea completada',
-              message: 'Los datos de la tarea fueron almacendos, cuando recuperes la conexión a internet debes sincronizar para procesar la tarea.',
-            });
-
+          setIsAlert(false);
+          navigation.navigate('Task', {
+            status: true,
+            title: 'Tarea completada',
+            message:
+              'Los datos de la tarea fueron almacendos, cuando recuperes la conexión a internet debes sincronizar para procesar la tarea.',
+          });
         } else {
           setIsAlert(false);
           setTimeout(() => {
@@ -779,11 +880,11 @@ const saveTemporalData = async (dbTable, step, active) => {
         }
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setIsAlert(false);
-        setTitleAlert('Error');
-        setMessageAlert(error.message || 'Ha ocurrido un error.');
-        setShowAlert(true);
+      setTitleAlert('Error');
+      setMessageAlert(error.message || 'Ha ocurrido un error.');
+      setShowAlert(true);
     }
   };
 
@@ -889,15 +990,21 @@ const saveTemporalData = async (dbTable, step, active) => {
           setTransferStep(0);
           const customerData = await getStep('customers', idCustomer, 0);
           console.log({data: customerData, action: 'CONFIG_CUSTOMER'});
-          BluetoothServerModule.sendJsonToClient({data: customerData, action: 'CONFIG_CUSTOMER'});
-          setSuccessTransfer((prev) => [...prev, 0]);
+          BluetoothServerModule.sendJsonToClient({
+            data: customerData,
+            action: 'CONFIG_CUSTOMER',
+          });
+          setSuccessTransfer(prev => [...prev, 0]);
           break;
         case 'CONFIG_WALLET':
           setTransferStep(1);
           const walletData = await getStep('customersWallets', idCustomer, 0);
           console.log({data: walletData, action: 'CONFIG_WALLET'});
-          BluetoothServerModule.sendJsonToClient({data: walletData, action: 'CONFIG_WALLET'});
-          setSuccessTransfer((prev) => [...prev, 1]);
+          BluetoothServerModule.sendJsonToClient({
+            data: walletData,
+            action: 'CONFIG_WALLET',
+          });
+          setSuccessTransfer(prev => [...prev, 1]);
           break;
         case 'CONFIG_TRANSACTION':
           setTransferStep(2);
@@ -906,60 +1013,84 @@ const saveTemporalData = async (dbTable, step, active) => {
             idCustomer,
             0,
           );
-          BluetoothServerModule.sendJsonToClient({data: transactionData, action: 'CONFIG_TRANSACTION'});
-          setSuccessTransfer((prev) => [...prev, 2]);
+          BluetoothServerModule.sendJsonToClient({
+            data: transactionData,
+            action: 'CONFIG_TRANSACTION',
+          });
+          setSuccessTransfer(prev => [...prev, 2]);
           break;
         case 'CONFIG_BALANCE':
           setTransferStep(3);
           const balanceData = await getStep('balanceWallets', idCustomer, 0);
           console.log({data: balanceData, action: 'CONFIG_BALANCE'});
-          BluetoothServerModule.sendJsonToClient({data: balanceData, action: 'CONFIG_BALANCE'});
-          setSuccessTransfer((prev) => [...prev, 3]);
+          BluetoothServerModule.sendJsonToClient({
+            data: balanceData,
+            action: 'CONFIG_BALANCE',
+          });
+          setSuccessTransfer(prev => [...prev, 3]);
           break;
         case 'CONFIG_DEBET':
           setTransferStep(4);
           const debetData = await getStep('debetWallets', idCustomer, 0);
           // console.log({data: debetData, action: 'CONFIG_DEBET'});
-          BluetoothServerModule.sendJsonToClient({data: debetData, action: 'CONFIG_DEBET'});
-          setSuccessTransfer((prev) => [...prev, 4]);
+          BluetoothServerModule.sendJsonToClient({
+            data: debetData,
+            action: 'CONFIG_DEBET',
+          });
+          setSuccessTransfer(prev => [...prev, 4]);
           break;
         case 'CONFIG_SALES':
           setTransferStep(5);
           const salesData = await getStep('saleWallets', idCustomer, 0);
           // console.log({data: salesData, action: 'CONFIG_SALES'});
-          BluetoothServerModule.sendJsonToClient({data: salesData, action: 'CONFIG_SALES'});
-          setSuccessTransfer((prev) => [...prev, 5]);
+          BluetoothServerModule.sendJsonToClient({
+            data: salesData,
+            action: 'CONFIG_SALES',
+          });
+          setSuccessTransfer(prev => [...prev, 5]);
           break;
         case 'CONFIG_CREDIT':
           setTransferStep(6);
           const creditData = await getStep('creditWallets', idCustomer, 0);
-          BluetoothServerModule.sendJsonToClient({data: creditData, action: 'CONFIG_CREDIT'});
-          setSuccessTransfer((prev) => [...prev, 6]);
+          BluetoothServerModule.sendJsonToClient({
+            data: creditData,
+            action: 'CONFIG_CREDIT',
+          });
+          setSuccessTransfer(prev => [...prev, 6]);
           break;
         case 'CONFIG_RULES':
-          setTransferStep(7)
+          setTransferStep(7);
           const rulesData = await getStep('customerRules', 0, 0);
-          BluetoothServerModule.sendJsonToClient({data: rulesData, action: 'CONFIG_RULES'});
-          setSuccessTransfer((prev) => [...prev, 7]);
+          BluetoothServerModule.sendJsonToClient({
+            data: rulesData,
+            action: 'CONFIG_RULES',
+          });
+          setSuccessTransfer(prev => [...prev, 7]);
           break;
         case 'CONFIG_PLANS':
-          setTransferStep(8)
+          setTransferStep(8);
           const plansData = await getStep('customerPlans', 0, 0);
-          BluetoothServerModule.sendJsonToClient({data: plansData, action: 'CONFIG_PLANS'});
-          setSuccessTransfer((prev) => [...prev, 8]);
+          BluetoothServerModule.sendJsonToClient({
+            data: plansData,
+            action: 'CONFIG_PLANS',
+          });
+          setSuccessTransfer(prev => [...prev, 8]);
           break;
         case 'CONFIG_PROMOTIONS':
-          setTransferStep(9)
+          setTransferStep(9);
           const promotionData = await getStep('customerPromotions', 0, 0);
-          BluetoothServerModule.sendJsonToClient({data: promotionData, action: 'CONFIG_PROMOTIONS'});
-          setSuccessTransfer((prev) => [...prev, 9, 10]);
+          BluetoothServerModule.sendJsonToClient({
+            data: promotionData,
+            action: 'CONFIG_PROMOTIONS',
+          });
+          setSuccessTransfer(prev => [...prev, 9, 10]);
           break;
         case 'CLOSE':
           if (data !== null) {
-            console.log('[ CLOSE DATA ] ========> ', data)
-            setDataBalance(data?.balance)
-            setDataAvailableDays(data?.availableDays)
-          };
+            console.log('[ CLOSE DATA ] ========> ', data);
+            setDataBalance(data?.balance);
+            setDataAvailableDays(data?.availableDays);
+          }
           sheetRef.current?.close();
           break;
 
@@ -987,7 +1118,7 @@ const saveTemporalData = async (dbTable, step, active) => {
         BluetoothServerModule.sendJsonToClient(sendResponse);
         setCustomerConnect(true);
       } else {
-        handleClickTransferData(action, data)
+        handleClickTransferData(action, data);
       }
     } catch (error) {
       console.log('[*-0-*]', error);
@@ -1018,471 +1149,460 @@ const saveTemporalData = async (dbTable, step, active) => {
               setStatusServerColor(colorsTheme.naranja60);
               setIsRunning(false);
             })
-            .catch(error => console.error('Error al detener el servidor', error));
+            .catch(error =>
+              console.error('Error al detener el servidor', error),
+            );
           dataReceivedListener.remove();
           // dataBlueReceivedListener.remove();
         };
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }, []);
 
   const DefaultSteps = () => (
     <ProgressSteps
-          completedProgressBarColor={colorsTheme.naranja}
-          activeStepIconBorderColor={colorsTheme.naranja}
-          activeStepIconColor={colorsTheme.naranja}
-          activeLabelColor={colorsTheme.naranja}
-          completedStepIconColor={colorsTheme.naranja}
-          labelFontSize={13}
-          activeLabelFontSize={15}
-          activeStepNumColor={colorsTheme.blanco}
-          marginBottom={35}
-          activeStep={active}>
-          {/* Pantalla Uno */}
-          <ProgressStep label="Datos" scrollable={false} removeBtnRow={true}>
-            {loading ? (
+      completedProgressBarColor={colorsTheme.naranja}
+      activeStepIconBorderColor={colorsTheme.naranja}
+      activeStepIconColor={colorsTheme.naranja}
+      activeLabelColor={colorsTheme.naranja}
+      completedStepIconColor={colorsTheme.naranja}
+      labelFontSize={13}
+      activeLabelFontSize={15}
+      activeStepNumColor={colorsTheme.blanco}
+      marginBottom={35}
+      activeStep={active}>
+      {/* Pantalla Uno */}
+      <ProgressStep label="Datos" scrollable={false} removeBtnRow={true}>
+        {loading ? (
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: height * 0.5,
+            }}>
+            <ActivityIndicator size="large" color={colorsTheme.naranja} />
+          </View>
+        ) : (
+          <FlatList
+            key={'FlatList-1'}
+            data={step1}
+            renderItem={(item, index) =>
+              InputsGenerateStep1(item, index, navigation)
+            }
+            keyExtractor={item => item.idScreenElement}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingBottom: '50%'}}
+            ListEmptyComponent={
               <View
                 style={{
-                  justifyContent: 'center',
+                  backgroundColor: colorsTheme.gris80,
+                  width: width,
+                  padding: 10,
+                  alignContent: 'center',
                   alignItems: 'center',
-                  height: height * 0.5,
+                  marginTop: 10,
                 }}>
-                <ActivityIndicator size="large" color={colorsTheme.naranja} />
+                <Text style={{color: colorsTheme.blanco}}>
+                  No se han encontrado Pantalla de inicio.
+                </Text>
               </View>
-            ) : (
-                <FlatList
-                  key={'FlatList-1'}
-                  data={step1}
-                  renderItem={(item, index) => InputsGenerateStep1(item, index, navigation)}
-                  keyExtractor={item => item.idScreenElement}
-                  showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ paddingBottom: '50%' }}
-                  ListEmptyComponent={<View
-                    style={{
-                      backgroundColor: colorsTheme.gris80,
-                      width: width,
-                      padding: 10,
-                      alignContent: 'center',
-                      alignItems: 'center',
-                      marginTop: 10,
-                    }}>
-                    <Text style={{ color: colorsTheme.blanco }}>
-                      No se han encontrado Pantalla de inicio.
-                    </Text>
-                  </View>}
-                  ListFooterComponent={<ButtonProgressStep
-                    text="Siguiente"
-                    type={'right'}
-                    onPress={() => saveTemporalData('task', step1, active)} />} />
-            )}
-          </ProgressStep>
-          {/* Pantalla Dos */}
-          <ProgressStep
-            label="Equipo y Complementos"
-            scrollable={false}
-            removeBtnRow={true}>
-            <FlatList
-              data={step2}
-              renderItem={InputsGenerateStep2}
-              keyExtractor={item => item.idTaskAddon}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingBottom: '20%'}}
-              ListEmptyComponent={
-                <View
+            }
+            ListFooterComponent={
+              <ButtonProgressStep
+                text="Siguiente"
+                type={'right'}
+                onPress={() => saveTemporalData('task', step1, active)}
+              />
+            }
+          />
+        )}
+      </ProgressStep>
+      {/* Pantalla Dos */}
+      <ProgressStep
+        label="Equipo y Complementos"
+        scrollable={false}
+        removeBtnRow={true}>
+        <FlatList
+          data={step2}
+          renderItem={InputsGenerateStep2}
+          keyExtractor={item => item.idTaskAddon}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: '20%'}}
+          ListEmptyComponent={
+            <View
+              style={{
+                backgroundColor: colorsTheme.gris80,
+                width: width,
+                padding: 10,
+                alignContent: 'center',
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
+              <Text style={{color: colorsTheme.blanco}}>
+                No se han encontrado Equipo.
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            <View style={{flexDirection: 'row', marginTop: 15}}>
+              <ButtonProgressStep
+                text="Anterior"
+                type={'left'}
+                onPress={() => setActive(prev => prev - 1)}
+              />
+              <ButtonProgressStep
+                text="Siguiente"
+                type={'right'}
+                onPress={() => saveTemporalData('task', step2, active)}
+              />
+            </View>
+          }
+        />
+      </ProgressStep>
+      {/* Pantalla Tres */}
+      <ProgressStep label="Actividades" scrollable={false} removeBtnRow={true}>
+        <FlatList
+          style={{marginTop: 15}}
+          data={step3}
+          renderItem={InputsGenerateStep3}
+          keyExtractor={item => item.idTaskStep}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: '20%'}}
+          ListEmptyComponent={
+            <View
+              style={{
+                backgroundColor: colorsTheme.gris80,
+                width: width,
+                padding: 10,
+                alignContent: 'center',
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
+              <Text style={{color: colorsTheme.blanco}}>
+                {'No se han encontrado pasos.'}
+              </Text>
+            </View>
+          }
+          ListHeaderComponent={
+            <View>
+              <View>
+                <Text
                   style={{
-                    backgroundColor: colorsTheme.gris80,
-                    width: width,
-                    padding: 10,
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    marginTop: 10,
+                    backgroundColor: colorsTheme.naranja,
+                    padding: 15,
+                    margin: 3,
+                    borderRadius: 10,
+                    flex: 8,
+                    color: colorsTheme.blanco,
+                    fontWeight: '700',
                   }}>
-                  <Text style={{color: colorsTheme.blanco}}>
-                    No se han encontrado Equipo.
-                  </Text>
-                </View>
-              }
-              ListFooterComponent={
-                <View style={{flexDirection: 'row', marginTop: 15}}>
-                  <ButtonProgressStep
-                    text="Anterior"
-                    type={'left'}
-                    onPress={() => setActive(prev => prev - 1)}
-                  />
-                  <ButtonProgressStep
-                    text="Siguiente"
-                    type={'right'}
-                    onPress={() => saveTemporalData('task', step2, active)}
-                  />
-                </View>
-              }
-            />
-          </ProgressStep>
-          {/* Pantalla Tres */}
-          <ProgressStep
-            label="Actividades"
-            scrollable={false}
-            removeBtnRow={true}>
-            <FlatList
-              style={{marginTop: 15}}
-              data={step3}
-              renderItem={InputsGenerateStep3}
-              keyExtractor={item => item.idTaskStep}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingBottom: '20%'}}
-              ListEmptyComponent={
-                <View
-                  style={{
-                    backgroundColor: colorsTheme.gris80,
-                    width: width,
-                    padding: 10,
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    marginTop: 10,
-                  }}>
-                  <Text style={{color: colorsTheme.blanco}}>
-                    {'No se han encontrado pasos.'}
-                  </Text>
-                </View>
-              }
-              ListHeaderComponent={
-                <View>
-                  <View>
-                    <Text
-                      style={{
-                        backgroundColor: colorsTheme.naranja,
-                        padding: 15,
-                        margin: 3,
-                        borderRadius: 10,
-                        flex: 8,
-                        color: colorsTheme.blanco,
-                        fontWeight: '700',
-                      }}>
-                      Actividades
-                    </Text>
-                  </View>
-                </View>
-              }
-              ListFooterComponent={
-                <View style={{flexDirection: 'row', marginTop: 15}}>
-                  <ButtonProgressStep
-                    text="Anterior"
-                    type={'left'}
-                    onPress={() => setActive(prev => prev - 1)}
-                  />
-                  <ButtonProgressStep
-                    text="Siguiente"
-                    type={'right'}
-                    onPress={() => saveTemporalData('task', evidences, active)}
-                  />
-                </View>
-              }
-            />
-          </ProgressStep>
-          {/* Pantalla Cuatro */}
-          <ProgressStep
-            label="Retirar De Tendero"
-            scrollable={false}
-            removeBtnRow={true}>
-            <FlatList
-              data={step4}
-              renderItem={InputsGenerateStep4}
-              keyExtractor={item => item.idReceivedAddon}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingBottom: '20%'}}
-              ListEmptyComponent={
-                <View
-                  style={{
-                    backgroundColor: colorsTheme.gris80,
-                    width: width,
-                    padding: 10,
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    marginTop: 10,
-                  }}>
-                  <Text style={{color: colorsTheme.blanco}}>
-                    No se han encontrado Equipo.
-                  </Text>
-                </View>
-              }
-              ListFooterComponent={
-                <View style={{flexDirection: 'row', marginTop: 15}}>
-                  <ButtonProgressStep
-                    text="Anterior"
-                    type={'left'}
-                    onPress={() => setActive(prev => prev - 1)}
-                  />
-                  <ButtonProgressStep
-                    text="Siguiente"
-                    type={'complete'}
-                    onPress={() => saveTemporalData('task', step4, active)}
-                  />
-                </View>
-              }
-            />
-          </ProgressStep>
-          {/* Pantalla Cinco */}
-          <ProgressStep label={'Listado De Control'} removeBtnRow={true}>
-            <FlatList
-              data={step5}
-              key={'Check-FlatList-1'}
-              renderItem={InputsGenerateStep5}
-              // keyExtractor={item => item.idReceivedAddon}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingBottom: '20%'}}
-              ListEmptyComponent={
-                <View
-                  style={{
-                    backgroundColor: colorsTheme.gris80,
-                    width: width,
-                    padding: 10,
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    marginTop: 10,
-                  }}>
-                  <Text style={{color: colorsTheme.blanco}}>
-                    No se han encontrado Equipo.
-                  </Text>
-                </View>
-              }
-              ListFooterComponent={
-                <View style={{flexDirection: 'row', marginTop: 15}}>
-                  <ButtonProgressStep
-                    text="Anterior"
-                    type={'left'}
-                    onPress={() => setActive(prev => prev - 1)}
-                  />
-                  <ButtonProgressStep
-                    text="Completar"
-                    type={'complete'}
-                    onPress={() => saveTemporalData('task', step5, active)}
-                  />
-                  {/* <ButtonProgressStep text="Completar" type={'complete'} onPress={() => handleConsole()} /> */}
-                </View>
-              }
-            />
-          </ProgressStep>
-        </ProgressSteps>
-  )
+                  Actividades
+                </Text>
+              </View>
+            </View>
+          }
+          ListFooterComponent={
+            <View style={{flexDirection: 'row', marginTop: 15}}>
+              <ButtonProgressStep
+                text="Anterior"
+                type={'left'}
+                onPress={() => setActive(prev => prev - 1)}
+              />
+              <ButtonProgressStep
+                text="Siguiente"
+                type={'right'}
+                onPress={() => saveTemporalData('task', evidences, active)}
+              />
+            </View>
+          }
+        />
+      </ProgressStep>
+      {/* Pantalla Cuatro */}
+      <ProgressStep
+        label="Retirar De Tendero"
+        scrollable={false}
+        removeBtnRow={true}>
+        <FlatList
+          data={step4}
+          renderItem={InputsGenerateStep4}
+          keyExtractor={item => item.idReceivedAddon}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: '20%'}}
+          ListEmptyComponent={
+            <View
+              style={{
+                backgroundColor: colorsTheme.gris80,
+                width: width,
+                padding: 10,
+                alignContent: 'center',
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
+              <Text style={{color: colorsTheme.blanco}}>
+                No se han encontrado Equipo.
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            <View style={{flexDirection: 'row', marginTop: 15}}>
+              <ButtonProgressStep
+                text="Anterior"
+                type={'left'}
+                onPress={() => setActive(prev => prev - 1)}
+              />
+              <ButtonProgressStep
+                text="Siguiente"
+                type={'complete'}
+                onPress={() => saveTemporalData('task', step4, active)}
+              />
+            </View>
+          }
+        />
+      </ProgressStep>
+      {/* Pantalla Cinco */}
+      <ProgressStep label={'Listado De Control'} removeBtnRow={true}>
+        <FlatList
+          data={step5}
+          key={'Check-FlatList-1'}
+          renderItem={InputsGenerateStep5}
+          // keyExtractor={item => item.idReceivedAddon}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: '20%'}}
+          ListEmptyComponent={
+            <View
+              style={{
+                backgroundColor: colorsTheme.gris80,
+                width: width,
+                padding: 10,
+                alignContent: 'center',
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
+              <Text style={{color: colorsTheme.blanco}}>
+                No se han encontrado Equipo.
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            <View style={{flexDirection: 'row', marginTop: 15}}>
+              <ButtonProgressStep
+                text="Anterior"
+                type={'left'}
+                onPress={() => setActive(prev => prev - 1)}
+              />
+              <ButtonProgressStep
+                text="Completar"
+                type={'complete'}
+                onPress={() => saveTemporalData('task', step5, active)}
+              />
+              {/* <ButtonProgressStep text="Completar" type={'complete'} onPress={() => handleConsole()} /> */}
+            </View>
+          }
+        />
+      </ProgressStep>
+    </ProgressSteps>
+  );
 
   const VisitSteps = () => (
     <ProgressSteps
-          completedProgressBarColor={colorsTheme.naranja}
-          activeStepIconBorderColor={colorsTheme.naranja}
-          activeStepIconColor={colorsTheme.naranja}
-          activeLabelColor={colorsTheme.naranja}
-          completedStepIconColor={colorsTheme.naranja}
-          labelFontSize={13}
-          activeLabelFontSize={15}
-          activeStepNumColor={colorsTheme.blanco}
-          marginBottom={35}
-          activeStep={active}>
-          {/* Pantalla Uno */}
-          <ProgressStep label="Datos" scrollable={false} removeBtnRow={true}>
-            {loading ? (
+      completedProgressBarColor={colorsTheme.naranja}
+      activeStepIconBorderColor={colorsTheme.naranja}
+      activeStepIconColor={colorsTheme.naranja}
+      activeLabelColor={colorsTheme.naranja}
+      completedStepIconColor={colorsTheme.naranja}
+      labelFontSize={11}
+      activeLabelFontSize={13}
+      activeStepNumColor={colorsTheme.blanco}
+      marginBottom={35}
+      activeStep={active}>
+      {/* Pantalla Uno */}
+      <ProgressStep label="Datos" scrollable={false} removeBtnRow={true}>
+        {loading ? (
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: height * 0.5,
+            }}>
+            <ActivityIndicator size="large" color={colorsTheme.naranja} />
+          </View>
+        ) : (
+          <FlatList
+            key={'FlatList-1'}
+            data={step1}
+            renderItem={(item, index) =>
+              InputsGenerateStep1(item, index, navigation)
+            }
+            keyExtractor={item => item.idScreenElement}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingBottom: '50%'}}
+            ListEmptyComponent={
               <View
                 style={{
-                  justifyContent: 'center',
+                  backgroundColor: colorsTheme.gris80,
+                  width: width,
+                  padding: 10,
+                  alignContent: 'center',
                   alignItems: 'center',
-                  height: height * 0.5,
+                  marginTop: 10,
                 }}>
-                <ActivityIndicator size="large" color={colorsTheme.naranja} />
+                <Text style={{color: colorsTheme.blanco}}>
+                  No se han encontrado Pantalla de inicio.
+                </Text>
               </View>
-            ) : (
-                <FlatList
-                  key={'FlatList-1'}
-                  data={step1}
-                  renderItem={(item, index) => InputsGenerateStep1(item, index, navigation)}
-                  keyExtractor={item => item.idScreenElement}
-                  showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ paddingBottom: '50%' }}
-                  ListEmptyComponent={<View
-                    style={{
-                      backgroundColor: colorsTheme.gris80,
-                      width: width,
-                      padding: 10,
-                      alignContent: 'center',
-                      alignItems: 'center',
-                      marginTop: 10,
-                    }}>
-                    <Text style={{ color: colorsTheme.blanco }}>
-                      No se han encontrado Pantalla de inicio.
-                    </Text>
-                  </View>}
-                  ListFooterComponent={<ButtonProgressStep
-                    text="Siguiente"
-                    type={'right'}
-                    onPress={() => saveTemporalData('task', step1, active)} />} />
-            )}
-          </ProgressStep>
-          {/* Pantalla Dos */}
-          <ProgressStep
-            label="Cobro"
-            scrollable={false}
-            removeBtnRow={true}>
-            <View style={{marginHorizontal: 20, alignItems: 'center'}}>
-              <View style={{height: '100%', width: '100%'}}>
-                <HandshakeServerScreen header={false} />
+            }
+            ListFooterComponent={
+              <ButtonProgressStep
+                text="Siguiente"
+                type={'right'}
+                onPress={() => saveTemporalData('task', step1, active)}
+              />
+            }
+          />
+        )}
+      </ProgressStep>
+      {/* Pantalla Dos */}
+      <ProgressStep label="Cobro" scrollable={false} removeBtnRow={true}>
+        <View style={{marginHorizontal: 20, alignItems: 'center'}}>
+          <ScrollView style={{height: '100%', width: '100%'}}>
+            <HandshakeServerScreen
+              header={false}
+              description={'Realiza el cobro al tendero'}
+              typeScreen={'task'}
+              nextStep={() => setActive(prev => prev + 1)}
+              previousStep={() => setActive(prev => prev - 1)}
+            />
+          </ScrollView>
+        </View>
+      </ProgressStep>
+      {/* Pantalla Tre */}
+      <ProgressStep
+        label="Sincronización"
+        scrollable={false}
+        removeBtnRow={true}>
+        <View style={{marginHorizontal: 20, alignItems: 'center'}}>
+          <ScrollView style={{height: '100%', width: '100%'}}>
+            <HandshakeServerScreen
+              header={false}
+              description={'Recopila la información de los lotes del tendero'}
+              typeScreen={'task'}
+              nextStep={() => setActive(prev => prev + 1)}
+              previousStep={() => setActive(prev => prev - 1)}
+            />
+          </ScrollView>
+        </View>
+      </ProgressStep>
+      {/* Pantalla Cuatro */}
+      <ProgressStep label="Actividades" scrollable={false} removeBtnRow={true}>
+        <FlatList
+          style={{marginTop: 15}}
+          data={step3}
+          renderItem={InputsGenerateStep3}
+          keyExtractor={item => item.idTaskStep}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: '20%'}}
+          ListEmptyComponent={
+            <View
+              style={{
+                backgroundColor: colorsTheme.gris80,
+                width: width,
+                padding: 10,
+                alignContent: 'center',
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
+              <Text style={{color: colorsTheme.blanco}}>
+                {'No se han encontrado pasos.'}
+              </Text>
+            </View>
+          }
+          ListHeaderComponent={
+            <View>
+              <View>
+                <Text
+                  style={{
+                    backgroundColor: colorsTheme.naranja,
+                    padding: 15,
+                    margin: 3,
+                    borderRadius: 10,
+                    flex: 8,
+                    color: colorsTheme.blanco,
+                    fontWeight: '700',
+                  }}>
+                  Actividades
+                </Text>
               </View>
             </View>
-          </ProgressStep>
-          {/* Pantalla Tre */}
-          <ProgressStep
-            label="Sincronización"
-            scrollable={false}
-            removeBtnRow={true}>
-            <FlatList
-              data={step4}
-              renderItem={InputsGenerateStep4}
-              keyExtractor={item => item.idReceivedAddon}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingBottom: '20%'}}
-              ListEmptyComponent={
-                <View
-                  style={{
-                    backgroundColor: colorsTheme.gris80,
-                    width: width,
-                    padding: 10,
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    marginTop: 10,
-                  }}>
-                  <Text style={{color: colorsTheme.blanco}}>
-                    No se han encontrado Equipo.
-                  </Text>
-                </View>
-              }
-              ListFooterComponent={
-                <View style={{flexDirection: 'row', marginTop: 15}}>
-                  <ButtonProgressStep
-                    text="Anterior"
-                    type={'left'}
-                    onPress={() => setActive(prev => prev - 1)}
-                  />
-                  <ButtonProgressStep
-                    text="Siguiente"
-                    type={'complete'}
-                    onPress={() => saveTemporalData('task', step4, active)}
-                  />
-                </View>
-              }
-            />
-          </ProgressStep>
-          {/* Pantalla Cuatro */}
-          <ProgressStep
-            label="Actividades a realizar"
-            scrollable={false}
-            removeBtnRow={true}>
-            <FlatList
-              style={{marginTop: 15}}
-              data={step3}
-              renderItem={InputsGenerateStep3}
-              keyExtractor={item => item.idTaskStep}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingBottom: '20%'}}
-              ListEmptyComponent={
-                <View
-                  style={{
-                    backgroundColor: colorsTheme.gris80,
-                    width: width,
-                    padding: 10,
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    marginTop: 10,
-                  }}>
-                  <Text style={{color: colorsTheme.blanco}}>
-                    {'No se han encontrado pasos.'}
-                  </Text>
-                </View>
-              }
-              ListHeaderComponent={
-                <View>
-                  <View>
-                    <Text
-                      style={{
-                        backgroundColor: colorsTheme.naranja,
-                        padding: 15,
-                        margin: 3,
-                        borderRadius: 10,
-                        flex: 8,
-                        color: colorsTheme.blanco,
-                        fontWeight: '700',
-                      }}>
-                      Actividades
-                    </Text>
-                  </View>
-                </View>
-              }
-              ListFooterComponent={
-                <View style={{flexDirection: 'row', marginTop: 15}}>
-                  <ButtonProgressStep
-                    text="Anterior"
-                    type={'left'}
-                    onPress={() => setActive(prev => prev - 1)}
-                  />
-                  <ButtonProgressStep
-                    text="Siguiente"
-                    type={'right'}
-                    onPress={() => saveTemporalData('task', evidences, active)}
-                  />
-                </View>
-              }
-            />
-          </ProgressStep>
-          {/* Pantalla Cinco */}
-          <ProgressStep label={'Checklist'} removeBtnRow={true}>
-            <FlatList
-              data={step5}
-              key={'Check-FlatList-1'}
-              renderItem={InputsGenerateStep5}
-              // keyExtractor={item => item.idReceivedAddon}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingBottom: '20%'}}
-              ListEmptyComponent={
-                <View
-                  style={{
-                    backgroundColor: colorsTheme.gris80,
-                    width: width,
-                    padding: 10,
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    marginTop: 10,
-                  }}>
-                  <Text style={{color: colorsTheme.blanco}}>
-                    No se han encontrado Equipo.
-                  </Text>
-                </View>
-              }
-              ListFooterComponent={
-                <View style={{flexDirection: 'row', marginTop: 15}}>
-                  <ButtonProgressStep
-                    text="Anterior"
-                    type={'left'}
-                    onPress={() => setActive(prev => prev - 1)}
-                  />
-                  <ButtonProgressStep
-                    text="Completar"
-                    type={'complete'}
-                    onPress={() => saveTemporalData('task', step5, active)}
-                  />
-                  {/* <ButtonProgressStep text="Completar" type={'complete'} onPress={() => handleConsole()} /> */}
-                </View>
-              }
-            />
-          </ProgressStep>
-        </ProgressSteps>
-  )
+          }
+          ListFooterComponent={
+            <View style={{flexDirection: 'row', marginTop: 15}}>
+              <ButtonProgressStep
+                text="Anterior"
+                type={'left'}
+                onPress={() => setActive(prev => prev - 1)}
+              />
+              <ButtonProgressStep
+                text="Siguiente"
+                type={'right'}
+                onPress={() => saveTemporalData('task', evidences, active)}
+              />
+            </View>
+          }
+        />
+      </ProgressStep>
+      {/* Pantalla Cinco */}
+      <ProgressStep label={'Checklist'} removeBtnRow={true}>
+        <FlatList
+          data={step5}
+          key={'Check-FlatList-1'}
+          renderItem={InputsGenerateStep5}
+          // keyExtractor={item => item.idReceivedAddon}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: '20%'}}
+          ListEmptyComponent={
+            <View
+              style={{
+                backgroundColor: colorsTheme.gris80,
+                width: width,
+                padding: 10,
+                alignContent: 'center',
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
+              <Text style={{color: colorsTheme.blanco}}>
+                No se han encontrado Equipo.
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            <View style={{flexDirection: 'row', marginTop: 15}}>
+              <ButtonProgressStep
+                text="Anterior"
+                type={'left'}
+                onPress={() => setActive(prev => prev - 1)}
+              />
+              <ButtonProgressStep
+                text="Completar"
+                type={'complete'}
+                onPress={() => saveTemporalData('task', step5, active)}
+              />
+              {/* <ButtonProgressStep text="Completar" type={'complete'} onPress={() => handleConsole()} /> */}
+            </View>
+          }
+        />
+      </ProgressStep>
+    </ProgressSteps>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -1578,49 +1698,48 @@ const saveTemporalData = async (dbTable, step, active) => {
                 </Text>
               </TouchableOpacity>
             </View>
+          ) : !customerConnect ? (
+            <Text
+              style={{
+                ...styles.tranferTitle,
+                textAlign: 'center',
+                marginHorizontal: 20,
+              }}>
+              {'Esperando que el tendero se conecte'}
+            </Text>
           ) : (
-            !customerConnect ? (
-              <Text
-                style={{
-                  ...styles.tranferTitle,
-                  textAlign: 'center',
-                  marginHorizontal: 20,
-                }}>
-                {'Esperando que el tendero se conecte'}
-              </Text>
-            ) : (
-              <View style={{marginHorizontal: 20}}>
-                <View>
-                  <View style={{alignItems: 'center'}}>
-                    <TouchableOpacity onPress={() => {
-                      setSuccessTransfer([])
-                      handleClickTransferData('CONFIG_CUSTOMER')
+            <View style={{marginHorizontal: 20}}>
+              <View>
+                <View style={{alignItems: 'center'}}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSuccessTransfer([]);
+                      handleClickTransferData('CONFIG_CUSTOMER');
                     }}>
-                      <Text
-                        style={{
-                          borderWidth: 1,
-                          backgroundColor: colorsTheme.naranja,
-                          borderColor: colorsTheme.blanco,
-                          color: colorsTheme.blanco,
-                          borderRadius: 8,
-                          padding: 10,
-                          marginTop: 10,
-                          textAlign: 'center',
-                          width: width * 0.6,
-                        }}>
-                        {'Iniciar transferencia'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                    <Text
+                      style={{
+                        borderWidth: 1,
+                        backgroundColor: colorsTheme.naranja,
+                        borderColor: colorsTheme.blanco,
+                        color: colorsTheme.blanco,
+                        borderRadius: 8,
+                        padding: 10,
+                        marginTop: 10,
+                        textAlign: 'center',
+                        width: width * 0.6,
+                      }}>
+                      {'Iniciar transferencia'}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-                <FlatList
-                  data={TRANSACTION_LIST}
-                  renderItem={RenderTransactionList}
-                  numColumns={3}
-                  contentContainerStyle={{ paddingBottom: height * 0.5 }}
-                />
               </View>
-            )
+              <FlatList
+                data={TRANSACTION_LIST}
+                renderItem={RenderTransactionList}
+                numColumns={3}
+                contentContainerStyle={{paddingBottom: height * 0.5}}
+              />
+            </View>
           )}
         </BottomSheetView>
       </BottomSheet>
@@ -1631,7 +1750,7 @@ const saveTemporalData = async (dbTable, step, active) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colorsTheme.blanco
+    backgroundColor: colorsTheme.blanco,
   },
   colorText: {
     color: colorsTheme.gris80,

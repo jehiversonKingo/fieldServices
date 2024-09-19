@@ -113,17 +113,19 @@ const HomeScreen = ({navigation}) => {
     console.log('[ DEBET USER ]', parseFloat(getDebt.amount).toFixed(2))
     if (debtUser && getDebt) {
       if (parseFloat(debtUser.amount).toFixed(2) !== parseFloat(getDebt.amount).toFixed(2)) {
-        setDataVisible({
-          type: "info",
-          title: "¡Atención!",
-          subTitle: "Realizaste un cobro y aún no sincronizas datos. Por favor sincroniza lo antes posible de lo contrario corres el riesgo de no poder realizar más cobros.",
-          secondButton: true,
-          secondAction: () => {
-            setIsVisible(false)
-          },
-          blocked: true
-        })
-        setIsVisible(true)
+        if (parseFloat(debtUser.amount).toFixed(2) > parseFloat(getDebt.amount).toFixed(2)) {
+          setDataVisible({
+            type: "info",
+            title: "¡Atención!",
+            subTitle: "Realizaste un cobro y aún no sincronizas datos. Por favor sincroniza lo antes posible de lo contrario corres el riesgo de no poder realizar más cobros.",
+            secondButton: true,
+            secondAction: () => {
+              setIsVisible(false)
+            },
+            blocked: true
+          })
+          setIsVisible(true)
+        }
       }
     }
 

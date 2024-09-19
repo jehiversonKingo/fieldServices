@@ -76,8 +76,9 @@ export const getAllPlans = async () => {
 }
 
 export const getCurrency = async () => {
-    return axiosInstanceShopkeeper
-        .get(`settings/currency/2`)
+    const headers = await customHeadersAuth();
+    return axiosInstance
+        .get(`settings/currency/1`, headers)
         .then(response => {
             return response.data
         })
