@@ -324,7 +324,7 @@ const HandshakeServerScreen = ({
 
                     console.log('THISISMY NEWDEVT ==>', walletUser);
                     console.log('THISISMY NEWDEVT <==', debtUser);
-
+                    setDisableButton(false)
                     await updateStep('walletUser', 0, JSON.stringify(walletUser), 0);
                     await updateStep('debtUser', 0, JSON.stringify(debtUser), 0);
                     break;
@@ -540,7 +540,7 @@ const HandshakeServerScreen = ({
                     />
                 )}
                 {console.log('[---------------------/ [ TYPESREEN ] /----------------------]', typeScreen)}
-                {typeScreen == 'task' && (
+                {['task', 'taskSync'].includes(typeScreen) && (
                     <View style={{height: 100, flexDirection: 'row', marginTop: 15}}>
                         <ButtonProgressStep
                             text="Anterior"
@@ -553,7 +553,7 @@ const HandshakeServerScreen = ({
                         <ButtonProgressStep
                             text="Siguiente"
                             type={'right'}
-                            disabled={disabledButton}
+                            disabled={disabledButton && typeScreen == 'task'}
                             onPress={() =>{
                                 nextStep()
                                 setReceivedData([])

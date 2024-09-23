@@ -74,6 +74,7 @@ import {getAllCommunities} from '../../../services/settings.services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HandshakeServerScreen from '../Sync/HandshakeServerScreen';
 import {ScrollView} from 'react-native-gesture-handler';
+import { handleGetLocationReturnValue, handleGetLocationValue } from '../../../functions/fncLocation';
 
 const TRANSACTION_LIST = [
   {
@@ -649,9 +650,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 taskStatus = await setDataAllTaskInstall({
                   step1,
                   step2,
-                  step3: null,
-                  step4,
-                  step5,
                   idTask: id,
                 });
                 break;
@@ -659,9 +657,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 taskStatus = await setDataAllTaskInstall({
                   step1,
                   step2,
-                  step3: null,
-                  step4,
-                  step5,
                   idTask: id,
                 });
                 break;
@@ -669,18 +664,14 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 taskStatus = await setDataAllTaskMaintenance({
                   step1,
                   step2,
-                  step3: null,
                   step4,
-                  step5,
                   idTask: id,
                 });
               case 4:
                 taskStatus = await setDataAllTaskMaintenance({
                   step1,
                   step2,
-                  step3: null,
                   step4,
-                  step5,
                   idTask: id,
                 });
                 break;
@@ -698,29 +689,20 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                 taskStatus = await setDataAllTaskSwap({
                   step1,
                   step2,
-                  step3: evidences,
                   step4,
-                  step5,
                   idTask: id,
                 });
                 break;
               case 7:
                 taskStatus = await setDataAllTaskPickup({
                   step1,
-                  step2,
-                  step3: evidences,
                   step4,
-                  step5,
                   idTask: id,
                 });
                 break;
               case 10:
                 taskStatus = await setDataAllTaskMigration({
                   step1,
-                  step2,
-                  step3: evidences,
-                  step4,
-                  step5,
                   idTask: id,
                   availableDays: dataAvailableDays,
                 });
@@ -728,20 +710,17 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               case 11:
                 taskStatus = await setDataAllTaskMigration({
                   step1,
-                  step2,
-                  step3: evidences,
-                  step4,
-                  step5,
                   idTask: id,
                   availableDays: dataAvailableDays,
                 });
                 break;
               case 12:
+                const location = await handleGetLocationValue();
+                console.log('[ GPS LOCATIONS ] >>> ', location);
                 taskStatus = await setDataAllTaskVisit({
                   step1,
-                  step4,
-                  step5,
                   idTask: id,
+                  gps: `${location.latitude || 0},${location.longitude || 0}`
                 });
                 break;
               default:
@@ -1493,7 +1472,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             <HandshakeServerScreen
               header={false}
               description={'Recopila la información de los lotes del tendero'}
-              typeScreen={'task'}
+              typeScreen={'taskSync'}
               nextStep={() => setActive(prev => prev + 1)}
               previousStep={() => setActive(prev => prev - 1)}
             />

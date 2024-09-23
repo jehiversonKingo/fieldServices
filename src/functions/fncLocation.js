@@ -112,3 +112,31 @@ export const handleGetLocationReturnValue = async (
   console.log("Testing", locationTes)
   return locationTes;
 };
+
+export const handleGetLocationValue = async () => {
+  const hasPermission = await hasLocationPermission();
+  if (!hasPermission) {
+    return;
+  }
+  let locationTes = await new Promise((response, reject) =>{
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log("llegue", {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+        response({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      error => {
+        console.log(error.code, error.message);
+        reject({error: error.code, message: error.message})
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+  });
+  console.log("Testing", locationTes)
+  return locationTes;
+};

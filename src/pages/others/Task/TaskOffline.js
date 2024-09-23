@@ -9,10 +9,10 @@ import * as RNFS from 'react-native-fs';
 
 //Components
 import Header from '../../../components/Layouts/Header';
-import { getTasks, getTaskById, setDataAllTaskInstall, getStepInstruction, getElemetScreen, setDataAllTaskMigration, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskChecklist, setDataTaskPhotos } from '../../../services/task.services';
+import { getTasks, getTaskById, setDataAllTaskInstall, getStepInstruction, getElemetScreen, setDataAllTaskMigration, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskChecklist, setDataTaskPhotos, setDataAllTaskVisit } from '../../../services/task.services';
 import { getTicketById } from '../../../services/ticket.services';
 import {getAllDataStep, deleteStep} from '../../../functions/fncSqlite';
-import {handleGetLocationReturnValue} from '../../../functions/fncLocation';
+import {handleGetLocationReturnValue, handleGetLocationValue} from '../../../functions/fncLocation';
 import {colorsTheme} from '../../../configurations/configStyle';
 import { getStep, updateStep } from '../../../functions/fncSqlite';
 import {Context as AuthContext} from '../../../context/AuthContext';
@@ -427,6 +427,14 @@ const TaskOffline = ({navigation}) => {
                   step5,
                   idTask,
                   blockDays: availableDays
+                });
+                case 12:
+                const location = await handleGetLocationValue();
+                console.log('[ GPS LOCATIONS ] >>> ', location);
+                taskStatus = await setDataAllTaskVisit({
+                  step1,
+                  idTask,
+                  gps: `${location.latitude || 0},${location.longitude || 0}`
                 });
                 break;
               default:

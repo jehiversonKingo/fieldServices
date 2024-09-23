@@ -78,7 +78,7 @@ export const getAllPlans = async () => {
 export const getCurrency = async () => {
     const headers = await customHeadersAuth();
     return axiosInstance
-        .get(`settings/currency/1`, headers)
+        .get(`settings/currency/${process.env.REACT_APP_CURRENCY}`, headers)
         .then(response => {
             return response.data
         })
