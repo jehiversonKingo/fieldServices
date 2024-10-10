@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import {useCameraDevices, Camera, useCameraDevice, useCameraFormat} from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useCameraFormat} from 'react-native-vision-camera';
+import PhotoManipulator from 'react-native-photo-manipulator';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import {handleChange} from '../../../functions/functionChangeValue';
@@ -16,11 +17,11 @@ import FitImage from 'react-native-fit-image';
 import * as RNFS from 'react-native-fs';
 //Components
 import Footer from '../../../components/Layouts/Footer';
-
 import {colorsTheme} from '../../../configurations/configStyle';
+import { handleGetLocationValue} from '../../../functions/fncLocation';
 
 const CameraScreen = ({navigation, route}) => {
-  const {index, setData, data} = route.params;
+  const {index, setData, data= []} = route.params;
   const {height, width} = Dimensions.get('screen');
   const [photoData, setPhotoData] = useState('');
   const [photoB64, setPhotoB64] = useState('');
@@ -40,6 +41,8 @@ const CameraScreen = ({navigation, route}) => {
   const camera = useRef(null);
 
   useEffect(() => {
+    console.log("[DATA] >>", index, setData, data);
+    
     checkCameraPermission();
   }, [isScanned]);
 
@@ -53,11 +56,25 @@ const CameraScreen = ({navigation, route}) => {
 
   const handleClickBtnSuccess = async () => {
     try {
-      setData(photoB64);
-      handleChange(index, photoData, 'value', data, setData);
-      navigation.goBack();
+      console.log("[Index]", index);
+      console.log("[PhotoData]", photoData);
+      console.log("[DATA]", data);
+      console.log("[SETDATA]", setData);
+  
+      if (Array.isArray(data) && typeof setData === 'function') {
+        if (!data[index]) {
+          data[index] = {};
+        }
+  
+        handleChange(index, photoData, 'value', data, setData);
+        setData(photoB64);
+        navigation.goBack();
+      } else {
+        console.error("[ERROR] 'data' no es un array o 'setData' no es una función.");
+      }
+  
       console.log("[DATA >]", index, photoData, 'value', data, setData);
-      console.log('[ TODO BIEN:) ].');
+      console.log('[ TODO BIEN :) ]');
     } catch (error) {
       console.error('[ERROR] >>', error);
     }
@@ -70,17 +87,55 @@ const CameraScreen = ({navigation, route}) => {
   };
 
   const onPressButton = async () => {
-    const photo = await camera.current.takePhoto({
-      flash: torch,
-      qualityPrioritization: 'balanced',
-      enableShutterSound: false,
-    });
-    const base64 = await RNFS.readFile(`file://${photo.path}`, 'base64');
-    setPhotoData(photo);
-    setPhotoB64({photo: `data:image/jpg;base64,${base64}`, path: photo.path});
-    setIsScanned(false);
+    const response = await handleGetLocationValue();
+    const { latitude, longitude } = response;
+    const dateText = new Date().toLocaleString();
+    const coordinateText = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
+    try {
+      const photo = await camera.current.takePhoto({
+        flash: torch,
+        qualityPrioritization: 'balanced',
+        enableShutterSound: false,
+      });
+  
+      if (!photo || !photo.path) {
+        console.error("[ERROR]");
+        return;
+      }
+  
+      const watermarkText = [
+        {
+          text: dateText,
+          position: { x: 200, y: 600 },
+          textSize: 20,
+          color: '#ed6a2c',
+        },
+        {
+          text: coordinateText,
+          position: { x: 120, y: 630 },
+          textSize: 20,
+          color: '#ed6a2c',
+        },
+      ];
+      
+      console.log("[GPS CARLOS] >>", response);
+      const resultPath = await PhotoManipulator.printText(`file://${photo.path}`, watermarkText);
+      
+      if (!resultPath) {
+        console.error("[ERROR] No se pudo añadir la marca de agua.");
+        return;
+      }
+  
+      const base64 = await RNFS.readFile(resultPath, 'base64');
+      setPhotoData({ photo: resultPath, path: resultPath });
+      setPhotoB64({ photo: `data:image/jpg;base64,${base64}`, path: resultPath });
+      setIsScanned(false);
+  
+    } catch (error) {
+      console.error("[ERROR onPressButton] >>", error);
+    }
   };
-
+  
   return (
     <SafeAreaView style={{backgroundColor: colorsTheme.negro}}>
       <View>
