@@ -1,33 +1,34 @@
 {
   "project_info": {
-    "project_number": "924331237037",
-    "project_id": "stack-ant-prod",
-    "storage_bucket": "stack-ant-prod.appspot.com"
+    "project_number": "913115531574",
+    "firebase_url": "https://stack-ant-dev-default-rtdb.firebaseio.com",
+    "project_id": "stack-ant-dev",
+    "storage_bucket": "stack-ant-dev.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:924331237037:android:904a739efaf501c9513024",
+        "mobilesdk_app_id": "1:913115531574:android:8ac01d6ab4783d4a544b97",
         "android_client_info": {
-          "package_name": "com.antfieldservice"
+          "package_name": "com.Shopkeeper"
         }
       },
       "oauth_client": [
         {
-          "client_id": "924331237037-5400n8jvjc9qqhq7pv90j75q34n2mba6.apps.googleusercontent.com",
+          "client_id": "913115531574-3r7tubp0qprc4uqipij0h0rltatdvph9.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB9IPEu9ctWH1DkMgHYJ-OJUpJqAaRI78U"
+          "current_key": "AIzaSyADEWhFx7hbW80owO6RIED6VaIdEqCyq0A"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "924331237037-5400n8jvjc9qqhq7pv90j75q34n2mba6.apps.googleusercontent.com",
+              "client_id": "913115531574-3r7tubp0qprc4uqipij0h0rltatdvph9.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -36,27 +37,56 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:924331237037:android:53bb271cd8c64068513024",
+        "mobilesdk_app_id": "1:913115531574:android:8177eb8cdb431212544b97",
         "android_client_info": {
-          "package_name": "com.kingoapp"
+          "package_name": "com.antfieldservice"
         }
       },
       "oauth_client": [
         {
-          "client_id": "924331237037-5400n8jvjc9qqhq7pv90j75q34n2mba6.apps.googleusercontent.com",
+          "client_id": "913115531574-3r7tubp0qprc4uqipij0h0rltatdvph9.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB9IPEu9ctWH1DkMgHYJ-OJUpJqAaRI78U"
+          "current_key": "AIzaSyADEWhFx7hbW80owO6RIED6VaIdEqCyq0A"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "924331237037-5400n8jvjc9qqhq7pv90j75q34n2mba6.apps.googleusercontent.com",
+              "client_id": "913115531574-3r7tubp0qprc4uqipij0h0rltatdvph9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913115531574:android:5e31f799822c7b81544b97",
+        "android_client_info": {
+          "package_name": "com.kingoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "913115531574-3r7tubp0qprc4uqipij0h0rltatdvph9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADEWhFx7hbW80owO6RIED6VaIdEqCyq0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "913115531574-3r7tubp0qprc4uqipij0h0rltatdvph9.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

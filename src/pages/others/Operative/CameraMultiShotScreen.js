@@ -18,15 +18,17 @@ import * as RNFS from 'react-native-fs';
 import Footer from '../../../components/Layouts/Footer';
 import { FlatList } from 'react-native-gesture-handler';
 import { colorsTheme } from '../../../configurations/configStyle';
+import { handleGetLocationValue} from '../../../functions/fncLocation';
 
 //functions
 import { handleIsValidUrl } from '../../../functions/fncGeneral';
 import {Context as AuthContext} from '../../../context/AuthContext';
+import PhotoManipulator from 'react-native-photo-manipulator';
 
 const CameraMultiShotScreen = ({ navigation, route }) => {
   const { setData, data, idTaskStep } = route.params;
   const { height, width } = Dimensions.get('screen');
-  const device = useCameraDevice('back')
+  const device = useCameraDevice('back');
   const [photoData, setPhotoData] = useState('');
   const [indexUse, setIndexUse] = useState(0);
   const [photos, setPhotos] = useState(data);
@@ -41,6 +43,8 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     checkCameraPermission();
+    console.log("[DATA] >>", setData, data);
+
     // setData((prev) => [...prev, ...photosBase64]);
   }, [isScanned]);
 
@@ -64,30 +68,96 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
     setIndexUse(index);
     setIsScanned(false);
   };
-
-  const onPressButton = async () => {
-    const photo = await camera.current.takePhoto({
-      flash: torch,
-      qualityPrioritization: 'speed',
-      enableShutterSound: false,
-      resolution: {
-        width: 640,
-        height: 480,
-      },
-      jpeg: {
-        quality: 50,
-      },
-    });
-    const base64 = await RNFS.readFile(`file://${photo.path}`, 'base64');
-    // console.log("[ SDFASDF ] => ", photo);
-    let newValue = [...photos, { photo, idTaskStep, path: photo.path }];
-    let newValue2 = [...photosBase64, { photo: `data:image/jpg;base64,${base64}`, idTaskStep, path: photo.path }];    setPhotos(newValue);
-    setPhotosBase64(newValue2);
-    if (inline) {
-      setData(newValue2);
-    } else setData(newValue);
+  
+  const addWatermark = async (photoPath) => {
+    if (!photoPath) {
+      console.error("[ERROR] photoPath is undefined or null");
+      return null;
+    }
+  
+    try {
+      const response = await handleGetLocationValue();
+      const { latitude, longitude } = response;
+      const dateText = new Date().toLocaleString();
+      const coordinateText = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
+  
+      const watermarkText = [
+        {
+          text: `No.: ${idTaskStep.toString()}`,
+          position: { x: 2560, y: 3600 },
+          textSize: 100,
+          color: '#ed6a2c',
+        },
+        {
+          text: dateText,
+          position: { x: 1910, y: 3800 },
+          textSize: 100,
+          color: '#ed6a2c',
+        },
+        {
+          text: coordinateText,
+          position: { x: 1540, y: 4000 },
+          textSize: 100,
+          color: '#ed6a2c',
+        }
+      ];
+      
+      const resultPath = await PhotoManipulator.printText(`file://${photoPath}`, watermarkText);
+  
+      if (!resultPath) {
+        console.error("[ERROR]");
+        return null;
+      }
+  
+      return resultPath;
+    } catch (error) {
+      console.error('[ERROR addWatermark] >>', error);
+      return null;
+    }
   };
-  console.log(isScanned, device != null, hasPermission);
+  
+  const onPressButton = async () => {
+    try {
+      const photo = await camera.current.takePhoto({
+        flash: torch,
+        qualityPrioritization: 'speed',
+        enableShutterSound: false,
+        resolution: {
+          width: 640,
+          height: 480,
+        },
+        jpeg: {
+          quality: 50,
+        },
+      });
+  
+      if (!photo || !photo.path) {
+        console.error("[ERROR] Failed to take photo or path is undefined");
+        return;
+      }
+  
+      const photoWithWatermark = await addWatermark(photo.path);
+  
+      if (!photoWithWatermark) {
+        console.error("[ERROR] Failed to add watermark");
+        return;
+      }
+  
+      console.log('[IMG WATERMARK] >', photoWithWatermark);
+  
+      const base64 = await RNFS.readFile(photoWithWatermark, 'base64');
+  
+      let newValue = [...photos, { photo, idTaskStep, path: photoWithWatermark }];
+      let newValue2 = [...photosBase64, { photo: `data:image/jpg;base64,${base64}`, idTaskStep, path: photoWithWatermark }];
+  
+      setPhotos(newValue);
+      setPhotosBase64(newValue2);
+      setData(inline ? newValue2 : newValue);
+    } catch (error) {
+      console.error('[ERROR onPressButton] >>', error);
+    }
+  };
+
   return (
     <SafeAreaView style={{ backgroundColor: colorsTheme.negro }}>
       <View>
