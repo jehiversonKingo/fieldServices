@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from 'react-native';
 import { Camera, useCameraDevice } from 'react-native-vision-camera';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -25,9 +26,52 @@ import { handleIsValidUrl } from '../../../functions/fncGeneral';
 import {Context as AuthContext} from '../../../context/AuthContext';
 import PhotoManipulator from 'react-native-photo-manipulator';
 
+
+const Header = ({ onClose, onTorchToggle, torchStatus }) => (
+  <View style={styles.header}>
+    <TouchableOpacity onPress={onClose} hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}>
+      <Fontisto name="close-a" color={colorsTheme.gris20} size={20} style={styles.icon} />
+    </TouchableOpacity>
+    <TouchableOpacity onPress={onTorchToggle} hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}>
+      <Ionicons
+        name={torchStatus === 'off' ? 'flash' : 'flash-off'}
+        color={colorsTheme.blanco}
+        size={25}
+        style={styles.icon}
+      />
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={{
+        marginTop: 10,
+        flexDirection: 'row',
+        backgroundColor: colorsTheme.naranja,
+        borderRadius: 10,
+        width: 100,
+        height: 40,
+        // position: 'absolute',
+        right: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      onPress={onClose}>
+      <Ionicons name={'checkmark-circle-outline'} color={colorsTheme.blanco} size={25} />
+      <Text style={{}}>Completar</Text>
+    </TouchableOpacity>
+  </View>
+);
+
+const CaptureButton = ({ onPress }) => (
+  <View style={styles.captureButtonContainer}>
+    <TouchableOpacity style={styles.camExternalButton} onPress={onPress}>
+      <View style={styles.camInternalButton} />
+    </TouchableOpacity>
+    <Text style={styles.captureButtonText}>Tocar para tomar fotos</Text>
+  </View>
+);
+
+const { height, width } = Dimensions.get('screen');
 const CameraMultiShotScreen = ({ navigation, route }) => {
   const { setData, data, idTaskStep } = route.params;
-  const { height, width } = Dimensions.get('screen');
   const device = useCameraDevice('back');
   const [photoData, setPhotoData] = useState('');
   const [indexUse, setIndexUse] = useState(0);
@@ -80,27 +124,34 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
       const { latitude, longitude } = response;
       const dateText = new Date().toLocaleString();
       const coordinateText = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
-  
-      const watermarkText = [
-        {
-          text: `No.: ${idTaskStep.toString()}`,
-          position: { x: 2560, y: 3600 },
-          textSize: 100,
-          color: '#ed6a2c',
-        },
-        {
-          text: dateText,
-          position: { x: 1910, y: 3800 },
-          textSize: 100,
-          color: '#ed6a2c',
-        },
-        {
-          text: coordinateText,
-          position: { x: 1540, y: 4000 },
-          textSize: 100,
-          color: '#ed6a2c',
-        }
-      ];
+
+      let watermarkText = [];
+      await Image.getSize(`file://${photoPath}`,  (imageWidth, imageHeight) => {
+        console.log('[ imageHeight ] >> ', imageHeight);
+        watermarkText = [
+          {
+            text: `No.: ${idTaskStep.toString()}`,
+            position: { x: imageWidth * 0.2, y: imageHeight - (imageHeight * 0.2) },
+            textSize: Math.floor(imageWidth * 0.05),
+            color: '#ed6a2c',
+          },
+          {
+            text: dateText,
+            position: { x: imageWidth * 0.2, y: imageHeight - (imageHeight * 0.15) },
+            textSize: Math.floor(imageWidth * 0.05),
+            fontWeight: 700,
+            color: '#ed6a2c',
+          },
+          {
+            text: coordinateText,
+            position: { x: imageWidth * 0.2, y: imageHeight - (imageHeight * 0.1) },
+            textSize: Math.floor(imageWidth * 0.05),
+            fontWeight: 700,
+            color: '#ed6a2c',
+          },
+        ];
+        return {width, height};
+      });
       
       const resultPath = await PhotoManipulator.printText(`file://${photoPath}`, watermarkText);
   
@@ -159,9 +210,9 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: colorsTheme.negro }}>
+    <SafeAreaView style={styles.safeArea}>
       <View>
-        <View
+        {/* <View
           style={{
             marginTop: 20,
             width: '100%',
@@ -211,7 +262,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
             <Ionicons name={'checkmark-circle-outline'} color={colorsTheme.blanco} size={25} />
             <Text style={{}}>Completar</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {isScanned === false && (
           <>
@@ -265,13 +316,18 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
             <StatusBar barStyle="light-content" backgroundColor={colorsTheme.negro} />
             <Camera
               ref={camera}
-              style={{ marginTop: 50, height: height * 0.8, width: width }}
+              style={styles.camera}
               device={device}
               isActive={isScanned}
-              autoFocus="on"
               photo={true}
+              autoFocus="on"
             />
-            <View
+            <Header
+              onClose={() => navigation.goBack()}
+              onTorchToggle={() => setTorch(torch === 'off' ? 'on' : 'off')}
+              torchStatus={torch}
+            />
+            {/* <View
               style={{
                 alignContent: 'center',
                 alignItems: 'center',
@@ -282,8 +338,8 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
                 onPress={onPressButton}>
                 <View style={styles.camInternalButton} />
               </TouchableOpacity>
-              <Text>Tocar para tomar fotos</Text>
-            </View>
+              <Text>Tocar para tomar fotos</Text> */}
+            {/* </View> */}
 
             <View
               style={{ position: 'absolute', top: height * 0.68, width: width }}>
@@ -319,6 +375,9 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
                   ListEmptyComponent={<Text>No se encontraron datos.</Text>}
                   horizontal={true}
                 />
+              </View>
+              <View style={{ marginTop: 10 }}>
+                <CaptureButton onPress={onPressButton} />
               </View>
             </View>
           </>
@@ -370,6 +429,70 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'center',
     textAlign: 'center',
+  },
+
+  //-------------------------------------------
+  safeArea: { flex: 1, backgroundColor: colorsTheme.negro },
+  camera: { ...StyleSheet.absoluteFillObject },
+  overlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'space-between' },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+  },
+  icon: { marginTop: 20 },
+  captureButtonContainer: { alignItems: 'center', marginBottom: 30 },
+  camExternalButton: {
+    backgroundColor: colorsTheme.blanco,
+    borderRadius: 50,
+    width: 70,
+    height: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  camInternalButton: {
+    backgroundColor: colorsTheme.naranja,
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+  },
+  captureButtonText: { color: colorsTheme.blanco, marginTop: 10 },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  camButton: {
+    flexDirection: 'row',
+    backgroundColor: colorsTheme.naranja,
+    borderRadius: 10,
+    flex: 1,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 10,
+  },
+  buttonText: {
+    marginLeft: 10,
+    color: colorsTheme.blanco,
+    fontSize: 16,
+  },
+  container: {
+    flex: 1, // Ocupa toda la pantalla
+  },
+  image: {
+    width: width,  // 100% del ancho de la pantalla
+    height: height, // 100% del alto de la pantalla
+    justifyContent: 'flex-end', // Esto posiciona los botones en la parte inferior
+  },
+  overlay2: {
+    position: 'absolute',
+    bottom: 100, // Distancia del fondo
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-around', // Distribuye los botones horizontalmente
+    paddingHorizontal: 20,
   },
 });
 
