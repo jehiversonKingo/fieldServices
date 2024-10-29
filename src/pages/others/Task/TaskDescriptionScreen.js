@@ -135,6 +135,7 @@ const eventEmitter = new NativeEventEmitter(NativeModules.ServerSocketModule);
 const {BluetoothServerModule} = NativeModules;
 const TaskDescriptionScreen = ({navigation, route}) => {
   const typeTask = route.params.type;
+  console.log('[ TYPE TASK ] >> ', typeTask)
   //Step
   const [active, setActive] = useState(0);
   const [isAlert, setIsAlert] = useState(false);
@@ -429,6 +430,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       setTitleAlert('¡Atención!');
       setMessageAlert('Es posible que hagan falta algunos datos.');
     }
+
+    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~>', getDataScreen);
 
     const {screen, addon, steps, addonReceived, stepsChecks} = getDataScreen;
 

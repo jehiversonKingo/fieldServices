@@ -14,113 +14,113 @@ import moment from 'moment';
 const { width } = Dimensions.get('screen');
 
 const RenderItemList = ({item, goTo, onLongPress}) => {
-    let color = '';
-    let colorLabel = '';
-    let icon = '';
-    let sizeAlert = '';
-    switch (item.task.taskPriority.name) {
-      case 'Alta':
-        color = colorsTheme.naranja;
-        colorLabel = colorsTheme.blanco;
-        icon = 'warning-outline';
-        sizeAlert = 85;
-        break;
-      case 'Media':
-        color = 'yellow';
-        colorLabel = colorsTheme.gris80;
-        icon = 'remove-circle-outline';
-        sizeAlert = 90;
-        break;
-      case 'Baja':
-        color = colorsTheme.verdeFuerte;
-        colorLabel = colorsTheme.blanco;
-        icon = 'checkmark-circle-outline';
-        sizeAlert = 85;
-        break;
-    }
+  let color = '';
+  let colorLabel = '';
+  let icon = '';
+  let sizeAlert = '';
+  switch (item.task.taskPriority.name) {
+    case 'Alta':
+      color = colorsTheme.naranja;
+      colorLabel = colorsTheme.blanco;
+      icon = 'warning-outline';
+      sizeAlert = 85;
+      break;
+    case 'Media':
+      color = 'yellow';
+      colorLabel = colorsTheme.gris80;
+      icon = 'remove-circle-outline';
+      sizeAlert = 90;
+      break;
+    case 'Baja':
+      color = colorsTheme.verdeFuerte;
+      colorLabel = colorsTheme.blanco;
+      icon = 'checkmark-circle-outline';
+      sizeAlert = 85;
+      break;
+  }
 
-    return (
-      <TouchableOpacity
+  return (
+    <TouchableOpacity
+      style={{
+        ...styles.containerList.background,
+        backgroundColor: moment().isAfter(moment(item.task.expirationDate)) ? colorsTheme.naranja20 : colorsTheme.blanco
+      }}
+      onLongPress={() => onLongPress(item.idTask)}
+      onPress={() =>
+        goTo(
+          item.task.idTaskState !== 3 ? 'TaskDescription' : 'TaskNocValidation',
+          {id: item.idTask, idCustomer: item.task.idCustomer, type: item.task.idTaskCategory},
+        )
+      }>
+      <View
         style={{
-          ...styles.containerList.background,
-          backgroundColor: moment().isAfter(moment(item.task.expirationDate)) ? colorsTheme.naranja20 : colorsTheme.blanco
-        }}
-        onLongPress={() => onLongPress(item.idTask)}
-        onPress={() =>
-          goTo(
-            item.task.idTaskState !== 3 ? 'TaskDescription' : 'TaskNocValidation',
-            {id: item.idTask, idCustomer: item.task.ticket.idCustomer, type: item.task.ticket.idTicketCategory},
-          )
-        }>
+          flex: 1,
+          flexDirection: 'row',
+          borderRadius: 5,
+          padding: 5,
+        }}>
         <View
           style={{
-            flex: 1,
-            flexDirection: 'row',
+            flex: 0.4,
+            backgroundColor: item.task.taskState.idTaskState !== 3 ? colorsTheme.naranja : colorsTheme.verdeFuerte,
+            justifyContent: 'center',
+            alignItems: 'center',
+            alignContent: 'center',
             borderRadius: 5,
-            padding: 5,
           }}>
           <View
             style={{
-              flex: 0.4,
-              backgroundColor: item.task.taskState.idTaskState !== 3 ? colorsTheme.naranja : colorsTheme.verdeFuerte,
               justifyContent: 'center',
               alignItems: 'center',
               alignContent: 'center',
-              borderRadius: 5,
             }}>
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                alignContent: 'center',
-              }}>
-              <FontAwesome5
-                name={'id-card-alt'}
-                color={colorsTheme.blanco}
-                size={25}
-                style={styles.bottomMenu.icon}
-              />
-            </View>
+            <FontAwesome5
+              name={'id-card-alt'}
+              color={colorsTheme.blanco}
+              size={25}
+              style={styles.bottomMenu.icon}
+            />
           </View>
-          <View style={{flex: 2, padding: 8}}>
-            <View style={{flexDirection: 'row'}}>
-              <View>
-                <Text style={{...styles.bottomMenu.text, color: colorsTheme.gris80}}>
-                  TK-{item.idTask}
-                </Text>
-                <Text style={{color: colorsTheme.gris80}}>{item.task.ticket.description}</Text>
-              </View>
-              <View style={{width: sizeAlert, position: 'absolute', right: 0, top: -12}}>
-                <View
+        </View>
+        <View style={{flex: 2, padding: 8}}>
+          <View style={{flexDirection: 'row'}}>
+            <View>
+              <Text style={{...styles.bottomMenu.text, color: colorsTheme.gris80}}>
+                TK-{item.idTask}
+              </Text>
+              <Text style={{color: colorsTheme.gris80}}>{item.task.description}</Text>
+            </View>
+            <View style={{width: sizeAlert, position: 'absolute', right: 0, top: -12}}>
+              <View
+                style={{
+                  backgroundColor: `${color}`,
+                  borderRadius: 50,
+                  margin: 5,
+                  height: 30,
+                  flexDirection: 'row',
+                }}>
+                <Ionicons
+                  name={icon}
+                  color={colorLabel}
+                  size={20}
+                  style={{marginLeft: 6, marginTop: 4}}
+                />
+                <Text
                   style={{
-                    backgroundColor: `${color}`,
-                    borderRadius: 50,
-                    margin: 5,
-                    height: 30,
-                    flexDirection: 'row',
+                    color: colorLabel,
+                    marginTop: 5,
+                    position: 'absolute',
+                    right: 12,
                   }}>
-                  <Ionicons
-                    name={icon}
-                    color={colorLabel}
-                    size={20}
-                    style={{marginLeft: 6, marginTop: 4}}
-                  />
-                  <Text
-                    style={{
-                      color: colorLabel,
-                      marginTop: 5,
-                      position: 'absolute',
-                      right: 12,
-                    }}>
-                    {item.task.taskPriority.name}
-                  </Text>
-                </View>
+                  {item.task.taskPriority.name}
+                </Text>
               </View>
             </View>
           </View>
         </View>
-      </TouchableOpacity>
-    );
+      </View>
+    </TouchableOpacity>
+  );
 };
 
 const styles = StyleSheet.create({

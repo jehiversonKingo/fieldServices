@@ -19,7 +19,7 @@ export const getTasks = async () => {
 export const getElemetScreen = async (id) => {
   const headers = await customHeadersAuth();
   return await axiosInstance
-    .post('/task/elementScreen', {'idTask': id}, headers)
+    .post('/task/elementScreen', {idTask: id}, headers)
     .then(task => {
       return task.data;
     })

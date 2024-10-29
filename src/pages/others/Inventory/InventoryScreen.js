@@ -30,10 +30,15 @@ const InventoryScreen = ({navigation}) => {
       let getKingo = [];
         if(inline){
           console.log('*1*');
-          getAddon = await getListAddon();
-          await updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0);
+          let inventory = await getListAddon();
+          getAddon = [];
+          getKingo = [];
+          if (inventory) {
+            getAddon = inventory?.addons || [];
+            getKingo = inventory?.equipments || [];
+          }
 
-          getKingo = await getListEquipment();
+          await updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0);
           await updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0);
         }else{
           let dataKingos = await getStep('warehouseEquipment',0,0);
