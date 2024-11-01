@@ -99,7 +99,7 @@ export const getValidAddonOrEquipmentAsigned = async (addons) => {
 export const deleteOrder = async (idOrder) => {
   const headers = await customHeadersAuth();
     return axiosInstance
-    .delete(`/order/deleteOrder/${idOrder}`, headers)
+    .put(`/order/deleteOrder/${idOrder}`, headers)
     .then(order => {
       const {data} = order.data;
       return {status: true, data: data};

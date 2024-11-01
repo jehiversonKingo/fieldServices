@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
+  Alert,
 } from 'react-native';
 import moment from 'moment/moment';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -16,7 +17,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import Header from '../../../components/Layouts/Header';
 
 //Functions
-import {getOrders} from '../../../services/orders.services';
+import {getOrders, deleteOrder} from '../../../services/orders.services';
 import { handleFilterData, handleGetDataUserLocal } from '../../../functions/fncGeneral';
 
 const {width, height} = Dimensions.get('screen');
@@ -40,10 +41,20 @@ const OrdersListScreen = ({navigation, route}) => {
     navigation.navigate(route, data);
   };
 
-  const validInactive = () => {
-    isShowAlert(true);
-    setTitleAlert('Alerta');
-    setMessageAlert('¿Desea Eliminar este registro?');
+  const validInactive = async (idOrder) => {
+    try {
+       await deleteOrder(idOrder);
+       isShowAlert(true);
+       setTitleAlert('Inactivado');
+       setMessageAlert('Proceso Completado');
+       handleDataList();
+    } catch (error) {
+      handleDataList();
+      isShowAlert(true);
+       setTitleAlert('Problema');
+       setMessageAlert('Ocurrio un problema en el proceso');
+      console.log("[ERROR INACTIVATE] >>", error);
+    }
   };
 
   const RenderItemList = ({item}) => {
@@ -55,54 +66,62 @@ const OrdersListScreen = ({navigation, route}) => {
     }
 
     return (
-      <TouchableOpacity
-        style={{...styles.orderContainer.background}}
-        onPress={() => goTo(goToDirection, {id: item.idOrder})}
-        onLongPress={() => {
-          validInactive();
+    <TouchableOpacity
+      style={{...styles.orderContainer.background, flexDirection: 'row'}}
+      onPress={() => goTo(goToDirection, {id: item.idOrder})}>
+      <View
+        style={{
+          flex: 0.2,
+          backgroundColor: item.idOrderType !== 2 ? colorsTheme.naranja : colorsTheme.verdeFuerte,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: 10,
         }}>
-        <View
+        <FontAwesome5
+          name={'archive'}
+          color={colorsTheme.blanco}
+          size={35}
+          style={styles.bottomMenu.icon}
+        />
+      </View>
+      <View style={{flex: 0.7, padding: 5}}>
+        <Text style={{...styles.orderContainer.text, fontWeight: 'bold'}}>
+          {'OIK-' + item.idOrder}
+        </Text>
+        <Text style={styles.orderContainer.text}>{item.warehouseSender}</Text>
+        <Text style={styles.orderContainer.text}>
+          {item.WarehouseSender.name}
+        </Text>
+        <Text
           style={{
-            flex: 0.2,
-            backgroundColor: item.idOrderType !== 2 ? colorsTheme.naranja : colorsTheme.verdeFuerte,
+            ...styles.orderContainer.text,
+            position: 'absolute',
+            bottom: 5,
+            right: -30,
+          }}>
+          {moment(item?.createdAt).format('DD/MM/YYYY')}
+        </Text>
+      </View>
+      <TouchableOpacity
+          style={{
+            position: 'absolute',
+            right: 4,
+            top: 3,
             justifyContent: 'center',
             alignItems: 'center',
-            alignContent: 'center',
-            borderRadius: 5,
-          }}>
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              alignContent: 'center',
-            }}>
-            <FontAwesome5
-              name={'archive'}
-              color={colorsTheme.blanco}
-              size={25}
-              style={styles.bottomMenu.icon}
-            />
-          </View>
-        </View>
-        <View style={{flex: 0.7, padding: 5}}>
-          <Text style={{...styles.orderContainer.text, fontWeight: 'bold'}}>
-            {'OIK-' + item.idOrder}
-          </Text>
-          <Text style={styles.orderContainer.text}>{item.warehouseSender}</Text>
-          <Text style={styles.orderContainer.text}>
-            {item.WarehouseSender.name}
-          </Text>
-          <Text
-            style={{
-              ...styles.orderContainer.text,
-              position: 'absolute',
-              bottom: 5,
-              right: 0,
-            }}>
-            {moment(item?.createdAt).format('DD/MM/YYYY')}
-          </Text>
-        </View>
+            padding: 10,
+          }}
+          onPress={() => {
+            validInactive(item.idOrder);
+          }}
+         >
+        <FontAwesome5
+          name={'trash'}
+          color={colorsTheme.rojo}
+          size={23}
+        />
       </TouchableOpacity>
+    </TouchableOpacity>
     );
   };
 
