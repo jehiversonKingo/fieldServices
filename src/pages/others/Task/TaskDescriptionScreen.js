@@ -585,7 +585,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       setMessageAlert('');
       let dataKingos = JSON.parse(await getStep('warehouseEquipment', 0, 0));
       let dataAddons = JSON.parse(await getStep('warehouseAddon', 0, 0));
-      console.log('^^^^^^^^', dataKingos, dataAddons);
       let inventoryKingo =
         dataKingos.length > 0 ? dataKingos.map(item => item.barcode) : [];
       let inventoryAddon =

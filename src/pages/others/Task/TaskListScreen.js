@@ -65,7 +65,20 @@ const TaskListScreen = ({ navigation, route }) => {
         let dataTask = await getStep('taskInfo', id, 0);
         data = dataTask ? JSON.parse(dataTask) : [];
       }
-      setTaskData(data)
+
+      if (data.length === 0) {
+        setTaskData([])
+      } else {
+        if (data.taskAddons.length > 0) {
+          const install = data.taskAddons.filter(item => item.transferType === 'enviado');
+          const pickup = data.taskAddons.filter(item => item.transferType === 'recibido');
+
+          data["taskAddons"] = install;
+          data["receivedAddons"] = pickup;
+          console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~>', data)
+          setTaskData(data)
+        }
+      }
       setInfoLoading(false);
     } catch (error) {
       console.log("[ onLongPress TASK ] >", error);
