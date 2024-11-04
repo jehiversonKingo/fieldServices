@@ -3,7 +3,7 @@ import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
 import {colorsTheme} from '../../configurations/configStyle';
 
 const ButtonProgressStep = ({text = 'text', onPress = () => {}, type, disabled=false}) => (
-  <View style={{flex: 1, marginTop: 20}}>
+  <View style={{flex: 1, marginTop: 45}}>
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}

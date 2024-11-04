@@ -1,4 +1,5 @@
-import {Platform, PermissionsAndroid} from 'react-native';
+
+import {Platform, PermissionsAndroid, NativeModules} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import {handleChange} from './functionChangeValue';
 
@@ -83,6 +84,7 @@ export const handleGetLocationReturnValue = async (
   setMessageAlert,
   setTitleAlert
 ) => {
+  const {GPSModule} = NativeModules;
   const hasPermission = await hasLocationPermission();
   if (!hasPermission) {
     return;
@@ -90,27 +92,25 @@ export const handleGetLocationReturnValue = async (
   setIsAlert(true);
   setTitleAlert('Obteniendo ubicación');
   setMessageAlert('Espere un momento por favor...');
-  let locationTes = await new Promise((response, reject) =>{
-    Geolocation.getCurrentPosition(
-      position => {
-        console.log("llegue", {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+
+  let locations = await new Promise((resolve, reject) => {
+    GPSModule.getCurrentLocation((lat, lon) => {
+      if (typeof lat === 'string' || typeof lon === 'string') {
+        reject({
+          latitude: 0,
+          longitude: 0,
         });
-        response({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      },
-      error => {
-        console.log(error.code, error.message);
-        reject({error: error.code, message: error.message})
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-    );
+        return;
+      }
+      response({
+        latitude: lat,
+        longitude: lon,
+      });
+    });
   });
-  console.log("Testing", locationTes)
-  return locationTes;
+
+  console.log("Testing", locations)
+  return locations;
 };
 
 export const handleGetLocationValue = async () => {

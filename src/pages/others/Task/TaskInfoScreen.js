@@ -1,7 +1,11 @@
 import React, { Fragment } from "react";
 import { ActivityIndicator, StyleSheet, Text, View, FlatList } from "react-native";
-import { colorsTheme } from "../../../configurations/configStyle";
+import AntDesignIcon from 'react-native-vector-icons/AntDesign';
+import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import moment from "moment";
+
+import { colorsTheme } from "../../../configurations/configStyle";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const TaskInfoScreen = ({data, isLoading}) => {
   return (
@@ -20,6 +24,26 @@ const TaskInfoScreen = ({data, isLoading}) => {
                 </View>
             ) : (
                 <Fragment>
+                    
+                    <View style={{...styles.container.background, flexDirection:'row'}}>
+                       <TouchableOpacity style={{ justifyContent:'center', alignContent:'center', alignItems:'center' }}>
+                            <AntDesignIcon name={"caretright"} color={colorsTheme.verdeFuerte} size={30} />
+                            <Text style={{ color:colorsTheme.negro}}> Iniciar Camino </Text>
+                       </TouchableOpacity>
+                       <TouchableOpacity style={{ justifyContent:'center', alignContent:'center', alignItems:'center' }}>
+                            <AntDesignIcon name={"close"} color={colorsTheme.rojo} size={30} />
+                            <Text style={{ color:colorsTheme.negro}}> Cancelar </Text>
+                       </TouchableOpacity>
+                       <TouchableOpacity style={{ justifyContent:'center', alignContent:'center', alignItems:'center' }}>
+                            <IoniconsIcon name={"location"} color={colorsTheme.azul} size={30} />
+                            <Text style={{ color:colorsTheme.negro}}> Llegada a sitio </Text>
+                       </TouchableOpacity>
+                       <TouchableOpacity style={{ justifyContent:'center', alignContent:'center', alignItems:'center' }}>
+                            <IoniconsIcon name={"log-in-outline"} color={colorsTheme.rojo} size={30} />
+                            <Text style={{ color:colorsTheme.negro}}> Salida del sitio</Text>
+                       </TouchableOpacity>
+                    </View>
+
                     <View style={{...styles.container.background}}>
                         <Text style={{color: colorsTheme.gris80}}>   
                             <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
@@ -58,7 +82,7 @@ const TaskInfoScreen = ({data, isLoading}) => {
                             textAlign: "center",
                             fontWeight: "700"
                         }}>
-                            {"Complementos requeridos"}
+                            {"Componentes requeridos"}
                         </Text>
                         <View>
                             {
@@ -108,7 +132,7 @@ const TaskInfoScreen = ({data, isLoading}) => {
                                         )}
                                     />
                                 ) : (
-                                    <Text style={{color: colorsTheme.gris80, textAlign: "center"}}>{"Esta tarea no tiene complementos asignados"}</Text>
+                                    <Text style={{color: colorsTheme.gris80, textAlign: "center"}}>{"Esta tarea no tiene Componentes asignados"}</Text>
                                 )
                             }
                         </View>

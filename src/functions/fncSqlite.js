@@ -45,10 +45,6 @@ export const getStep = async(table, idRowModule, step) => {
   return new Promise((resolve, reject) => {
     let db = openDatabase({name: database});
     db.transaction(txn => {
-      console.log(
-        '[ QUERY ] => ',
-        `SELECT * FROM ${table} WHERE idRowModule = ${idRowModule} AND step = ${step}`,
-      );
       txn.executeSql(
         `SELECT * FROM ${table} WHERE idRowModule = ${idRowModule} AND step = ${step};`,
         [],
@@ -70,7 +66,7 @@ export const getStep = async(table, idRowModule, step) => {
     });
   });
 };
-
+ 
 export const updateStep = async(table, idRowModule, params, step) => {
   return new Promise((resolve, reject) => {
     let db = openDatabase({name: database});
@@ -127,7 +123,6 @@ export const deleteStep = async (table, idRowModule) => {
     });
   });
 };
-
 
 export const getAllDataSql = async (table) => {
   return new Promise((resolve, reject) => {

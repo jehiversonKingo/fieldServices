@@ -11,6 +11,7 @@ import moment from 'moment/moment';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import orderBy from 'lodash/orderBy';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import { SpeedDial } from '@rneui/themed';
 
 //Components
 import Header from '../../../components/Layouts/Header';
@@ -29,6 +30,7 @@ const OrdersListScreen = ({navigation, route}) => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState();
   const [active, setActive] = useState(0);
+  const [open, setOpen] = useState(false);
 
   //Alert
   const [showAlert, isShowAlert] = useState();
@@ -196,7 +198,8 @@ const OrdersListScreen = ({navigation, route}) => {
               }
           />
         )}
-      <View
+
+      {/* <View
         style={{
           position: 'absolute',
           right: 10,
@@ -215,7 +218,23 @@ const OrdersListScreen = ({navigation, route}) => {
             fa5Style={{borderColor: colorsTheme.blanco}}
           />
         </TouchableOpacity>
-      </View>
+      </View> */}
+
+    <SpeedDial
+        isOpen={open}
+        color={colorsTheme.naranja}
+        icon={{ name: 'shuffle', color: '#fff' }}
+        openIcon={{ name: 'remove-circle-outline', color: '#fff' }}
+        onOpen={() => setOpen(!open)}
+        onClose={() => setOpen(!open)}
+      >
+        <SpeedDial.Action
+          icon={{ name: 'queue', color: '#fff' }}
+          color={colorsTheme.naranja}
+          title="Nueva Orden"
+          onPress={() => goTo('AddOrdersDescription', {})}
+        />
+      </SpeedDial>
 
       <AwesomeAlert
         show={showAlert}

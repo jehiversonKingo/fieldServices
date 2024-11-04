@@ -10,11 +10,13 @@ import * as RNFS from 'react-native-fs';
 //Components
 import Header from '../../../components/Layouts/Header';
 import { getTasks, getTaskById, setDataAllTaskInstall, getStepInstruction, getElemetScreen, setDataAllTaskMigration, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskChecklist, setDataTaskPhotos, setDataAllTaskVisit } from '../../../services/task.services';
-import { getTicketById } from '../../../services/ticket.services';
 import {getAllDataStep, deleteStep} from '../../../functions/fncSqlite';
-import {handleGetLocationReturnValue, handleGetLocationValue} from '../../../functions/fncLocation';
+import {handleGetLocationValue} from '../../../functions/fncLocation';
 import {colorsTheme} from '../../../configurations/configStyle';
 import { getStep, updateStep } from '../../../functions/fncSqlite';
+import { getLocationsFromDatabaseByIdTask, deleteLocationsFromDatabaseByIdTask } from '../../../functions/fncTracker';
+import { sendDataTracker } from '../../../services/tracking.services';
+
 import {Context as AuthContext} from '../../../context/AuthContext';
 
 const {width, height} = Dimensions.get('screen');
@@ -26,6 +28,7 @@ const TaskOffline = ({navigation}) => {
     const [isAlert, setIsAlert] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [showProgressAlert, setShowProgressAlert] = useState(false);
+    const [showtitle, setShowTitle] = useState("");
     const [progressAlert, setProgressAlert] = useState(0);
     const [totalUpload, setTotalUpload] = useState(0);
     const [messageAlert, setMessageAlert] = useState('');
@@ -45,9 +48,9 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep1 = ({item, index}) => {
       return(
-        <View key={`B${index}`} style={{flexDirection: "row", backgroundColor: colorsTheme.naranja20}}>
-          <View key={`C${index}`}>
-            <Text key={`D${index}`} style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
+        <View key={`T1${index}`} style={{flexDirection: "row" }}>
+          <View>
+            <Text style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
               {
                 typeof item.value === 'object' ? (
                   item.screenElement.name !== 'Sync' && (
@@ -65,9 +68,9 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep2 = ({item, index}) => {
       return(
-        <View key={`B1${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.naranja20}}>
-          <View key={`C1${index}`}>
-            <Text key={`D1${index}`} style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
+        <View key={`T2${index}`} style={{flexDirection: 'row' }}>
+          <View>
+            <Text style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
               {item.addon.name +': '+ item.value}
             </Text>
           </View>
@@ -77,8 +80,7 @@ const TaskOffline = ({navigation}) => {
 
     const TaskStackStep3 = ({item, index}) => {
       return(
-        <View key={`B2${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.naranja20}}>
-          <View key={`C2${index}`}>
+        <View key={`T3${index}`} style={{flexDirection: 'row'}}>
             <FitImage
                 indicator={true}
                 indicatorColor={colorsTheme.naranja}
@@ -87,16 +89,15 @@ const TaskOffline = ({navigation}) => {
                 resizeMode="stretch"
                 style={{ width: 150, height: 150 }}
             />
-          </View>
         </View>
       )
     };
 
     const TaskStackStep4 = ({item, index}) => {
       return(
-        <View key={`B3${index}`} style={{flexDirection: 'row', backgroundColor:colorsTheme.naranja20}}>
-          <View key={`C3${index}`}>
-            <Text key={`D3${index}`} style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
+        <View key={`T4${index}`} style={{flexDirection: 'row' }}>
+          <View>
+            <Text style={{fontSize: 18, fontWeight: '500', margin:5, color:colorsTheme.negro, fontSize:12}}>
               {item.addon.name +': '+ item.value}
             </Text>
           </View>
@@ -114,12 +115,7 @@ const TaskOffline = ({navigation}) => {
       const task = JSON.parse(item);
       return (
         <View
-          style={{
-            padding: 12,
-            margin:5,
-            borderColor: colorsTheme.naranja60,
-            borderWidth:3,
-          }}
+          style={{ marginTop: 10 }}
           keyExtractor={(item) => item.idTask.toString()}
           key={`AT-${index}`}>
           <ListItem.Accordion
@@ -131,7 +127,7 @@ const TaskOffline = ({navigation}) => {
                   style={styles.iconImg}
                 />
                 <ListItem.Content>
-                  <ListItem.Title>{' TASK ID: ' + task.idTask}</ListItem.Title>
+                  <ListItem.Title>{'Tarea: ' + task.idTask}</ListItem.Title>
                 </ListItem.Content>
               </>
             }
@@ -154,13 +150,11 @@ const TaskOffline = ({navigation}) => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{paddingBottom: '50%', margin:30}}
               keyExtractor={item => item.idTaskScreenElement}
-              numColumns={2}
               ListHeaderComponent={
               <View
                   style={{
                     backgroundColor: colorsTheme.naranja,
                     borderRadius: 5,
-                    width: width * 0.76,
                     padding: 10,
                     justifyContent:'center',
                     alignItems: 'center',
@@ -173,7 +167,6 @@ const TaskOffline = ({navigation}) => {
               <View
                   style={{
                   backgroundColor: colorsTheme.gris80,
-                  width: width * 0.76,
                   padding: 10,
                   alignContent: 'center',
                   alignItems: 'center',
@@ -199,27 +192,25 @@ const TaskOffline = ({navigation}) => {
               <View
                   style={{
                   backgroundColor: colorsTheme.naranja,
-                  width: width * 0.76,
                   padding: 10,
                   justifyContent:'center',
                   alignItems: 'center',
                   marginTop: 10,
                   }}>
-                  <Text style={{color: colorsTheme.blanco}}>Equipo Y Complementos</Text>
+                  <Text style={{color: colorsTheme.blanco}}>Equipo Y Componentes</Text>
               </View>
               }
               ListEmptyComponent={
               <View
                   style={{
                   backgroundColor: colorsTheme.gris80,
-                  width: width * 0.76,
                   padding: 10,
                   alignContent: 'center',
                   alignItems: 'center',
                   marginTop: 10,
                   }}>
                   <Text style={{color: colorsTheme.blanco}}>
-                  No se han encontrado Equipos o Complementos.
+                  No se han encontrado Equipos o Componentes.
                   </Text>
               </View>
               }
@@ -233,12 +224,10 @@ const TaskOffline = ({navigation}) => {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{paddingBottom: '50%', margin:30}}
-              // keyExtractor={item => (item.idTaskStep + index).toString()}
               ListHeaderComponent={
               <View
                   style={{
                   backgroundColor: colorsTheme.naranja,
-                  width: width * 0.76,
                   padding: 10,
                   justifyContent:'center',
                   alignItems: 'center',
@@ -251,7 +240,6 @@ const TaskOffline = ({navigation}) => {
               <View
                   style={{
                   backgroundColor: colorsTheme.gris80,
-                  width: width * 0.76,
                   padding: 10,
                   alignContent: 'center',
                   alignItems: 'center',
@@ -277,27 +265,25 @@ const TaskOffline = ({navigation}) => {
               <View
                   style={{
                   backgroundColor: colorsTheme.naranja,
-                  width: width * 0.76,
                   padding: 10,
                   justifyContent:'center',
                   alignItems: 'center',
                   marginTop: 10,
                   }}>
-                  <Text style={{color: colorsTheme.blanco}}>Equipo y Complementos recogido</Text>
+                  <Text style={{color: colorsTheme.blanco}}>Equipo y Componentes recogido</Text>
               </View>
               }
               ListEmptyComponent={
               <View
                   style={{
                   backgroundColor: colorsTheme.gris80,
-                  width: width * 0.76,
                   padding: 10,
                   alignContent: 'center',
                   alignItems: 'center',
                   marginTop: 10,
                   }}>
                   <Text style={{color: colorsTheme.blanco}}>
-                  No se han encontrado datos sobre Equipos o Complementos recogidos.
+                  No se han encontrado datos sobre Equipos o Componentes recogidos.
                   </Text>
               </View>
               }
@@ -450,9 +436,8 @@ const TaskOffline = ({navigation}) => {
 
             if (taskStatus?.status) {
               setIsAlert(false);
-              setTimeout(() => {
                 setShowProgressAlert(true);
-              }, 300);
+                setShowTitle("Cargando Imagenes")
 
               for (let i = 0; i < evidences.length; i++) {
                 const item = evidences[i];
@@ -531,22 +516,24 @@ const TaskOffline = ({navigation}) => {
       setIsAlert(true);
       setTitleAlert('Cargando datos, espere por favor');
       if(inline){
-          let errorList = [];
-          data.forEach(async(iteration) => {
-            let task = JSON.parse(iteration);
-            for(let item of task.step1){
-              if(typeof item.value === 'object' && item.screenElement?.elementType.name === 'location') {
-                  let location = await handleGetLocationReturnValue(setIsAlert, setTitleAlert, setMessageAlert);
-                  // item.value = location;
-              }
+          data.forEach(async(item) => {
+            let task = JSON.parse(item);
+            console.log("<==(START)==>");
+            const trackingList = await getLocationsFromDatabaseByIdTask(task.idTask);
+            console.log("<==(DATOS)==>", trackingList);
+            const data = await sendDataTracker({locations:trackingList});
+            console.log("<==(SSS)==>", data);
+            if(data.status === true){
+              console.log("_1_", data)
+              deleteLocationsFromDatabaseByIdTask(task.idTask);
+            }else{
+              console.log("_2_", data)
             }
-
             await handleResolveTask(task);
           });
           setIsAlert(false);
           setDisabeldUpload(false)
           getAllDataTask();
-          // navigation.navigate('Task', { taskStatus });
       } else {
         setDisabeldUpload(false)
           setTitleAlert('Error sigues offline');
@@ -572,11 +559,11 @@ const TaskOffline = ({navigation}) => {
             ListHeaderComponent={
             <View
                 style={{
-                backgroundColor: colorsTheme.naranja,
-                width: width,
-                padding: 10,
-                alignItems: 'center',
-                marginTop: 10,
+                  backgroundColor: colorsTheme.naranja,
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems:"center",
+                  padding: 10
                 }}>
                 <Text style={{color: colorsTheme.blanco}}>Listado Tareas Pendientes de enviar</Text>
             </View>
@@ -658,7 +645,7 @@ const TaskOffline = ({navigation}) => {
             />
             <AwesomeAlert
               show={showProgressAlert}
-              title={'Cargando Imagenes...'}
+              title={showtitle}
               closeOnTouchOutside={false}
               closeOnHardwareBackPress={false}
               showCancelButton={false}

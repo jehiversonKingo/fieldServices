@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FlashMessage, { showMessage } from 'react-native-flash-message';
 import NetInfo from '@react-native-community/netinfo';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BackgroundGeolocation from 'react-native-background-geolocation';
 
 //Others
 import HomeScreen from './src/pages/others/HomeScreen';
@@ -56,6 +57,8 @@ import SignInScreen from './src/pages/auth/SignInScreen';
 import ProfileScreen from './src/pages/auth/ProfileScreen';
 
 //Context
+import { TrackingProvider } from './src/context/TrackingContext';
+import { TrackingContext as InitServices } from './src/context/TrackingContext';
 import { Provider as AuthProvider } from './src/context/AuthContext.js';
 import { Context as AuthContext } from './src/context/AuthContext';
 
@@ -241,6 +244,7 @@ const Stack = createNativeStackNavigator();
 const App = () => {
 
   const { state, validSession, changeCodeTask, offlineSession } = React.useContext(AuthContext);
+  const { initService, startTracking, timer, initServiceActivity } = React.useContext(InitServices);
   const { session, user } = state;
 
   const requestAllPermissions = async () => {
@@ -264,6 +268,14 @@ const App = () => {
       console.error("{ PERMISSION ERROR } => ", err);
     }
   };
+
+  React.useEffect(() => {
+    BackgroundGeolocation.getState().then(state => {
+      console.log('Estado de BackgroundGeolocation:', state);
+    }).catch(error => {
+      console.error('Error al obtener el estado de BackgroundGeolocation:', error);
+    });
+  }, []);
 
   React.useEffect(() => {
     requestAllPermissions();
@@ -328,7 +340,9 @@ export default () => {
   return (
     <AuthProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <App />
+        <TrackingProvider>
+          <App />
+        </TrackingProvider>
       </GestureHandlerRootView>
     </AuthProvider>
   );

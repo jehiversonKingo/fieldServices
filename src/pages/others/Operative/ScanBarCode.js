@@ -65,7 +65,6 @@ const ScanBarcodeApp = ({navigation, route}) => {
 
   const checkCameraPermission = async () => {
     const status = await Camera.getCameraPermissionStatus();
-    console.log("PERMISO ?????", status);
     setHasPermission(status === 'granted');
   };
 
@@ -105,13 +104,22 @@ const ScanBarcodeApp = ({navigation, route}) => {
                 style={styles.rnholeView}
               />
               <FlashMessage />
-              <View style={{position: 'absolute'}}>
+              <View 
+                style={{
+                  position: 'absolute',
+                  borderWidth: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colorsTheme.naranja,
+                  opacity: torch === "on" ? 0.4 : 1,
+                  marginTop: 5,
+                }}
+              >
                 <TouchableOpacity
                   onPress={() => setTorch((prevTorch) => prevTorch === "off" ? "on" : "off")}
-                  style={{margin: "3%", width: 50, alignItems: 'center'}}
-                  hitSlop={{ top: 25, bottom: 25, left: 15, right: 15 }}
+                  style={{ margin: "3%", width: 50, alignItems: 'center' }}
                 >
-                  <Ionicons name={torch === "off" ? 'flash' : 'flash-off'} color={colorsTheme.blanco} size={25} />
+                  <Ionicons name={torch === "off" ? 'flash-off' : 'flash'} color={colorsTheme.blanco} size={25} />
                 </TouchableOpacity>
               </View>
             </>

@@ -9,6 +9,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import java.util.List;
+import com.antfieldservice.GPSPackge;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -27,6 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
           // packages.add(new MyReactNativePackage());
           packages.add(new KingoPackage());
           packages.add(new HandshakePackage());
+          packages.add(new GPSPackge());
           return packages;
         }
 

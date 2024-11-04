@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Camera, useCameraDevice } from 'react-native-vision-camera';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Fontisto from 'react-native-vector-icons/Fontisto';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { handleRemove } from '../../../functions/functionChangeValue';
 import FitImage from 'react-native-fit-image';
 import * as RNFS from 'react-native-fs';
@@ -67,7 +67,6 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
 
   const onPressButton = async () => {
     const photo = await camera.current.takePhoto({
-      flash: torch,
       qualityPrioritization: 'speed',
       enableShutterSound: false,
       resolution: {
@@ -98,49 +97,56 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
             height: 55,
             marginBottom: -45,
             flexDirection: 'row',
-            justifyContent: "space-between"
+            justifyContent: "space-between",
           }}
         >
+          <View style={{ justifyContent:'center'}}>
           <TouchableOpacity
-            style={{ left: 0 }}
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <Fontisto
-              name={'close-a'}
-              color={colorsTheme.gris20}
-              size={20}
-              style={{ marginTop: 20, marginBottom: -40, marginLeft: 18 }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ marginTop: 15, marginBottom: -40, marginLeft: 18 }}
-            onPress={() => setTorch((prevTorch) => prevTorch === "off" ? "on" : "off")}>
-            <Ionicons
-              name={torch === "off" ? 'flash' : 'flash-off'}
-              color={colorsTheme.blanco}
-              size={25}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              marginTop: 10,
-              flexDirection: 'row',
-              backgroundColor: colorsTheme.naranja,
-              borderRadius: 10,
-              width: 100,
-              height: 40,
-              // position: 'absolute',
-              right: 5,
-              alignItems: 'center',
-              justifyContent: 'center',
+            style={{ 
+              left: 0,
+              padding: 20, 
+              justifyContent: 'center', 
+              alignContent:'center' 
             }}
             onPress={() => {
               navigation.goBack();
             }}>
-            <Ionicons name={'checkmark-circle-outline'} color={colorsTheme.blanco} size={25} />
-            <Text style={{}}>Completar</Text>
+            <FontAwesome5
+                  name={'arrow-left'}
+                  color={colorsTheme.gris20}
+                  size={25}
+                  style={{marginTop: 24, position: 'absolute', left:5}}
+                />
           </TouchableOpacity>
+          </View>
+          <View style={{ flexDirection:'row' }}>
+          <TouchableOpacity
+            style={{ 
+              justifyContent:'center', 
+              alignContent:'flex-end', 
+              alignItems:'flex-end',  
+              paddingHorizontal: 10,
+              marginRight: 5
+            }}
+            onPress={() => setTorch((prevTorch) => prevTorch === "off" ? "on" : "off")}>
+            <Ionicons
+              name={torch === "off" ? 'flash-off' : 'flash'}
+              color={colorsTheme.blanco}
+              size={30}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              alignItems: 'center',
+              justifyContent:'center',
+              paddingHorizontal: 8,
+            }}
+            onPress={() => {
+              navigation.goBack();
+            }}>
+            <Ionicons name={'checkmark-circle-outline'} color={colorsTheme.blanco} size={32} />
+          </TouchableOpacity>
+          </View>
         </View>
 
         {isScanned === false && (
@@ -200,6 +206,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
               isActive={isScanned}
               autoFocus="on"
               photo={true}
+              torch={torch}
             />
             <View
               style={{

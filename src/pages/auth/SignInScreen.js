@@ -24,8 +24,8 @@ import { ThemeConsumer } from '@rneui/themed';
 const { width } = Dimensions.get('screen');
 
 const SignInScreen = ({ }) => {
-  const [user, setUser] = useState('');
-  const [password, setPassword] = useState('');
+  const [user, setUser] = useState('carlos.lara@kingoenergy.com');
+  const [password, setPassword] = useState('LaraSolano1_');
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle] = useState('¡Atención!');
   const [alertMessage, setAlertMessage] = useState('');
@@ -62,18 +62,20 @@ const SignInScreen = ({ }) => {
         <View style={styles.imgContainer}>
           <Image source={Logo} style={styles.imgLogin} />
         </View>
-        <Text style={styles.colorText}>Usuario</Text>
         <TextInput
           style={styles.inputLogin}
+          placeholder='Usuario'
+          placeholderTextColor={'gray'}
           onChangeText={value => {
             setUser(value);
           }}
           value={user}
         />
-        <Text style={styles.colorText}>Contraseña</Text>
         <TextInput
           secureTextEntry={true}
-          style={styles.inputLogin}
+          placeholder='Contraseña'
+          placeholderTextColor={"gray"}
+          style={styles.inputLogin} 
           onChangeText={value => {
             setPassword(value);
           }}
@@ -84,16 +86,17 @@ const SignInScreen = ({ }) => {
             title={isLoading ? "cargando..." : "Ingresar"}
             disabled={isLoading}
             size="lg"
-            buttonStyle={{ backgroundColor: colorsTheme.naranja, borderRadius: 30 }}
-            containerStyle={{
-              marginHorizontal: 50,
-              marginVertical: 10,
-            }}
+            buttonStyle={{ backgroundColor: colorsTheme.naranja, borderRadius:5 }}
+            
             onPress={() => logIn()}
           />
         </TouchableOpacity>
-        <Text style={{ ...styles.colorText, textAlign: "center" }}>{process.env.REACT_APP_ENVIROMENT} {`${DeviceInfo.getVersion()}`}</Text>
       </View> 
+      <View style={styles.versionContainer}>
+        <Text style={styles.versionText}>
+          {process.env.REACT_APP_ENVIROMENT} {DeviceInfo.getVersion()}
+        </Text>
+      </View>
       <AwesomeAlert
         show={showAlert} 
         title={alertTitle} 
@@ -121,7 +124,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: ThemeConsumer.blanco,
+    backgroundColor: colorsTheme.blanco,
   },
   formLogin: {
     width: width * 0.9,
@@ -147,12 +150,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: colorsTheme.blanco,
     borderColor: colorsTheme.naranja,
-    borderWidth: 1,
-    borderRadius: 10,
+    borderWidth: 1.5,
+    borderRadius: 5,
   },
   buttonLogin: {
     margin: 50,
     backgroundColor: colorsTheme.naranja,
+    borderRadius:5
+  },
+  versionContainer: {
+    marginTop: 25
+  },
+  versionText: {
+    color: colorsTheme.gris,
+    textAlign: 'center',
   },
 });
 
