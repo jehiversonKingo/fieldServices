@@ -28,11 +28,12 @@ const VisitScreen = ({ navigation, route }) => {
     try {
       const checkpointsCustomer = [];
       const getTaskData = await getTasks();
-      getTaskData.forEach(ticket => {
-        console.log("VISITA =======>", ticket.task.ticket);
-        const coordinates = handleGPSCoordinates(ticket.task.ticket.customer.gps);
+      console.log("WHAAA", getTaskData);
+      getTaskData.forEach(item => {
+        console.log("VISITA =======>", item.task);
+        const coordinates = handleGPSCoordinates(item.task.customer.gps);
         let color = "";
-        switch (ticket.task.idTaskPriority) {
+        switch (item.task.idTaskPriority) {
           case 1:
             color = colorsTheme.rojo
             break;
@@ -44,12 +45,12 @@ const VisitScreen = ({ navigation, route }) => {
             break;
         }
         checkpointsCustomer.push({
-          idCustomer: ticket.task.ticket.customer.idCustomer,
-          name: ticket.task.ticket.customer.name,
-          dpi: ticket.task.ticket.customer.dpi,
-          phone: ticket.task.ticket.customer.phone,
-          community: ticket.task.ticket.customer.community,
-          description: ticket.task.ticket.description,
+          idCustomer: item.task.customer.idCustomer,
+          name: item.task.customer.name,
+          dpi: item.task.customer.dpi,
+          phone: item.task.customer.phone,
+          community: item.task.customer.community,
+          description: item.task.description,
           latitude: coordinates[0],
           longitude: coordinates[1],
           color

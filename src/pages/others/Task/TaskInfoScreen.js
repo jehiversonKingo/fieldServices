@@ -54,25 +54,25 @@ const TaskInfoScreen = ({data, isLoading}) => {
                         <Text style={{color: colorsTheme.gris80}}>
                             <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
                                 {"Tendero: "}
-                            </Text>{data?.ticket?.customer.name ?? ""}  
+                            </Text>{data?.customer.name ?? ""}  
                         </Text>
 
                         <Text style={{color: colorsTheme.gris80}}>
                             <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
                                 {"Teléfono: "}
-                            </Text>{data?.ticket?.customer.phone ?? ""}
+                            </Text>{data?.customer.phone ?? ""}
                         </Text>
 
                         <Text style={{color: colorsTheme.gris80}}>
                             <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
                                 {"Descripción: "}
-                            </Text>{data?.ticket?.description ?? ""}
+                            </Text>{data?.description ?? ""}
                         </Text>
 
                         <Text style={{color: colorsTheme.gris80}}>
                             <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
                                 {"Tipo: "}
-                            </Text>{data?.ticket?.ticketCategory.name ?? ""}  
+                            </Text>{data?.taskCategory.name ?? ""}  
                         </Text>
                     </View>
 

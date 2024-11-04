@@ -480,7 +480,7 @@ const TaskOffline = ({navigation}) => {
                 setTitleAlert('Error');
                 setMessageAlert(
                   taskStatus?.message ||
-                    'No se puedieron cargar los datos de la tarea.',
+                    'No se pudieron cargar los datos de la tarea.',
                 );
                 setShowAlert(true);
               }, 150);

@@ -136,6 +136,7 @@ const eventEmitter = new NativeEventEmitter(NativeModules.ServerSocketModule);
 const {BluetoothServerModule} = NativeModules;
 const TaskDescriptionScreen = ({navigation, route}) => {
   const typeTask = route.params.type;
+  console.log('[ TYPE TASK ] >> ', typeTask)
   //Step
   const [active, setActive] = useState(0);
   const [isAlert, setIsAlert] = useState(false);
@@ -434,6 +435,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       setMessageAlert('Es posible que hagan falta algunos datos.');
     }
 
+    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~>', getDataScreen);
+
     const {screen, addon, steps, addonReceived, stepsChecks} = getDataScreen;
 
     if (!screen || !addon || !steps || !addonReceived || !stepsChecks) {
@@ -571,12 +574,16 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       setMessageAlert('');
       let dataKingos = JSON.parse(await getStep('warehouseEquipment', 0, 0));
       let dataAddons = JSON.parse(await getStep('warehouseAddon', 0, 0));
-      console.log('^^^^^^^^', dataKingos, dataAddons);
+
+      console.log("[inventoryKingo] =======", dataKingos);
+
       let inventoryKingo =
         dataKingos.length > 0 ? dataKingos.map(item => item.barcode) : [];
       let inventoryAddon =
         dataAddons.length > 0 ? dataAddons.map(item => item.barcode) : [];
 
+      console.log("[inventoryKingo]", dataKingos);
+      console.log("[inventoryAddon]", dataAddons);
       let validArrayKingosStep2 = false;
       let validArrayAddonsStep2 = false;
 
@@ -752,18 +759,20 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               setShowProgressAlert(false);
               navigation.navigate('Task', {taskStatus});
             } else {
+              console.log("KKKKKKKKKKKKKKK2KKKKKKKKKKKKKKKK",taskStatus);
               setIsAlert(false);
               setShowProgressAlert(false);
               setTimeout(() => {
                 setTitleAlert('Error');
                 setMessageAlert(
                   taskStatus?.message ||
-                    'No se puedieron cargar los datos de la tarea.',
+                    'No se pudieron cargar los datos de la tarea.',
                 );
                 setShowAlert(true);
               }, 150);
             }
           } else {
+            console.log("KKKKKKKKKKKKKKK3KKKKKKKKKKKKKKKK");
             setIsAlert(false);
             setTimeout(() => {
               setTitleAlert('¡Atención!');
@@ -774,43 +783,22 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             }, 150);
           }
         } else {
+          console.log("KKKKKKKKKKKKKKK4KKKKKKKKKKKKKKKK");
           setIsAlert(false);
           setTimeout(() => {
             setTitleAlert('Error');
             setMessageAlert(
               'Alguno de los barcodes que ingresaste no existen en tu bodega.',
             );
-
             setShowAlert(true);
           }, 150);
         }
       } else {
-        console.log(
-          '...............................[TaskComplete]............................',
-          {
-            step1,
-            step2,
-            evidences,
-            step4,
-            step5,
-            idTask: id,
-            typeTask: type,
-          },
-        );
-
-        console.log(
-          validArrayKingosStep2,
-          validArrayAddonsStep2,
-          step2.length,
-          step4.length,
-        );
         if (step2.length <= 0 || step4.length <= 0) {
           validArrayAddonsStep2 = true;
         }
 
         if (validArrayKingosStep2) {
-          /* HERE */
-
           await updateStep(
             'TaskComplete',
             id,
@@ -853,8 +841,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         }
       }
     } catch (error) {
-      console.log(error);
       setIsAlert(false);
+      console.log("KKKKKKKKKKKKKKK1KKKKKKKKKKKKKKKK", error);
       setTitleAlert('Error');
       setMessageAlert(error.message || 'Ha ocurrido un error.');
       setShowAlert(true);
@@ -1112,8 +1100,10 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       });
     });
   };
-
+  
   useEffect(() => {
+    setIsAlert(false); 
+    setShowAlert(false);
     handleDataList();
   }, [active]);
 

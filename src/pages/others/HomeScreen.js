@@ -72,15 +72,14 @@ const HomeScreen = ({navigation}) => {
       if (inline) {
         options = await getModulesByRole(data.user.idRole);
         let dataTask = await getAllDataStep('TaskComplete');
-        const [getAddon, getKingo, getCommunities] = await Promise.all([
+        const [getAddon, getCommunities] = await Promise.all([
           getListAddon(),
-          getListEquipment(),
           getAllCommunities()
         ]);
 
         await Promise.all([
-          updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0),
-          updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0),
+          updateStep('warehouseAddon', 0, JSON.stringify(getAddon?.addons || []), 0),
+          updateStep('warehouseEquipment', 0, JSON.stringify(getAddon?.equipments || []), 0),
           updateStep('communities', 1, JSON.stringify(getCommunities), 0),
           updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0),
         ]);

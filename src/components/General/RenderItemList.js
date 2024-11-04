@@ -108,7 +108,7 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
     setIsAlert(false);
     goTo(
       item.task.idTaskState !== 3 ? 'TaskDescription' : 'TaskNocValidation',
-      { id: item.idTask, idCustomer: item.task.ticket.idCustomer, type: item.task.ticket.idTicketCategory }
+      { id: item.idTask, idCustomer: item.task.idCustomer, type: item.task.idTaskCategory }
     )
   }
 
@@ -168,7 +168,7 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
           </View>
           <View style={styles.taskInfoContainer}>
             <Text style={styles.taskId}>TK-{item.idTask}</Text>
-            <Text style={styles.taskDescription}>{item.task.ticket.description}</Text>
+            <Text style={styles.taskDescription}>{item.task.description}</Text>
           </View>
           <View style={{ justifyContent:'center' }}>
             <IoniconsIcon
@@ -216,7 +216,7 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
                           onPress={() => {
                             goTo(
                               item.task.idTaskState !== 3 ? 'TaskDescription' : 'TaskNocValidation',
-                              { id: item.idTask, idCustomer: item.task.ticket.idCustomer, type: item.task.ticket.idTicketCategory }
+                              { id: item.idTask, idCustomer: item.task.idCustomer, type: item.task.idTaskCategory }
                             )
                           }}
                         >
@@ -271,13 +271,13 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
                       {moment(taskData.expirationDate ?? "").format("MM-DD-YYYY")}
                     </Text>
                     <Text style={styles.taskDetail}>
-                      <Text style={styles.taskDetailLabel}>{"Tendero: "}</Text>{taskData?.ticket?.customer.name ?? ""}
+                      <Text style={styles.taskDetailLabel}>{"Tendero: "}</Text>{taskData.customer.name ?? ""}
                     </Text>
                     <Text style={styles.taskDetail}>
-                      <Text style={styles.taskDetailLabel}>{"Teléfono: "}</Text>{taskData?.ticket?.customer.phone ?? ""}
+                      <Text style={styles.taskDetailLabel}>{"Teléfono: "}</Text>{taskData.customer.phone ?? ""}
                     </Text>
                     <Text style={styles.taskDetail}>
-                      <Text style={styles.taskDetailLabel}>{"Tipo: "}</Text>{taskData?.ticket?.ticketCategory.name ?? ""}
+                      <Text style={styles.taskDetailLabel}>{"Tipo: "}</Text>{taskData.taskCategory.name ?? ""}
                     </Text>
                   </View>
                   <View style={{ backgroundColor: colorsTheme.naranja, }}>
@@ -325,17 +325,16 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
                       data={dataTracking}
                       keyExtractor={(addon) => addon.idTaskAddon}
                       renderItem={({ item, index }) => (
-                        <View style={{ flex: 1 }}>
-                          <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ color: colorsTheme.negro }}>GPS:</Text>
+                        <View style={{ flexDirection: 'row', alignContent:'space-between' }}>
+                          <View style={{ flexDirection: 'row', padding: 5 }}>
+                            <Text style={{ color: colorsTheme.negro }}>{index+1}</Text>
+                          </View>
+                          <View style={{ flexDirection: 'row', padding: 5 }}>
+                            <Text style={{ color: colorsTheme.negro, fontWeight:'bold' }}>GPS: </Text>
                             <Text style={{ color: colorsTheme.negro }}>{item.GPS}</Text>
                           </View>
-                          <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ color: colorsTheme.negro }}>User:</Text>
-                            <Text style={{ color: colorsTheme.negro }}>{item.idUser}</Text>
-                          </View>
-                          <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ color: colorsTheme.negro }}>Status:</Text>
+                          <View style={{ flexDirection: 'row', padding: 5 }}>
+                            <Text style={{ color: colorsTheme.negro, fontWeight:'bold'}}>Status: </Text>
                             <Text style={{ color: colorsTheme.negro }}>{item.status}</Text>
                           </View>
                         </View>

@@ -189,10 +189,19 @@ const SyncDataScreen = ({ navigation }) => {
         setListItem(prevState => prevState.map(item =>
           item.title === 'Menu' ? { ...item, counter: item.counter + 1 } : item
         ));
-        getAddon = await getListAddon();
-        await updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0);
 
-        getKingo = await getListEquipment();
+        let inventory = await getListAddon();
+        getAddon = [];
+        getKingo = [];
+        if (inventory) {
+          getAddon = inventory?.addons || [];
+          getKingo = inventory?.equipments || [];
+        }
+
+        console.log("[getAddon]==", getAddon[0]);
+        console.log("[getKingo]==", getKingo);
+
+        await updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0);
         await updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0);
         setListItem(prevState => prevState.map(item =>
           item.title === 'Inventario' ? { ...item, counter: item.counter + 1 } : item
@@ -231,6 +240,7 @@ const SyncDataScreen = ({ navigation }) => {
         let valueCustomer = 0;
         for (let task of getTaskData) {
           let dataTask = await getElemetScreen(task.idTask);
+          console.log('_____________________________>>>', dataTask);
           const { steps } = dataTask;
           const infoTask = await getTaskById(task.idTask)
           await updateStep('taskDescription', task.idTask, JSON.stringify(dataTask), 0);
@@ -239,9 +249,8 @@ const SyncDataScreen = ({ navigation }) => {
             let dataStepsToDo = await getStepInstruction(step.idStep)
             await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
           });
-          let dataTicket = await getTicketById(task.task.idTicket);
 
-          !customersId.includes(dataTicket.idCustomer) && customersId.push(dataTicket.idCustomer);
+          !customersId.includes(task.task.idCustomer) && customersId.push(task.task.idCustomer);
 
           valueCustomer = valueCustomer + counterCustomer;
 
