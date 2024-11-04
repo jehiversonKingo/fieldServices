@@ -37,6 +37,7 @@ const HandshakeServerScreen = ({
     const [statusServer, setStatusServer] = useState('El servidor esta apagado');
     const [statusServerColor, setStatusServerColor] = useState(colorsTheme.rojo);
     const [showAlertBluetooth, setShowAlertBluetooth] = useState(false);
+    const [showMessageAlert, setShowMessageAlert] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [messageAlert, setMessageAlert] = useState('');
     const [titleAlert, setTitleAlert] = useState('');
@@ -129,7 +130,7 @@ const HandshakeServerScreen = ({
             setTitleAlert('¡Atencón!');
             setMessageAlert('Datos guardados con éxito.');
             setType(2);
-            setShowAlert(true);
+            setShowMessageAlert(true);
 
             return {
                 status: true,
@@ -144,7 +145,7 @@ const HandshakeServerScreen = ({
             console.log('<ERRORRR1>', error);
             setTitleAlert('¡Atencón!');
             setMessageAlert('Error al intentar guardar los datos');
-            setShowAlert(true);
+            setShowMessageAlert(true);
             return {
                 status: false,
                 uid: data[0].data.uid,
@@ -193,67 +194,69 @@ const HandshakeServerScreen = ({
 
                         // Obtener datos de la billetera del usuario
                         const walletUserString = await getStep('walletUser', 0, 0);
-                        const walletUser = JSON.parse(walletUserString);
-                        console.log('[----2-----]]]]]]]]', walletUser);
-
-                        // Calcular el límite de crédito disponible
-                        const creditLimit = (
-                            parseFloat(walletUser.wallet.creditLimit) +
-                            parseFloat(walletUser.wallet.additionalFinancing) -
-                            (parseFloat(walletUser.wallet.debt) + parseFloat(data.amount))
-                        ).toFixed(2);
-
-                        console.log(
-                            '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{',
-                            parseFloat(walletUser.wallet.creditLimit),
-                            parseFloat(walletUser.wallet.additionalFinancing),
-                            parseFloat(walletUser.wallet.debt) + parseFloat(data.amount),
-                        );
-                        // Actualizar la deuda del usuario
-                        const updatedDebt = (
-                            parseFloat(walletUser.wallet.debt) + parseFloat(data.amount)
-                        ).toFixed(2);
-                        setDebt(updatedDebt);
-
-                        // Marcar el inicio de la carga
-                        setLoading(true);
-
-                        // Mostrar información en consola
-                        console.log(
-                            'WALLET',
-                            parseFloat(walletUser.wallet.creditLimit),
-                            parseFloat(walletUser.wallet.additionalFinancing),
-                            'PAY++++++++++',
-                            updatedDebt,
-                        );
-                        if (creditLimit > 0) {
-                            setLoading(false);
-                            setReceivedData(prevReceivedData => [
-                                ...prevReceivedData,
-                                {
-                                    time: moment().format('DD/MM HH:MM:ss'),
-                                    title: action,
-                                    description: `${data.customer.name
-                                        } - Envío un pago de Q ${parseFloat(data.amount).toFixed(2)}`,
-                                },
-                            ]);
-                            setAmount(data.amount);
-                            setTitleAlert(`${data.customer.name}`);
-                            setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`);
-                            setShowAlert(true);
-                            setType(1);
-                        } else {
-                            setLoading(false);
-                            setTitleAlert(`Cantidad no soportada`);
-                            setMessageAlert(
-                                `No cuenta con el saldo disponible en su wallet faltan Q${creditLimit * -1
-                                }`,
+                        console.log('[----2-----]]]]]]]]', walletUserString);
+                        if (JSON.parse(walletUserString)?.idWalletUser) {
+                            const walletUser = JSON.parse(walletUserString);
+    
+                            // Calcular el límite de crédito disponible
+                            const creditLimit = (
+                                parseFloat(walletUser.wallet.creditLimit) +
+                                parseFloat(walletUser.wallet.additionalFinancing) -
+                                (parseFloat(walletUser.wallet.debt) + parseFloat(data.amount))
+                            ).toFixed(2);
+    
+                            console.log(
+                                '{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{',
+                                parseFloat(walletUser.wallet.creditLimit),
+                                parseFloat(walletUser.wallet.additionalFinancing),
+                                parseFloat(walletUser.wallet.debt) + parseFloat(data.amount),
                             );
-                            setShowAlertBluetooth(true);
-                            setTimeout(() => {
-                                handleCancelAmount();
-                                setShowAlertBluetooth(false);
-                            }, 2000);
+                            // Actualizar la deuda del usuario
+                            const updatedDebt = (
+                                parseFloat(walletUser.wallet.debt) + parseFloat(data.amount)
+                            ).toFixed(2);
+                            setDebt(updatedDebt);
+    
+                            // Marcar el inicio de la carga
+                            setLoading(true);
+    
+                            // Mostrar información en consola
+                            console.log(
+                                'WALLET',
+                                parseFloat(walletUser.wallet.creditLimit),
+                                parseFloat(walletUser.wallet.additionalFinancing),
+                                'PAY++++++++++',
+                                updatedDebt,
+                            );
+                            if (creditLimit >= 0) {
+                                setLoading(false);
+                                setReceivedData(prevReceivedData => [
+                                    ...prevReceivedData,
+                                    {
+                                        time: moment().format('DD/MM HH:MM:ss'),
+                                        title: action,
+                                        description: `${data.customer.name
+                                            } - Envío un pago de Q ${parseFloat(data.amount).toFixed(2)}`,
+                                    },
+                                ]);
+                                setAmount(data.amount);
+                                setTitleAlert(`${data.customer.name}`);
+                                setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`);
+                                setShowAlert(true);
+                                setType(1);
+                            } else {
+                                setLoading(false);
+                                setTitleAlert(`Cantidad no soportada`);
+                                setMessageAlert(
+                                    `No cuenta con el saldo disponible en su wallet faltan Q${creditLimit * -1
+                                    }`,
+                                );
+                                setShowMessageAlert(true);
+                            }
+                        } else {
+                            setTitleAlert('¡Atencón!');
+                            setMessageAlert('Debes cargar datos para realizar handshake');
+                            setShowMessageAlert(true);
                         }
                     } else {
                         setReceivedData(prevReceivedData => [
@@ -285,7 +288,7 @@ const HandshakeServerScreen = ({
                     } else {
                         setTitleAlert('¡Atencón!');
                         setMessageAlert('La sulicitud no posee datos.');
-                        setShowAlert(true);
+                        setShowMessageAlert(true);
                     }
                     break;
                 default:
@@ -434,16 +437,12 @@ const HandshakeServerScreen = ({
         }
     };
 
-    const a = async () => {
-        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaa ', lastLote);
-    };
     useEffect(() => {
         requestAllPermissions()
             .then(res => {
                 if (res) {
                     BluetoothServerModule.startServer()
                         .then(result => {
-                            a();
                             console.log('Servidor iniciado', result);
                             setStatusServer('Servidor iniciado');
                             setStatusServerColor(colorsTheme.verdeClaro);
@@ -461,7 +460,7 @@ const HandshakeServerScreen = ({
                     setTimeout(() => {
                         setShowAlertBluetooth(false);
                         navigation.goBack();
-                    }, 1500);
+                    }, 3000);
                 }
             })
             .catch(error => console.log(error));
@@ -579,6 +578,18 @@ const HandshakeServerScreen = ({
                 cancelButtonColor={colorsTheme.rojo}
                 onConfirmPressed={handleConfirmAmount}
                 onCancelPressed={handleCancelAmount}
+            />
+            <AwesomeAlert
+                show={showMessageAlert}
+                title={titleAlert}
+                message={messageAlert}
+                closeOnTouchOutside={false}
+                closeOnHardwareBackPress={false}
+                showConfirmButton={true}
+                confirmButtonColor={colorsTheme.verdeClaro}
+                confirmButtonStyle={{ width: 100, alignItems: 'center' }}
+                confirmText="Ok"
+                onConfirmPressed={() => setShowMessageAlert(!showMessageAlert)}
             />
             <AwesomeAlert
                 show={showAlertBluetooth}
