@@ -220,6 +220,8 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
 
   const getData = async () => {
     let orderData = await getOrder(id);
+    console.log('[ ORDER DATA ] >> ', orderData);
+    
     if (orderData.status) {
       const {
         idUser,
@@ -235,45 +237,52 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
           orderDetailKingoData,
           orderStationeryData,
         }});
+    } else {
+      console.error('NADOTA >>', orderData)
     }
   };
 
   const makeStructureScreen = async({data}) => {
-    const { user } = await handleGetDataUserLocal();
-    const {
-      idUser,
-      orderDetailAddonData,
-      orderDetailKingoData,
-      orderStationeryData} = data;
-    let userAgentes = await getUserByRole(3, user.idUser);
-    console.log(userAgentes);
+    try {
+      const { user } = await handleGetDataUserLocal();
+      const {
+        idUser,
+        orderDetailAddonData,
+        orderDetailKingoData,
+        orderStationeryData
+      } = data;
+      let userAgentes = await getUserByRole(3, user.idUser);
+      console.log('users --->', userAgentes);
       setStep1([{
-      id: 1,
-      label: 'Agente',
-      type: 'selects',
-      value: idUser,
-      isFocus: false,
-      values: userAgentes,
-    }]);
+        id: 1,
+        label: 'Agente',
+        type: 'selects',
+        value: idUser,
+        isFocus: false,
+        values: userAgentes,
+      }]);
 
-    let dataAddons = [];
-    orderDetailAddonData.forEach((addon) => {
-      dataAddons.push(addon.value);
-    });
+      let dataAddons = [];
+      orderDetailAddonData.forEach((addon) => {
+        dataAddons.push(addon.value);
+      });
 
-    orderDetailKingoData.forEach(kingo => {
-      dataAddons.push(kingo.value);
-    });
+      orderDetailKingoData.forEach(kingo => {
+        dataAddons.push(kingo.value);
+      });
 
-    setStep2(dataAddons);
+      setStep2(dataAddons);
 
-    let dataPhoto = [];
-
-    orderStationeryData.forEach(stationery => {
-      dataPhoto.push(stationery.file);
-    });
-    setStep3(dataPhoto);
-    setIsLoading(false);
+      let dataPhoto = [];
+      console.log("[ PHOTOOOOS ] ---> ", orderStationeryData);
+      orderStationeryData.forEach(stationery => {
+        dataPhoto.push(stationery.file);
+      });
+      setStep3(dataPhoto);
+      setIsLoading(false);
+    } catch (error) {
+      console.log('[ GET ORDER ERROR ] >>', error)
+    }
   };
 
   useEffect(() => {

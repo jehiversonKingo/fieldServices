@@ -190,11 +190,11 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
 
   const makeStructureScreen = async({data}) => {
     const { user } = await handleGetDataUserLocal();
-    console.log("[ USER ] > ", user);
+    console.log("[ USER ] ---> ", user);
     let userAgentes = await getUserByRole(3, user.idUser);
     const {idUser,
       orderDetailAddonData,
-      orderDetailKingoData,
+      // orderDetailKingoData,
       orderStationeryData} = data;
 
     setStep1([{
@@ -211,9 +211,9 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
       dataAddons.push(addon.value);
     });
 
-    orderDetailKingoData.forEach(kingo => {
-      dataAddons.push(kingo.value);
-    });
+    // orderDetailKingoData.forEach(kingo => {
+    //   dataAddons.push(kingo.value);
+    // });
 
     setStep2(dataAddons);
 
