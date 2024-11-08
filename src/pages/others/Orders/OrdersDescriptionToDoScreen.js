@@ -211,10 +211,6 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
       dataAddons.push(addon.value);
     });
 
-    // orderDetailKingoData.forEach(kingo => {
-    //   dataAddons.push(kingo.value);
-    // });
-
     setStep2(dataAddons);
 
     let dataPhoto = [];

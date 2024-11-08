@@ -599,21 +599,14 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           validArrayKingosStep2 = step2.some(item => {
             const itemValue = item.value.trim(); // Elimina espacios innecesarios
             console.log('Buscando:', itemValue);
-
-            if (/^E/i.test(itemValue)) {
-              console.log('Buscando en inventoryKingo:', inventoryKingo);
-              const foundInKingo = inventoryKingo.some(
-                kingoItem => kingoItem.trim() === itemValue,
-              ); // Trim en ambos lados
-              console.log('¿Encontrado en inventoryKingo?:', foundInKingo);
-              return foundInKingo;
-            } else if (/^A/i.test(itemValue)) {
-              console.log('Buscando en inventoryAddon:', inventoryAddon);
-              const foundInAddon = inventoryAddon.some(
-                addonItem => addonItem.trim() === itemValue,
-              ); // Trim en ambos lados
-              console.log('¿Encontrado en inventoryAddon?:', foundInAddon);
-              return foundInAddon;
+            const foundInKingo = inventoryKingo.some(
+              kingoItem => kingoItem.trim() === itemValue,
+            );
+            const foundInAddon = inventoryAddon.some(
+              addonItem => addonItem.trim() === itemValue,
+            );
+            if (foundInAddon || foundInKingo) {
+              return true;
             } else {
               return false;
             }
