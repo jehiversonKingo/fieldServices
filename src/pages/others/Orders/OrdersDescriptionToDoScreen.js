@@ -151,7 +151,7 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
 
   const handleCompleteOrder = async () => {
     setIsAlert(true);
-    setTitleAlert('Comprobando Complementos');
+    setTitleAlert('Comprobando Componentes');
     let orderData = await completeOrder({step1, step2, idOrder:id});
     setIsAlert(false);
     if (orderData.status) {
@@ -271,7 +271,7 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
                   )}
           </ProgressStep>
           <ProgressStep
-            label="Equipo Y Complementos"
+            label="Equipo Y Componentes"
             scrollable={false}
             removeBtnRow={true}>
             <FlatList

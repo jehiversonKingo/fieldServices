@@ -18,7 +18,7 @@ import {
   PermissionsAndroid,
   Platform,
   NativeModules,
-  NativeEventEmitter,
+  NativeEventEmitter
 } from 'react-native';
 import {ProgressSteps, ProgressStep} from 'react-native-progress-steps';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
@@ -38,7 +38,6 @@ import StepToDoComponent from '../../../components/General/StepToDoComponent';
 import InputGenerateStep from '../../../components/General/InputGenerateStep';
 
 import {
-  handleChange,
   handleChangeArray,
 } from '../../../functions/functionChangeValue';
 import {updateStep, deleteStep, getStep} from '../../../functions/fncSqlite';
@@ -75,6 +74,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import HandshakeServerScreen from '../Sync/HandshakeServerScreen';
 import {ScrollView} from 'react-native-gesture-handler';
 import { handleGetLocationReturnValue, handleGetLocationValue } from '../../../functions/fncLocation';
+import { handleGetDataUserLocal } from '../../../functions/fncGeneral';
+import { createFieldTrackerTable, getLocationsFromDatabaseByIdTask, insertLocationToDatabase } from '../../../functions/fncTracker';
 
 const TRANSACTION_LIST = [
   {
@@ -174,6 +175,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
   const {state} = useContext(AuthContext);
   const {inline} = state;
+  const {GPSModule} = NativeModules;
 
   const InputsGenerateStep1 = ({item, index}) => (
     <InputGenerateStep
@@ -223,19 +225,19 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           }
           onClickValidate={() => onClickValidate(item.idTaskStep)}
         />
-        <View>
+        <View> 
           {customEvidence.length > 0 && (
             <ListItem.Accordion
+              containerStyle={{ borderWidth: 1, marginHorizontal: 5}}
               content={
-                <>
-                  <Ionicons name={'camera'} size={30} style={styles.iconImg} />
-                  <ListItem.Content>
+                <View style={{ flex:1, flexDirection:'row' }} >
+                  <Ionicons name={'camera'} size={30} color={colorsTheme.naranja} style={{ marginHorizontal: 10}}/>
+                  <ListItem.Content >
                     <ListItem.Title>
-                      {' '}
                       Fotos ({customEvidence.length})
                     </ListItem.Title>
                   </ListItem.Content>
-                </>
+                </View>
               }
               isExpanded={expanded[index]}
               onPress={() => {
@@ -246,17 +248,24 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                   setExpanded,
                 );
               }}>
-              <FlatList
-                key={`FlatListImg-${index}`}
-                data={customEvidence}
-                renderItem={step3PhotoItem}
-                numColumns={3}
-                keyExtractor={item => item.idTaskStep}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{paddingBottom: '10%', marginTop: 50}}
-                columnWrapperStyle={{justifyContent: 'space-between'}}
-              />
+              <View style={{ borderWidth: 1, borderColor: 'gray', margin: 5, padding: 5 }}>
+                <FlatList
+                  key={`FlatListImg-${index}`}
+                  data={customEvidence}
+                  renderItem={step3PhotoItem}
+                  numColumns={2}
+                  keyExtractor={item => item.idTaskStep}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{paddingBottom: '10%', marginTop: 50}}
+                  columnWrapperStyle={{ justifyContent: 'space-evenly' }}
+                  ListHeaderComponent={
+                    <View style={{ backgroundColor: colorsTheme.naranja, alignItems: 'center', padding: 15, marginBottom: 10 }}>
+                      <Text style={{ color: colorsTheme.blanco, fontSize: 15, fontWeight:'bold' }}> Foto de {item.step.name}</Text>
+                    </View>
+                  }
+                />
+              </View>
             </ListItem.Accordion>
           )}
         </View>
@@ -266,19 +275,16 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
   const step3PhotoItem = ({item, index}) => (
     <View key={`P-${index}`}>
-      <View style={{alignContent: 'center', alignItems: 'center'}}>
-        <TouchableOpacity style={{width: width * 0.3, margin: 1}}>
+      <View style={{alignContent: 'center', alignItems: 'center', borderWidth: 1, margin: 2}}>
+        <View style={{width: width * 0.3, margin: 1}}>
           <FitImage
             indicator={true}
             indicatorColor={colorsTheme.naranja}
             indicatorSize="large"
             source={{uri: 'file://' + item.path}}
             resizeMode="contain"
-            // originalWidth={100}
-            // originalHeight={150}
-            // style={{ width: 100 }}
           />
-        </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -307,9 +313,9 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           }
           key={`check-${index}`}
           renderItem={({item, index}) => (
-            <View style={styles.checkContainer}>
-              <View key={`B-${index}`} style={{flexDirection: 'row'}}>
-                <View key={`C-${index}`}>
+            <View style={[styles.checkContainer, { padding: 15}]}>
+              <View key={`${index}`} style={{flexDirection: 'row'}}>
+                <View>
                   <Text
                     style={{
                       fontSize: 15,
@@ -404,7 +410,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
   const handleDataList = async () => {
     setIsAlert(false);
-    console.log('[ PARAMS ]', route.params);
 
     const {id} = route.params;
     let getDataScreen = [];
@@ -421,7 +426,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     } else {
       const comm = await getStep('communities', 1, 0);
       getDataScreen = JSON.parse(await getStep('taskDescription', id, 0));
-      console.log('TASK DESCRIPTION_()_)_))_)_)_)_))', getDataScreen);
       if (comm.length > 0) getCommunities = JSON.parse(comm);
     }
 
@@ -435,14 +439,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
     const {screen, addon, steps, addonReceived, stepsChecks} = getDataScreen;
 
-    console.log(
-      '****************',
-      screen,
-      addon,
-      steps,
-      addonReceived,
-      stepsChecks,
-    );
     if (!screen || !addon || !steps || !addonReceived || !stepsChecks) {
       setShowAlert(true);
       setTitleAlert('¡Atención!');
@@ -457,8 +453,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       'idTaskScreenElement',
       1,
     );
+
     const newDataAddon = handleValidExist(addon, step2, 'idTaskAddon', 2);
-    console.log('PPPPPPPPPPPPPP', newDataAddon);
     const newDataSteps = handleValidExist(steps, step3, 'idTaskStep', 3);
     const newDataAddonReceived = handleValidExist(
       addonReceived,
@@ -468,16 +464,12 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     );
     const newDataChecks = handleValidExist(stepsChecks, step5, 'idTaskStep', 5);
 
-    /*if (newDataAddon.length == 0) setStepFlag2(true);
-    if (newDataAddonReceived.length == 0) setStepFlag4(true);
-    if (newDataChecks.length == 0) setStepFlag5(true); */
-
     setStep1(orderBy(newDataScreen, ['order'], ['asc']));
     setStep2(orderBy(newDataAddon, ['order'], ['asc']));
     setStep3(orderBy(newDataSteps, ['order'], ['asc']));
     setStep4(orderBy(newDataAddonReceived, ['order'], ['asc']));
     setStep5(orderBy(newDataChecks, ['order'], ['asc']));
-    console.log('STEP 3>>', newDataSteps);
+
     const filteredTaskStep = newDataSteps.filter(
       taskStep => taskStep.idStep === 22,
     );
@@ -573,9 +565,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     }
   };
 
-  /**
-   * COMPLETAR LA TAREA >>>>
-   */
   const completeTask = async () => {
     try {
       const {id, type} = route.params;
@@ -585,11 +574,16 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       setMessageAlert('');
       let dataKingos = JSON.parse(await getStep('warehouseEquipment', 0, 0));
       let dataAddons = JSON.parse(await getStep('warehouseAddon', 0, 0));
+
+      console.log("[inventoryKingo] =======", dataKingos);
+
       let inventoryKingo =
         dataKingos.length > 0 ? dataKingos.map(item => item.barcode) : [];
       let inventoryAddon =
         dataAddons.length > 0 ? dataAddons.map(item => item.barcode) : [];
 
+      console.log("[inventoryKingo]", dataKingos);
+      console.log("[inventoryAddon]", dataAddons);
       let validArrayKingosStep2 = false;
       let validArrayAddonsStep2 = false;
 
@@ -733,7 +727,12 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             }
 
             if (taskStatus?.status) {
-              setIsAlert(false);
+                setIsAlert(false);
+                updateStep('taskStatus', id, { status: "EndTask", createdAt: new Date() }, 0);
+                const { user } = await handleGetDataUserLocal();
+                const location = await handleGetFixLocation();
+                await insertLocationToDatabase(location, {idUser: user.idUser, idTask:id}, "EndTask");
+              
               setTimeout(() => {
                 setShowProgressAlert(true);
               }, 300);
@@ -753,18 +752,20 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               setShowProgressAlert(false);
               navigation.navigate('Task', {taskStatus});
             } else {
+              console.log("KKKKKKKKKKKKKKK2KKKKKKKKKKKKKKKK",taskStatus);
               setIsAlert(false);
               setShowProgressAlert(false);
               setTimeout(() => {
                 setTitleAlert('Error');
                 setMessageAlert(
                   taskStatus?.message ||
-                    'No se puedieron cargar los datos de la tarea.',
+                    'No se pudieron cargar los datos de la tarea.',
                 );
                 setShowAlert(true);
               }, 150);
             }
           } else {
+            console.log("KKKKKKKKKKKKKKK3KKKKKKKKKKKKKKKK");
             setIsAlert(false);
             setTimeout(() => {
               setTitleAlert('¡Atención!');
@@ -775,43 +776,22 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             }, 150);
           }
         } else {
+          console.log("KKKKKKKKKKKKKKK4KKKKKKKKKKKKKKKK");
           setIsAlert(false);
           setTimeout(() => {
             setTitleAlert('Error');
             setMessageAlert(
               'Alguno de los barcodes que ingresaste no existen en tu bodega.',
             );
-
             setShowAlert(true);
           }, 150);
         }
       } else {
-        console.log(
-          '...............................[TaskComplete]............................',
-          {
-            step1,
-            step2,
-            evidences,
-            step4,
-            step5,
-            idTask: id,
-            typeTask: type,
-          },
-        );
-
-        console.log(
-          validArrayKingosStep2,
-          validArrayAddonsStep2,
-          step2.length,
-          step4.length,
-        );
         if (step2.length <= 0 || step4.length <= 0) {
           validArrayAddonsStep2 = true;
         }
 
         if (validArrayKingosStep2) {
-          /* HERE */
-
           await updateStep(
             'TaskComplete',
             id,
@@ -854,8 +834,8 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         }
       }
     } catch (error) {
-      console.log(error);
       setIsAlert(false);
+      console.log("KKKKKKKKKKKKKKK1KKKKKKKKKKKKKKKK", error);
       setTitleAlert('Error');
       setMessageAlert(error.message || 'Ha ocurrido un error.');
       setShowAlert(true);
@@ -1100,7 +1080,23 @@ const TaskDescriptionScreen = ({navigation, route}) => {
     }
   };
 
+  const handleGetFixLocation = () => {
+    return new Promise((resolve, reject) => {
+      GPSModule.getCurrentLocation((lat, lon) => {
+        if (typeof lat === 'string' || typeof lon === 'string') {
+          reject({GPS:`0,0`});
+          return;
+        }
+
+        const position = {GPS:`${lat},${lon}`};
+        resolve(position);
+      });
+    });
+  };
+  
   useEffect(() => {
+    setIsAlert(false); 
+    setShowAlert(false);
     handleDataList();
   }, [active]);
 
@@ -1115,7 +1111,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           },
         );
         return () => {
-          // Cuando se desmonta el componente, detener el servidor y eliminar el suscriptor del evento
           BluetoothServerModule.stopServer()
             .then(res => {
               console.log('Servidor detenido', res);
@@ -1127,7 +1122,6 @@ const TaskDescriptionScreen = ({navigation, route}) => {
               console.error('Error al detener el servidor', error),
             );
           dataReceivedListener.remove();
-          // dataBlueReceivedListener.remove();
         };
       }
     } catch (error) {
@@ -1148,7 +1142,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       marginBottom={35}
       activeStep={active}>
       {/* Pantalla Uno */}
-      <ProgressStep label="Datos" scrollable={false} removeBtnRow={true}>
+      <ProgressStep label="Datos" scrollable={true} removeBtnRow={true}>
         {loading ? (
           <View
             style={{
@@ -1168,7 +1162,12 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             keyExtractor={item => item.idScreenElement}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: '50%'}}
+            contentContainerStyle={{paddingBottom: '35%'}}
+            ListHeaderComponent={
+              <View style={{ backgroundColor: colorsTheme.naranja, alignItems: 'center', padding: 15, marginBottom: 10 }}>
+                <Text style={{ color: colorsTheme.blanco, fontSize: 15, fontWeight:'bold' }}> Datos Generales</Text>
+              </View>
+            }
             ListEmptyComponent={
               <View
                 style={{
@@ -1196,7 +1195,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
       </ProgressStep>
       {/* Pantalla Dos */}
       <ProgressStep
-        label="Equipo y Complementos"
+        label="Equipo y Componentes"
         scrollable={false}
         removeBtnRow={true}>
         <FlatList
@@ -1270,10 +1269,12 @@ const TaskDescriptionScreen = ({navigation, route}) => {
                     backgroundColor: colorsTheme.naranja,
                     padding: 15,
                     margin: 3,
-                    borderRadius: 10,
+                    borderRadius: 5,
                     flex: 8,
                     color: colorsTheme.blanco,
-                    fontWeight: '700',
+                    fontWeight: 'bold',
+                    textAlign:'center',
+                    fontSize: 15
                   }}>
                   Actividades
                 </Text>
@@ -1627,6 +1628,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           </View>
         }
       />
+      
       <BottomSheet ref={sheetRef} snapPoints={snapPoints} index={-1}>
         <BottomSheetView>
           <View style={{margin: 20}}>
@@ -1717,6 +1719,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
           )}
         </BottomSheetView>
       </BottomSheet>
+      
     </SafeAreaView>
   );
 };

@@ -4,7 +4,6 @@ import PhoneInput from 'react-native-phone-number-input';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FitImage from 'react-native-fit-image';
-import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { handleIsValidUrl, handleCutString } from '../../functions/fncGeneral';
 
@@ -67,9 +66,9 @@ const Inputs = ({
 
     const handleClickLocation = async () => {
         if (editable) {
-            if (inline) {
+            /* if (inline) { */
                 await handleGetLocation(setInformation, informacion, index, setIsAlert, setTitleAlert, setMessageAlert);
-            } else {
+            /* } else {
                 setIsAlert(true);
                 setTitleAlert('Error offline');
                 setMessageAlert('No se puede obtener localización offline.');
@@ -84,7 +83,7 @@ const Inputs = ({
                 setTimeout(() => {
                     setIsAlert(false);
                 }, 2000);
-            }
+            } */
         }
     };
 
@@ -185,49 +184,59 @@ const Inputs = ({
             );
         case 'barcode':
             return (
-                <View style={{ flexDirection: 'row' }} key={`barcode-${item.id}`}>
-                    <View style={{ width: `${width}` * 0.75, marginRight: 10 }}>
-                        <Text style={styles.colorText}>{item?.addon ? item.addon.name : item.screenElement.label}</Text>
-                        <TextInput
-                            style={styles.inputForm}
-                            value={item.value}
-                            editable={false}
-                        />
-                    </View>
-                    <View style={{ width: `${width}` * 0.1, marginTop: 20 }}>
-                        <TouchableOpacity onPress={() => { handleClickBarcode(); }}>
-                            <Ionicons name={'barcode'} color={colorsTheme.naranja} size={40} style={styles.icon} />
-                        </TouchableOpacity>
+                <View key={`barcode-${item.id}`}>
+                    <View style={{ flex:1, marginRight: 10,  flex:1 }}>
+                        <View style={{flex:1}}>
+                            <Text style={styles.colorText}>{item?.addon ? item.addon.name : item.screenElement.label}</Text>
+                        </View>
+                        <View style={{ flexDirection: "row" }}>
+                            <View style={{ flex:4, marginRight: 10 }}>
+                                <TextInput
+                                    style={styles.inputForm}
+                                    value={item.value}
+                                    editable={false}
+                                />
+                            </View>
+                            <View style={{ flex:1 }}>
+                                <TouchableOpacity 
+                                    style={{ flex:1, justifyContent:'center', alignItems:'center', backgroundColor: colorsTheme.naranja, borderRadius: 5, marginTop: 5 }}
+                                    onPress={() => { handleClickBarcode(); }}
+                                >
+                                    <Ionicons name={'barcode'} color={colorsTheme.blanco} size={35} />
+                                </TouchableOpacity>
+                        </View>
+                        </View>
                     </View>
                 </View>
             );
         case 'location':
             let location = item.value !== null ? item.value !== '' ? typeof item.value === 'object' ? item.value : handleSplitLocation(item.value) : '' : '';
             return (
-                <View style={{ flexDirection: 'row' }} key={`location-${item.id}`}>
-                    <View style={{ width: `${width}` * 0.35, marginRight: 10 }}>
-                        <Text style={styles.colorText}>{item?.addon ? item.addon.name : item.screenElement.label}</Text>
-                        <TextInput
-                            style={styles.inputForm}
-                            value={typeof location === 'string' ? '' : location.length > 1 ? location[0] : location.latitude.toString()}
-                            placeholder={'Latitud'}
-                            placeholderTextColor={colorsTheme.gris80}
-                            editable={editable}
-                        />
-                    </View>
-                    <View style={{ width: `${width}` * 0.35, marginRight: 10 }}>
-                        <Text style={styles.colorText}>{''}</Text>
-                        <TextInput
-                            style={styles.inputForm}
-                            value={typeof location === 'string' ? '' : location.length > 1 ? location[1] : location.longitude.toString()}
-                            placeholder={'Longitud'}
-                            placeholderTextColor={colorsTheme.gris80}
-                            editable={editable}
-                        />
-                    </View>
-                    <View style={{ width: `${width}` * 0.106, marginTop: 20 }}>
-                        <TouchableOpacity onPress={() => { handleClickLocation(); }}>
-                            <Ionicons name={'location'} color={colorsTheme.naranja} size={40} style={styles.icon} />
+                <View key={`location-${item.id}`}>
+                    <Text style={styles.colorText}>{item?.addon ? item.addon.name : item.screenElement.label}</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                        <View style={{ width: `${width}` * 0.35, marginRight: 10 }}>
+                            <TextInput
+                                style={styles.inputForm}
+                                value={typeof location === 'string' ? '' : location.length > 1 ? location[0] : location.latitude.toString()}
+                                placeholder={'Latitud'}
+                                placeholderTextColor={colorsTheme.gris80}
+                                editable={editable}
+                            />
+                        </View>
+                        <View style={{ width: `${width}` * 0.35, marginRight: 10 }}>
+                            <TextInput
+                                style={styles.inputForm}
+                                value={typeof location === 'string' ? '' : location.length > 1 ? location[1] : location.longitude.toString()}
+                                placeholder={'Longitud'}
+                                placeholderTextColor={colorsTheme.gris80}
+                                editable={editable}
+                            />
+                        </View>
+                        <TouchableOpacity
+                        style={{ width: `${width}` * 0.15, marginTop: 5, backgroundColor: colorsTheme.naranja, alignItems:'center', justifyContent:'center', borderRadius: 5}} 
+                        onPress={handleClickLocation}>
+                            <Ionicons name={'location'} color={colorsTheme.blanco} size={30} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -241,8 +250,8 @@ const Inputs = ({
                         ? phoneValue[1] : '';
             }
             return (
-                <View key={`cellphone-${item.id}`}>
-                    <Text style={styles.colorText}>{item?.addon ? item.addon.name : item.screenElement.label}</Text>
+                <View key={`cellphone-${item.id}`} style={{marginVertical:5}}>
+                    <Text style={[styles.colorText]}>{item?.addon ? item.addon.name : item.screenElement.label}</Text>
                     <PhoneInput
                         ref={phoneInputRef}
                         defaultCode="GT"
@@ -255,11 +264,16 @@ const Inputs = ({
                         placeholder="Número de celular"
                         disabled={!editable}
                         placeholderTextColor={colorsTheme.negro}
-                        textContainerStyle={{padding: 0, margin: 0, backgroundColor: colorsTheme.gris20, borderTopEndRadius: 10, borderBottomRightRadius: 10}}
-                        codeTextStyle={{padding: 0, margin: 0}}
-                        textInputStyle={{ padding: 0, margin: 0, color: colorsTheme.negro}}
-
-                        containerStyle={{ width: '100%', backgroundColor: colorsTheme.gris20, borderRadius: 17, marginTop: 10, padding: 0 }}
+                        containerStyle={{ width: '100%', borderColor: colorsTheme.negro, borderWidth: 1, marginTop: 5, borderRadius: 5, }}
+                        textContainerStyle={{
+                            padding: 0, 
+                            margin: 0, 
+                            borderLeftWidth: 1, 
+                            borderColor: colorsTheme.negro, 
+                            borderTopEndRadius: 10, 
+                            borderBottomRightRadius: 10, 
+                            backgroundColor: colorsTheme.blanco}}
+                        textInputStyle={{ padding:0, color: colorsTheme.negro}}
                         countryPickerButtonStyle={{ color: colorsTheme.gris80, padding: 0, margin: 0 }}
                     />
                 </View>
@@ -269,7 +283,7 @@ const Inputs = ({
                 <View key={`text-${item.id}`}>
                     <Text style={styles.colorText}>{item?.addon ? item.addon.name : item.screenElement.label}</Text>
                     <TextInput
-                        style={styles.inputForm}
+                        style={[styles.inputForm, { marginBottom: 5}]}
                         onChangeText={handleChangeText}
                         value={item.value}
                         editable={editable}
@@ -338,14 +352,18 @@ const styles = StyleSheet.create({
         marginRight: 5,
     },
     colorText: {
-        color: colorsTheme.gris80,
+        color: colorsTheme.naranja,
+        fontWeight:'bold',
+        fontSize: 14
     },
     inputForm: {
         fontSize: 17,
         color: colorsTheme.negro,
-        marginBottom: 10,
-        backgroundColor: colorsTheme.gris20,
-        borderRadius: 10,
+        marginTop:5,
+        backgroundColor: colorsTheme.blanco,
+        borderColor: colorsTheme.negro,
+        borderWidth: 1,
+        borderRadius: 5,
     },
 
     dropdown: {
@@ -355,6 +373,7 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderRadius: 8,
         paddingHorizontal: 8,
+        
     },
     label: {
         color: colorsTheme.gris80,

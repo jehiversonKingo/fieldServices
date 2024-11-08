@@ -1,143 +1,100 @@
-import React, {useState, useEffect, useRef, useContext} from 'react';
-import {Image, View, TouchableOpacity, Text} from 'react-native';
-import Onboarding from 'react-native-onboarding-swiper';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-
-import { getStepInstruction } from '../../../services/task.services';
-import { getStep} from '../../../functions/fncSqlite';
-
+import React, {useState, useEffect, useContext} from 'react';
+import {View, Text, FlatList, Dimensions, ActivityIndicator} from 'react-native';
+import {getStepInstruction} from '../../../services/task.services';
+import {getStep} from '../../../functions/fncSqlite';
 import {colorsTheme} from '../../../configurations/configStyle';
 import {Context as AuthContext} from '../../../context/AuthContext';
-import Logo from '../../../../assets/img/Isotipo-Kingo.png';
+import Header from '../../../components/Layouts/Header';
 
-const OnboardingComponent = ({navigation, route}) => {
-  const onboardingRef = useRef(null);
+const OnboardingComponent = ({route, navigation}) => {
   const {idStep} = route.params;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const {state} = useContext(AuthContext);
   const {inline} = state;
-
-  const Square = ({ isLight, selected }) => {
-    let backgroundColor;
-    if (isLight) {
-      backgroundColor = selected ? colorsTheme.gris80 : colorsTheme.gris20;
-    } else {
-      backgroundColor = selected ? colorsTheme.blanco : colorsTheme.gris60;
-    }
-    return (
-      <View
-        style={{
-          width: 6,
-          height: 6,
-          marginHorizontal: 3,
-          backgroundColor,
-        }}
-      />
-    );
-  };
-
-  const Done = () => (
-    <TouchableOpacity onPress={() => navigation.goBack()}>
-      <View style={{flexDirection: 'row'}}>
-        <Text
-          style={{
-            fontSize: 16,
-            color: colorsTheme.blanco,
-            fontWeight: 'bold',
-            marginRight: 5,
-          }}>
-          {' '}
-          Finalizar{' '}
-        </Text>
-        <FontAwesome5
-          name={'check-circle'}
-          color={colorsTheme.blanco}
-          size={20}
-          style={{marginRight: 20}}
-        />
-      </View>
-    </TouchableOpacity>
-  );
-
-  const Skip = () => (
-    <TouchableOpacity>
-      {/* <View style={{ flexDirection: "row" }}>
-        <Text style={{ color: "white"}}> Omitir </Text>
-        <FontAwesome5 name={"chevron-down"} color={colorsTheme.blanco} size={20} />
-      </View> */}
-    </TouchableOpacity>
-  );
-
-  const Next = () => (
-    <TouchableOpacity
-      onPress={() => {
-        onboardingRef.current.goNext();
-      }}>
-      <View style={{flexDirection: 'row'}}>
-        <Text
-          style={{
-            fontSize: 16,
-            color: colorsTheme.blanco,
-            fontWeight: 'bold',
-            marginRight: 5,
-          }}>
-          {' '}
-          Siguiente{' '}
-        </Text>
-        <FontAwesome5
-          name={'chevron-right'}
-          color={colorsTheme.blanco}
-          size={20}
-          style={{marginRight: 20}}
-        />
-      </View>
-    </TouchableOpacity>
-  );
+  const {width} = Dimensions.get('screen');
 
   const handleGetInstruction = async () => {
-    let getDataStepToDo = [];
-    if(inline){
-      getDataStepToDo = await getStepInstruction(idStep);
-    }else{
-      getDataStepToDo = JSON.parse(await getStep('taskDescriptionToDo',idStep,0));
-    }
-    console.log(getDataStepToDo)
-    const { getDataStep } = getDataStepToDo;
+    try {
+      let getDataStepToDo = [];
+      if (inline) {
+        getDataStepToDo = await getStepInstruction(idStep);
+      } else {
+        const stepData = await getStep('taskDescriptionToDo', idStep, 0);
+        getDataStepToDo = JSON.parse(stepData);
+      }
 
-    let customDataInstructions = [];
-    getDataStep.map((instruction) => {
-      customDataInstructions.push(
-        {
-          backgroundColor: colorsTheme.blanco,
-          //image: <Image source={{uri: instruction.file}} style={{ height: 300, width:300}}/>,
-          image: <Image source={Logo} style={{ height: 300, width:300}} />,
-          title: instruction.title,
-          subtitle: instruction.description,
-        }
-      );
-    });
-    setData(customDataInstructions);
-    setLoading(false);
+      const {getDataStep} = getDataStepToDo;
+      console.log("[Instrucciones]", getDataStep);
+      setData(getDataStep || []);
+    } catch (error) {
+      console.error("Error al obtener las instrucciones:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     handleGetInstruction();
   }, []);
 
+  const renderInstruction = ({ item, index }) => (
+    <View
+      style={{
+        padding: 12,
+        backgroundColor: colorsTheme.blanco,
+        borderBottomColor: colorsTheme.naranja,
+        borderBottomWidth: 0.8,
+      }}
+      key={index}
+    >
+      <Text style={{ fontSize: 18, fontWeight: 'bold', color: colorsTheme.naranja }}>
+        {index + 1}. {item.title} 
+      </Text>
+      <Text style={{ marginTop: 5,  color: colorsTheme.naranja }}>
+        {item.description} 
+      </Text>
+    </View>
+  );
+  
+
   return loading ? (
-    <Text>Label</Text>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <ActivityIndicator size="large" color={colorsTheme.naranja} />
+      <Text>Cargando...</Text>
+    </View>
   ) : (
-    <Onboarding
-      ref={onboardingRef}
-      DoneButtonComponent={Done}
-      SkipButtonComponent={Skip}
-      NextButtonComponent={Next}
-      bottomBarHighlight={false}
-      bottomBarColor={colorsTheme.naranja}
-      pages={data}
-      DotComponent={Square}
+    <View style={{ backgroundColor: colorsTheme.blanco, flex:1}}>
+      <Header isLeft={true} navigation={navigation} />
+    <FlatList
+      data={data}
+      renderItem={renderInstruction}
+      keyExtractor={(item) => item.idStepInstruction.toString()} // Utiliza un identificador único
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ margin: 10 }}
+      ListHeaderComponent={
+        <View
+          style={{
+            backgroundColor: colorsTheme.naranja,
+            width: width,
+            padding: 10,
+            alignItems: 'center',
+            marginBottom: 10,
+          }}
+        >
+          <Text style={{ color: colorsTheme.blanco, fontWeight: 'bold' }}>
+            Listado De Instrucciones
+          </Text>
+        </View>
+      }
+      ListEmptyComponent={
+        <View style={{ alignItems: 'center' }}>
+          <Text style={{ color: colorsTheme.negro }}>No se encontraron datos.</Text>
+        </View>
+      }
     />
+  </View>
+
   );
 };
 

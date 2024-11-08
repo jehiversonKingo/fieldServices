@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
+  NativeModules
 } from 'react-native';
 import { Camera, useCameraDevice } from 'react-native-vision-camera';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -19,7 +20,6 @@ import * as RNFS from 'react-native-fs';
 import Footer from '../../../components/Layouts/Footer';
 import { FlatList } from 'react-native-gesture-handler';
 import { colorsTheme } from '../../../configurations/configStyle';
-import { handleGetLocationValue} from '../../../functions/fncLocation';
 
 //functions
 import { handleIsValidUrl } from '../../../functions/fncGeneral';
@@ -27,37 +27,40 @@ import {Context as AuthContext} from '../../../context/AuthContext';
 import PhotoManipulator from 'react-native-photo-manipulator';
 
 
-const Header = ({ onClose, onTorchToggle, torchStatus }) => (
+const Header = ({ onClose, onTorchToggle, torchStatus, navigation }) => (
   <View style={styles.header}>
     <TouchableOpacity onPress={onClose} hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}>
       <Fontisto name="close-a" color={colorsTheme.gris20} size={20} style={styles.icon} />
     </TouchableOpacity>
-    <TouchableOpacity onPress={onTorchToggle} hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}>
-      <Ionicons
-        name={torchStatus === 'off' ? 'flash' : 'flash-off'}
-        color={colorsTheme.blanco}
-        size={25}
-        style={styles.icon}
-      />
-    </TouchableOpacity>
-    <TouchableOpacity
-      style={{
-        marginTop: 10,
-        flexDirection: 'row',
-        backgroundColor: colorsTheme.naranja,
-        borderRadius: 10,
-        width: 100,
-        height: 40,
-        // position: 'absolute',
-        right: 5,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      onPress={onClose}>
-      <Ionicons name={'checkmark-circle-outline'} color={colorsTheme.blanco} size={25} />
-      <Text style={{}}>Completar</Text>
-    </TouchableOpacity>
-  </View>
+    <View style={{ flexDirection:'row' }}>
+          <TouchableOpacity
+            style={{ 
+              justifyContent:'center', 
+              alignContent:'flex-end', 
+              alignItems:'flex-end',  
+              paddingHorizontal: 10,
+              marginRight: 5
+            }}
+            onPress={() => onTorchToggle()}>
+            <Ionicons
+              name={torchStatus === "off" ? 'flash-off' : 'flash'}
+              color={colorsTheme.blanco}
+              size={30}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              alignItems: 'center',
+              justifyContent:'center',
+              paddingHorizontal: 8,
+            }}
+            onPress={() => {
+              navigation.goBack();
+            }}>
+            <Ionicons name={'checkmark-circle-outline'} color={colorsTheme.blanco} size={32} />
+          </TouchableOpacity>
+          </View>
+        </View>
 );
 
 const CaptureButton = ({ onPress }) => (
@@ -84,6 +87,7 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
 
   const {state} = useContext(AuthContext);
   const {inline} = state;
+  const {GPSModule} = NativeModules;
 
   useEffect(() => {
     checkCameraPermission();
@@ -118,9 +122,22 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
       console.error("[ERROR] photoPath is undefined or null");
       return null;
     }
+
+    const handleGetFixLocation = () => {
+      return new Promise((resolve, reject) => {
+        GPSModule.getCurrentLocation((lat, lon) => {
+          if (typeof lat === 'string' || typeof lon === 'string') {
+            reject({latitude:0,longitude: 0});
+            return;
+          }
+          const position = {latitude:lat,longitude: lon};
+          resolve(position);
+        });
+      });
+    };
   
     try {
-      const response = await handleGetLocationValue();
+      const response = await handleGetFixLocation();
       const { latitude, longitude } = response;
       const dateText = new Date().toLocaleString();
       const coordinateText = `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`;
@@ -212,58 +229,6 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View>
-        {/* <View
-          style={{
-            marginTop: 20,
-            width: '100%',
-            height: 55,
-            marginBottom: -45,
-            flexDirection: 'row',
-            justifyContent: "space-between"
-          }}
-        >
-          <TouchableOpacity
-            style={{ left: 0 }}
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <Fontisto
-              name={'close-a'}
-              color={colorsTheme.gris20}
-              size={20}
-              style={{ marginTop: 20, marginBottom: -40, marginLeft: 18 }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ marginTop: 15, marginBottom: -40, marginLeft: 18 }}
-            onPress={() => setTorch((prevTorch) => prevTorch === "off" ? "on" : "off")}>
-            <Ionicons
-              name={torch === "off" ? 'flash' : 'flash-off'}
-              color={colorsTheme.blanco}
-              size={25}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              marginTop: 10,
-              flexDirection: 'row',
-              backgroundColor: colorsTheme.naranja,
-              borderRadius: 10,
-              width: 100,
-              height: 40,
-              // position: 'absolute',
-              right: 5,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <Ionicons name={'checkmark-circle-outline'} color={colorsTheme.blanco} size={25} />
-            <Text style={{}}>Completar</Text>
-          </TouchableOpacity>
-        </View> */}
-
         {isScanned === false && (
           <>
             <View>
@@ -320,27 +285,14 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
               device={device}
               isActive={isScanned}
               photo={true}
-              autoFocus="on"
+              torch={torch}
             />
             <Header
               onClose={() => navigation.goBack()}
               onTorchToggle={() => setTorch(torch === 'off' ? 'on' : 'off')}
               torchStatus={torch}
+              navigation={navigation}
             />
-            {/* <View
-              style={{
-                alignContent: 'center',
-                alignItems: 'center',
-                marginTop: -height * 0.07,
-              }}>
-              <TouchableOpacity
-                style={styles.camExternalButton}
-                onPress={onPressButton}>
-                <View style={styles.camInternalButton} />
-              </TouchableOpacity>
-              <Text>Tocar para tomar fotos</Text> */}
-            {/* </View> */}
-
             <View
               style={{ position: 'absolute', top: height * 0.68, width: width }}>
               <View style={{ alignContent: 'center', alignItems: 'center' }}>

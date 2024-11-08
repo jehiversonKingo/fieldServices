@@ -72,17 +72,14 @@ const HomeScreen = ({navigation}) => {
       if (inline) {
         options = await getModulesByRole(data.user.idRole);
         let dataTask = await getAllDataStep('TaskComplete');
-        console.log('[ OFFLINE TASK ]', dataTask)
-        console.log("OPTIONS", options);
-        const [getAddon, getKingo, getCommunities] = await Promise.all([
+        const [getAddon, getCommunities] = await Promise.all([
           getListAddon(),
-          getListEquipment(),
           getAllCommunities()
         ]);
 
         await Promise.all([
           updateStep('warehouseAddon', 0, JSON.stringify(getAddon?.addons || []), 0),
-          updateStep('warehouseEquipment', 0, JSON.stringify(getKingo?.equipments || []), 0),
+          updateStep('warehouseEquipment', 0, JSON.stringify(getAddon?.equipments || []), 0),
           updateStep('communities', 1, JSON.stringify(getCommunities), 0),
           updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0),
         ]);
@@ -90,10 +87,8 @@ const HomeScreen = ({navigation}) => {
       } else {
         const storedOptions = JSON.parse(await getStep('menuOptions', data.user.idRole, 0));
         setBlockedTask(false)
-        console.log('[ OFFLINE ] ............', storedOptions);
         if (storedOptions) options = storedOptions.filter((item) => item.offline);
       }
-      console.log('[ INLINE ] ............', inline);
       options.map(item => console.log(item))
       setMenu(options.sort((a,b) => a.module.text - b.module.text));
     } catch (error) {
@@ -109,8 +104,6 @@ const HomeScreen = ({navigation}) => {
     let getDebt = await getDebetAgent();
     let debtUser = JSON.parse(await getStep('debtUser', 0, 0));
     let getWalletCustomers = JSON.parse(await getStep('customersOfflineData', 0, 0));
-    console.log('[ DEBET USER OFFLINE ]', parseFloat(debtUser.amount).toFixed(2));
-    console.log('[ DEBET USER ]', parseFloat(getDebt.amount).toFixed(2))
     if (debtUser && getDebt) {
       if (parseFloat(debtUser.amount).toFixed(2) !== parseFloat(getDebt.amount).toFixed(2)) {
         if (parseFloat(debtUser.amount).toFixed(2) > parseFloat(getDebt.amount).toFixed(2)) {

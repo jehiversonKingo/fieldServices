@@ -10,26 +10,29 @@ import {
 } from 'react-native';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import orderBy from 'lodash/orderBy';
+import BackgroundGeolocation from "react-native-background-geolocation";
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 
 //Components
 import Header from '../../../components/Layouts/Header';
 import RenderItemList from '../../../components/General/RenderItemList';
+import TaskInfoScreen from './TaskInfoScreen';
 
 //services
-import { getTasks, getElemetScreen, getStepInstruction, getTaskById } from '../../../services/task.services';
-import { updateStep, getStep } from '../../../functions/fncSqlite';
+import { getTasks} from '../../../services/task.services';
+import { getStep, updateStep } from '../../../functions/fncSqlite';
 import { handleFilterData } from '../../../functions/fncGeneral';
-
-const { width, height } = Dimensions.get('screen');
-
 import { colorsTheme } from '../../../configurations/configStyle';
-
 import { Context as AuthContext } from '../../../context/AuthContext';
 import ModalComponent from '../../../components/General/ModalComponent';
-import TaskInfoScreen from './TaskInfoScreen';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 
+import { useTracking } from '../../../context/TrackingContext';
+import { deleteLocationsFromDatabase } from '../../../functions/fncTracker';
+
+
+const { width, height } = Dimensions.get('screen');
 const TaskListScreen = ({ navigation, route }) => {
+  const { locations, timer, changeButton, stopTracking, cancelTracking, inserte, setInitServices, setTask, setTaskStatus } = useTracking();
   const { taskStatus } = route.params;
   const [open, isOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -43,6 +46,10 @@ const TaskListScreen = ({ navigation, route }) => {
   const [messageAlert, setMessageAlert] = useState('');
   const [titleAlert, setTitleAlert] = useState('');
 
+  const [isAlert2, setIsAlert2] = useState(false);
+  const [messageAlert2, setMessageAlert2] = useState('');
+  const [titleAlert2, setTitleAlert2] = useState('');
+
   const [isModal, setIsModal] = useState(false);
   const [taskData, setTaskData] = useState([]);
 
@@ -53,70 +60,17 @@ const TaskListScreen = ({ navigation, route }) => {
     navigation.navigate(route, data);
   };
 
-  const onLongPress = async (id) => {
-    try {
-      let data = [];
-      setInfoLoading(true);
-      setIsModal(true)
-      if (inline) {
-        response = await getTaskById(id);
-        data = response ? response : [];
-      } else {
-        let dataTask = await getStep('taskInfo', id, 0);
-        data = dataTask ? JSON.parse(dataTask) : [];
-      }
-
-      if (data.length === 0) {
-        setTaskData([])
-      } else {
-        if (data.taskAddons.length > 0) {
-          const install = data.taskAddons.filter(item => item.transferType === 'enviado');
-          const pickup = data.taskAddons.filter(item => item.transferType === 'recibido');
-
-          data["taskAddons"] = install;
-          data["receivedAddons"] = pickup;
-          console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~>', data)
-          setTaskData(data)
-        }
-      }
-      setInfoLoading(false);
-    } catch (error) {
-      console.log("[ onLongPress TASK ] >", error);
-      setTaskData([])
-      setInfoLoading(false);
-    }
-  }
-
   const handleDataList = async (filter) => {
     try {
       setLoading(true);
       let getTaskData = [];
       if (inline) {
-        console.log('[ TASK INLINE ]');
         getTaskData = await getTasks();
-       /*  for (const task of getTaskData) {
-          const [dataTask, infoTask] = await Promise.all([
-            getElemetScreen(task.idTask),
-            getTaskById(task.idTask)
-          ]);
-          const { steps } = dataTask;
-          await Promise.all([
-            updateStep('taskDescription', task.idTask, JSON.stringify(dataTask), 0),
-            updateStep('taskInfo', task.idTask, JSON.stringify(infoTask), 0)
-          ]);
-
-          for (const step of steps) {
-            const dataStepsToDo = await getStepInstruction(step.idStep);
-            await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
-          }
-        } */
-        //await updateStep('taskList', 0, JSON.stringify(getTaskData), 0);
       } else {
-        console.log('[ TASK OFF LINE ]');
         const dataTaskList = await getStep('taskList', 0, 0);
         getTaskData = JSON.parse(dataTaskList);
       }
-
+      //await deleteLocationsFromDatabase();
       handleFilterData(getTaskData, filter, setData, setLoading, 'task', 'idTaskState');
       handleFilterData(getTaskData, filter, setDataTmp, setLoading, 'task', 'idTaskState');
     } catch (error) {
@@ -136,6 +90,19 @@ const TaskListScreen = ({ navigation, route }) => {
     }
   }
 
+  const onPressExecution = (idTask, statusTracking) => {
+    setTask(idTask);
+    setTaskStatus(statusTracking)
+    console.log("*****************");
+    console.log({
+      itemImage: "execution",
+      headerTitle: "Proceso en ejecución",
+      subTitle: "Se ha comenzado la captura de coordenadas, puede detenerlo cuando usted requiera.",
+    });
+
+    setInitServices(true);
+  };
+
   useEffect(() => {
   }, [loading]);
 
@@ -145,7 +112,6 @@ const TaskListScreen = ({ navigation, route }) => {
   }, [inline]);
 
   useEffect(() => {
-    console.log('I GET THIS', taskStatus)
     if (taskStatus.status) {
       setIsAlert(true);
       setTitleAlert(taskStatus.title);
@@ -155,7 +121,7 @@ const TaskListScreen = ({ navigation, route }) => {
   }, [taskStatus]);
 
   return (
-    <>
+    <View style={{ flex:1, backgroundColor:colorsTheme.blanco}}>
       <Header
         isLeft={true}
         navigation={navigation}
@@ -203,38 +169,54 @@ const TaskListScreen = ({ navigation, route }) => {
                 <TextInput
                   value={filterTxt}
                   onChangeText={(text) => handleFilter(text)}
-                  style={{ ...styles.inputForm }}
+                  style={{ ...styles.inputForm, borderWidth: 1, marginTop: 15 }}
                   placeholder='Buscador'
-                  placeholderTextColor={colorsTheme.gris80}
+                  placeholderTextColor={colorsTheme.gris40}
                 />
-                <TouchableOpacity style={{ justifyContent: "center", marginHorizontal: 10 }}>
+                <TouchableOpacity style={{ justifyContent: "center", marginHorizontal: 10, backgroundColor: colorsTheme.naranja, paddingHorizontal: 15, marginVertical: 8, borderRadius: 5 }}>
                   <FontAwesome5Icon
                     name={"search"}
-                    color={colorsTheme.naranja}
+                    color={colorsTheme.blanco}
                     size={20}
-                  />
+                  /> 
                 </TouchableOpacity>
               </View>
-              <FlatList
-                data={orderBy(data, ['task.expirationDate', 'task.idTaskPriority'], ['desc'])}
-                renderItem={({ item }) => <RenderItemList item={item} goTo={goTo} onLongPress={onLongPress} />}
-                keyExtractor={item => item.idTask}
-                contentContainerStyle={{ ...styles.container }}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-                ListEmptyComponent={
-                  <View style={{
-                    backgroundColor: colorsTheme.naranja60,
-                    width: width * 0.90,
-                    height: height * 0.05,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderRadius: 100,
-                  }}>
-                    <Text style={{ fontSize: 16, fontWeight: 'bold', color: colorsTheme.blanco }}>No se encontraron datos.</Text>
-                  </View>
-                }
-              />
+              <View style={{ flex:1 }}>
+                <FlatList
+                  data={orderBy(data, ['task.expirationDate', 'task.idTaskPriority'], ['desc'])}
+                  renderItem={({ item }) => <RenderItemList 
+                    item={item} 
+                    goTo={goTo} 
+                    onPressExecution={onPressExecution} 
+                    cancelTracking={cancelTracking} 
+                    stopTracking={stopTracking}
+                    setIsAlert={setIsAlert2}
+                    setTitleAlert={setTitleAlert2}
+                    setMessageAlert={setMessageAlert2}
+                    />}
+                  keyExtractor={item => item.idTask}
+                  contentContainerStyle={{ ...styles.container }}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  ListHeaderComponent={
+                    <View style={{ backgroundColor: colorsTheme.naranja, alignItems: 'center', padding: 15, marginBottom: 10, marginHorizontal:5 }}>
+                      <Text style={{ color: colorsTheme.blanco, fontSize: 15, fontWeight:'bold' }}> Tareas</Text>
+                    </View>
+                  }
+                  ListEmptyComponent={
+                    <View style={{
+                      backgroundColor: colorsTheme.naranja60,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 10,
+                      padding: 10,
+                      margin: 10
+                    }}>
+                      <Text style={{ fontSize: 16, fontWeight: 'bold', color: colorsTheme.blanco }}>No se encontraron datos.</Text>
+                    </View>
+                  }
+                />
+              </View>
             </>
           )
       }
@@ -252,6 +234,14 @@ const TaskListScreen = ({ navigation, route }) => {
           setIsAlert(false);
         }}
       />
+      <AwesomeAlert
+        show={isAlert2}
+        showProgress={true}
+        title={titleAlert2}
+        message={messageAlert2}
+        closeOnTouchOutside={false}
+        closeOnHardwareBackPress={false}
+      />
       <ModalComponent
         isOpen={isModal}
         toggleModal={setIsModal}
@@ -259,7 +249,7 @@ const TaskListScreen = ({ navigation, route }) => {
         key={"infoTask"}
         children={<TaskInfoScreen data={taskData} isLoading={infoLoading} />}
       />
-    </>
+    </View>
   );
 };
 
@@ -267,7 +257,6 @@ const styles = StyleSheet.create({
   container: {
     paddingBottom: 25,
     marginTop: 10,
-    alignItems: 'center',
   },
   containerList: {
     background: {

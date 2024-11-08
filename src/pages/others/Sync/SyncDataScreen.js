@@ -198,6 +198,9 @@ const SyncDataScreen = ({ navigation }) => {
           getKingo = inventory?.equipments || [];
         }
 
+        console.log("[getAddon]==", getAddon[0]);
+        console.log("[getKingo]==", getKingo);
+
         await updateStep('warehouseAddon', 0, JSON.stringify(getAddon), 0);
         await updateStep('warehouseEquipment', 0, JSON.stringify(getKingo), 0);
         setListItem(prevState => prevState.map(item =>

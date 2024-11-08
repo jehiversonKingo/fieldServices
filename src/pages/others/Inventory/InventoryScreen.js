@@ -53,7 +53,6 @@ const InventoryScreen = ({navigation}) => {
     };
 
     const handleFilter = (value = "") => {
-      console.log("[ VALUE ]", value.toLowerCase());
       setFilterTxt(value)
       let dataFilter = []
       const regexPattern = new RegExp(value.toLowerCase(), "g");
@@ -62,12 +61,11 @@ const InventoryScreen = ({navigation}) => {
       } else {
         dataFilter = addon.filter((item => item.barcode.toLowerCase().match(regexPattern) || item.addon.name.toLowerCase().match(regexPattern)))
       }
+
       if (dataFilter.length > 0) {
         setData(dataFilter)
       } else {
-        if (active == 0) {
-          setData(kingos)
-        } else setData(addon)
+        setData([]);
       }
     }
 
@@ -94,11 +92,11 @@ const InventoryScreen = ({navigation}) => {
             shadowRadius: 6.27,
             elevation: 6,
           }}
-          key={`A-${index}`}>
-          <View key={`B-${index}`} style={{flexDirection: 'row'}}>
-            <View key={`C-${index}`}>
-              <Text key={`D-${index}`} style={{fontSize: 14, fontWeight: '400', color: colorsTheme.negro}}>
-                {(item.equipment ? item.equipment.equipmentModel.name : 'Addon: ' + item.addon.name)}
+          key={`${index}`}>
+          <View style={{flexDirection: 'row'}}>
+            <View>
+              <Text style={{fontSize: 14, fontWeight: '400', color: colorsTheme.negro}}>
+                {(item.equipment ? item.equipment.equipmentModel.name : '' + item.addon.name)}
               </Text>
               <Text style={{fontSize: 18, fontWeight: '500', color: colorsTheme.negro}}>
                 {`Barcode: ${item.barcode}`}
@@ -142,7 +140,7 @@ const InventoryScreen = ({navigation}) => {
             marginTop: 10,
             }}>
             <Text style={{color: colorsTheme.blanco}}>
-            No se han escaneado equipos.
+            No se han encontrado datos.
             </Text>
         </View>
         }
@@ -167,7 +165,7 @@ const InventoryScreen = ({navigation}) => {
             setActive(0)
             setData(kingos)
           }}>
-          <Text style={{color: colorsTheme.blanco}}>Kingos</Text>
+          <Text style={{color: colorsTheme.blanco}}>Equipos</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
@@ -179,7 +177,7 @@ const InventoryScreen = ({navigation}) => {
             setActive(1)
             setData(addon)
           }}>
-          <Text style={{color: colorsTheme.blanco}}>Addons</Text>
+          <Text style={{color: colorsTheme.blanco}}>Componentes</Text>
         </TouchableOpacity>
       </View>
       {loading ?

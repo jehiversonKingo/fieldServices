@@ -4,6 +4,7 @@ import { setTokenUser } from './settings.services';
 
 export const getUserByUid = async (uid) => {
     try {
+        console.log("HEEEE", uid);
         return await axiosInstance
             .get(`/settings/user/${uid}`)
             .then(async user => {
@@ -17,9 +18,11 @@ export const getUserByUid = async (uid) => {
                 }
             })
             .catch(error => {
+                console.log("???1???", error)
                 return { error: true, message: error.message };
             });
     } catch (error) {
+        console.log("???2???")
         return { error: true, message: error.message };
     }
 };

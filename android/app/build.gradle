@@ -2,6 +2,9 @@ apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 apply plugin: 'com.google.gms.google-services'
 
+Project background_geolocation = project(':react-native-background-geolocation')
+apply from: "${background_geolocation.projectDir}/app.gradle"
+
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
 
@@ -81,7 +84,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 7
-        versionName "1.4.11"
+        versionName "2.5.11"
 
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
@@ -112,7 +115,9 @@ android {
         release {
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            shrinkResources false
+            proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
+            //proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
 

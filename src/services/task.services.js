@@ -12,7 +12,9 @@ export const getTasks = async () => {
     })
     .catch(error => {
       console.log(error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -24,7 +26,9 @@ export const getElemetScreen = async (id) => {
       return task.data;
     })
     .catch(error => {
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -36,7 +40,9 @@ export const getTaskStep = async (id) => {
       return task.data;
     })
     .catch(error => {
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -48,7 +54,9 @@ export const getStepInstruction = async (idStep) => {
       return task.data;
     })
     .catch(error => {
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -66,8 +74,9 @@ export const setDataAllTask = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -83,8 +92,9 @@ export const setDataTaskChecklist = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -103,8 +113,9 @@ export const setDataAllTaskInstall = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS INSTALL ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -123,8 +134,9 @@ export const setDataAllTaskMaintenance = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS MAINTENANCE ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 }
 
@@ -143,8 +155,9 @@ export const setDataAllTaskProspect = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS MAINTENANCE ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 }
 
@@ -163,8 +176,9 @@ export const setDataAllTaskSwap = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS SWAP ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -177,8 +191,9 @@ export const setDataAllTaskMigration = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS MIGRATION ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -197,8 +212,9 @@ export const setDataAllTaskPickup = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS PICKUP ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS PICKUP ERROR]>>", data);
+      return data;
     });
 };
 
@@ -210,8 +226,9 @@ export const setDataAllTaskVisit = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS VISIT ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -235,8 +252,9 @@ export const setDataTaskEvidens = async (data) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 }
 
@@ -249,8 +267,9 @@ export const setDataTaskPhotos = async (params) => {
       return task.data;
     })
     .catch(error => {
-      console.log("[AXIOS ERROR]>>", error);
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 }
 
@@ -262,7 +281,9 @@ export const setCodeNoc = async (data) => {
       return task.data;
     })
     .catch(error => {
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 };
 
@@ -275,7 +296,9 @@ export const getTaskById = async (id) => {
       return task.data;
     })
     .catch(error => {
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 }
 
@@ -288,6 +311,8 @@ export const getCheckListByIdTask = async (id) => {
       return task.data;
     })
     .catch(error => {
-      return error;
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
     });
 }

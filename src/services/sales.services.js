@@ -103,7 +103,8 @@ export const getSaleCustomer = async(idCustomer) => {
     const datos = await axiosInstanceShopkeeper.get(`/sales/code/generated/${idCustomer}`);
     return datos.data;
   } catch (error) {
-    console.error('[ getSaleCustomer ]', error);
+    const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
     return [];
   }
 }
