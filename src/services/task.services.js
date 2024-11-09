@@ -98,6 +98,20 @@ export const setDataTaskChecklist = async (data) => {
     });
 };
 
+export const setDataTaskWithoutInventory = async (data) => {
+  const headers = await customHeadersAuth();
+  return await axiosInstance
+    .post('/task/progressTask', data, headers)
+    .then(task => {
+      return task.data;
+    })
+    .catch(error => {
+      const { data } = error.response;
+      console.log("[AXIOS ERROR]>>", data);
+      return data;
+    });
+};
+
 export const setDataAllTaskInstall = async (data) => {
   const headers = await customHeadersAuth();
   const {step1, step2, step3, step4, idTask} = data;

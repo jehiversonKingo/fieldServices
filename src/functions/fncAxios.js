@@ -3,12 +3,12 @@ import auth from '@react-native-firebase/auth';
 
 // console.log('[ AXIOS INSTANCE ] >> ', process.env.REACT_APP_URI_FIELD);
 export const axiosInstance = axios.create({
-  baseURL: 'https://5fae-45-173-219-85.ngrok-free.app/stack-ant-prod/us-central1/fieldservice_test',
+  baseURL: 'https://66ce-200-35-181-90.ngrok-free.app/stack-ant-prod/us-central1/fieldservicetest',
   //baseURL: process.env.REACT_APP_URI_FIELD,
 });
   
 export const axiosInstanceShopkeeper = axios.create({
-  baseURL: "https://5fae-45-173-219-85.ngrok-free.app/stack-ant-prod/us-central1/shopkeeperapi_test",
+  baseURL: "https://66ce-200-35-181-90.ngrok-free.app/stack-ant-prod/us-central1/shopkeeperapitest",
   //baseURL: process.env.REACT_APP_URI_SHOPKEEPER,
   headers: {token: process.env.REACT_APP_SHOPKEEPER_TOKEN},
 });

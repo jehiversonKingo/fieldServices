@@ -63,6 +63,7 @@ import {
   setDataAllTaskMaintenance,
   setDataAllTaskProspect,
   setDataAllTaskVisit,
+  setDataTaskWithoutInventory,
 } from '../../../services/task.services';
 import {colorsTheme} from '../../../configurations/configStyle';
 
@@ -567,7 +568,7 @@ const TaskDescriptionScreen = ({navigation, route}) => {
 
   const completeTask = async () => {
     try {
-      const {id, type} = route.params;
+      const {id, type, validateInventory} = route.params;
       console.log('[TYPE TASK] >>', type);
       setIsAlert(true);
       setTitleAlert('Iniciando proceso');
@@ -615,6 +616,11 @@ const TaskDescriptionScreen = ({navigation, route}) => {
         validArrayAddonsStep2 = true;
       }
 
+      if (!validateInventory) {
+        validArrayKingosStep2 = true;
+        validArrayAddonsStep2 = true;
+      }
+
       if (inline) {
         if (step2.length <= 0 || step4.length <= 0) {
           validArrayKingosStep2 = true;
@@ -634,96 +640,105 @@ const TaskDescriptionScreen = ({navigation, route}) => {
             setMessageAlert('');
             setIsAlert(true);
             console.log('TIIIIIIIIIIIIIIIPO', type);
-            switch (type) {
-              case 1:
-                taskStatus = await setDataAllTaskInstall({
-                  step1,
-                  step2,
-                  idTask: id,
-                });
-                break;
-              case 2:
-                taskStatus = await setDataAllTaskInstall({
-                  step1,
-                  step2,
-                  idTask: id,
-                });
-                break;
-              case 3:
-                taskStatus = await setDataAllTaskMaintenance({
-                  step1,
-                  step2,
-                  step4,
-                  idTask: id,
-                });
-              case 4:
-                taskStatus = await setDataAllTaskMaintenance({
-                  step1,
-                  step2,
-                  step4,
-                  idTask: id,
-                });
-                break;
-              case 5:
-                taskStatus = await setDataAllTaskProspect({
-                  step1,
-                  step2,
-                  step3: null,
-                  step4,
-                  step5,
-                  idTask: id,
-                });
-                break;
-              case 6:
-                taskStatus = await setDataAllTaskSwap({
-                  step1,
-                  step2,
-                  step4,
-                  idTask: id,
-                });
-                break;
-              case 7:
-                taskStatus = await setDataAllTaskPickup({
-                  step1,
-                  step4,
-                  idTask: id,
-                });
-                break;
-              case 10:
-                taskStatus = await setDataAllTaskMigration({
-                  step1,
-                  idTask: id,
-                  availableDays: dataAvailableDays,
-                });
-                break;
-              case 11:
-                taskStatus = await setDataAllTaskMigration({
-                  step1,
-                  idTask: id,
-                  availableDays: dataAvailableDays,
-                });
-                break;
-              case 12:
-                const location = await handleGetLocationValue();
-                console.log('[ GPS LOCATIONS ] >>> ', location);
-                taskStatus = await setDataAllTaskVisit({
-                  step1,
-                  idTask: id,
-                  gps: `${location.latitude || 0},${location.longitude || 0}`
-                });
-                break;
-              default:
-                console.log(
-                  'No se puede procesar, problemas con el tipo de tarea',
-                );
-                setIsAlert(false);
-                setTimeout(() => {
-                  setTitleAlert('¡Atención!');
-                  setMessageAlert(
+            if (validateInventory) {
+              switch (type) {
+                case 1:
+                  taskStatus = await setDataAllTaskInstall({
+                    step1,
+                    step2,
+                    idTask: id,
+                  });
+                  break;
+                case 2:
+                  taskStatus = await setDataAllTaskInstall({
+                    step1,
+                    step2,
+                    idTask: id,
+                  });
+                  break;
+                case 3:
+                  taskStatus = await setDataAllTaskMaintenance({
+                    step1,
+                    step2,
+                    step4,
+                    idTask: id,
+                  });
+                case 4:
+                  taskStatus = await setDataAllTaskMaintenance({
+                    step1,
+                    step2,
+                    step4,
+                    idTask: id,
+                  });
+                  break;
+                case 5:
+                  taskStatus = await setDataAllTaskProspect({
+                    step1,
+                    step2,
+                    step3: null,
+                    step4,
+                    step5,
+                    idTask: id,
+                  });
+                  break;
+                case 6:
+                  taskStatus = await setDataAllTaskSwap({
+                    step1,
+                    step2,
+                    step4,
+                    idTask: id,
+                  });
+                  break;
+                case 7:
+                  taskStatus = await setDataAllTaskPickup({
+                    step1,
+                    step4,
+                    idTask: id,
+                  });
+                  break;
+                case 10:
+                  taskStatus = await setDataAllTaskMigration({
+                    step1,
+                    idTask: id,
+                    availableDays: dataAvailableDays,
+                  });
+                  break;
+                case 11:
+                  taskStatus = await setDataAllTaskMigration({
+                    step1,
+                    idTask: id,
+                    availableDays: dataAvailableDays,
+                  });
+                  break;
+                case 12:
+                  const location = await handleGetLocationValue();
+                  console.log('[ GPS LOCATIONS ] >>> ', location);
+                  taskStatus = await setDataAllTaskVisit({
+                    step1,
+                    idTask: id,
+                    gps: `${location.latitude || 0},${location.longitude || 0}`
+                  });
+                  break;
+                default:
+                  console.log(
                     'No se puede procesar, problemas con el tipo de tarea',
                   );
-                  setShowAlert(true);
-                }, 150);
+                  setIsAlert(false);
+                  setTimeout(() => {
+                    setTitleAlert('¡Atención!');
+                    setMessageAlert(
+                      'No se puede procesar, problemas con el tipo de tarea',
+                    );
+                    setShowAlert(true);
+                  }, 150);
+              }
+            } else {
+              taskStatus = await setDataTaskWithoutInventory({
+                step1,
+                step2,
+                step4,
+                idTask: id,
+              });
             }
 
             if (taskStatus?.status) {

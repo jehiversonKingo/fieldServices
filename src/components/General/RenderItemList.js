@@ -56,6 +56,8 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
       console.log("*************", status?.status)
       setTaskStatus(status?.status || "default");
 
+      // console.log('TASK -----------------> ', data.taskAddons)
+
       const trackingList = await getLocationsFromDatabaseByIdTask(id);
       setDataTracking(trackingList);
       setTaskData(data);
@@ -108,7 +110,12 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
     setIsAlert(false);
     goTo(
       item.task.idTaskState !== 3 ? 'TaskDescription' : 'TaskNocValidation',
-      { id: item.idTask, idCustomer: item.task.idCustomer, type: item.task.idTaskCategory }
+      {
+        id: item.idTask,
+        idCustomer: item.task.idCustomer,
+        type: item.task.idTaskCategory,
+        validateInventory: item.task.validateInventory
+      }
     )
   }
 
@@ -271,13 +278,13 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
                       {moment(taskData.expirationDate ?? "").format("MM-DD-YYYY")}
                     </Text>
                     <Text style={styles.taskDetail}>
-                      <Text style={styles.taskDetailLabel}>{"Tendero: "}</Text>{taskData.customer.name ?? ""}
+                      <Text style={styles.taskDetailLabel}>{"Tendero: "}</Text>{taskData?.customer?.name ?? ""}
                     </Text>
                     <Text style={styles.taskDetail}>
-                      <Text style={styles.taskDetailLabel}>{"Teléfono: "}</Text>{taskData.customer.phone ?? ""}
+                      <Text style={styles.taskDetailLabel}>{"Teléfono: "}</Text>{taskData?.customer?.phone ?? ""}
                     </Text>
                     <Text style={styles.taskDetail}>
-                      <Text style={styles.taskDetailLabel}>{"Tipo: "}</Text>{taskData.taskCategory.name ?? ""}
+                      <Text style={styles.taskDetailLabel}>{"Tipo: "}</Text>{taskData?.taskCategory?.name ?? ""}
                     </Text>
                   </View>
                   <View style={{ backgroundColor: colorsTheme.naranja, }}>
@@ -285,7 +292,7 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
                   </View>
                   <View style={{ margin: 10 }}>
                     <FlatList
-                      data={taskData.taskAddons}
+                      data={(taskData.taskAddons || []).filter(item => item.transferType === 'enviado')}
                       keyExtractor={(addon) => addon.idTaskAddon}
                       renderItem={({ item, index }) => (
                         <View style={{ flexDirection: 'row' }}>
@@ -305,7 +312,7 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
                   </View>
                   <View style={{ margin: 10 }}>
                     <FlatList
-                      data={taskData.receivedAddons}
+                      data={(taskData.taskAddons || []).filter(item => item.transferType === 'recibido')}
                       keyExtractor={(addon) => addon.idTaskAddon}
                       renderItem={({ item, index }) => (
                         <Text style={styles.addonText}>{(index + 1) + "."}{item.addon.name}</Text>
