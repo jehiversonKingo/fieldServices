@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, Dimensions, Text } from 'react-native';
+import { View, ActivityIndicator, Dimensions, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-import { StyleSheet } from 'react-native';
 
 // Components
 import Header from '../../../components/Layouts/Header';
@@ -12,14 +11,14 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 
 const { height } = Dimensions.get('screen');
 
-
-const VisitScreen = ({ navigation, route }) => {
+const VisitScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [checkpoints, setcheckpoints] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [titleAlert, setTitleAlert] = useState('');
   const [messageAlert, setMessageAlert] = useState('');
+
   const handleMarkerPress = (marker) => {
     setSelectedMarker(marker === selectedMarker ? null : marker);
   };
@@ -28,20 +27,18 @@ const VisitScreen = ({ navigation, route }) => {
     try {
       const checkpointsCustomer = [];
       const getTaskData = await getTasks();
-      console.log("WHAAA", getTaskData);
       getTaskData.forEach(item => {
-        console.log("VISITA =======>", item.task);
         const coordinates = handleGPSCoordinates(item.task.customer.gps);
         let color = "";
         switch (item.task.idTaskPriority) {
           case 1:
-            color = colorsTheme.rojo
+            color = colorsTheme.rojo;
             break;
           case 2:
-            color = colorsTheme.amarillo
+            color = colorsTheme.amarillo;
             break;
           case 3:
-            color = colorsTheme.verdeClaro
+            color = colorsTheme.verdeClaro;
             break;
         }
         checkpointsCustomer.push({
@@ -55,21 +52,36 @@ const VisitScreen = ({ navigation, route }) => {
           longitude: coordinates[1],
           color
         });
-        console.log("Datos Visitas", checkpointsCustomer);
       });
-      setcheckpoints(checkpointsCustomer)
+
+      setcheckpoints(checkpointsCustomer);
       setLoading(false);
     } catch (error) {
       console.log(error);
       setTitleAlert('¡Atención!');
       setMessageAlert('No se pudo obtener la información. (CATCH ERROR)');
       setShowAlert(true);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     handleGetData();
   }, []);
+
+  const openInGoogleMaps = () => {
+    if (selectedMarker) {
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedMarker.latitude},${selectedMarker.longitude}`;
+      Linking.openURL(url);
+    }
+  };
+
+  const openInWaze = () => {
+    if (selectedMarker) {
+      const url = `https://waze.com/ul?ll=${selectedMarker.latitude},${selectedMarker.longitude}&navigate=yes`;
+      Linking.openURL(url);
+    }
+  };
 
   return (
     <>
@@ -97,40 +109,49 @@ const VisitScreen = ({ navigation, route }) => {
                 provider={PROVIDER_GOOGLE}
                 style={styles.map}
                 region={{
-                  latitude: checkpoints[0].latitude,
-                  longitude: checkpoints[0].longitude,
+                  latitude: checkpoints.length > 0 ? checkpoints[0].latitude : 14.634915, // Latitud predeterminada
+                  longitude: checkpoints.length > 0 ? checkpoints[0].longitude : -90.506882, // Longitud predeterminada
                   latitudeDelta: 0.0922,
                   longitudeDelta: 0.0421,
                 }}
               >
-                {checkpoints.map(checkpoint => (
-                  <Marker
-                    key={checkpoint.idCustomer}
-                    coordinate={{ latitude: checkpoint.latitude, longitude: checkpoint.longitude }}
-                    pinColor={checkpoint.color}
-                    title={`Tendero/a ${checkpoint.name}`}
-                    description={`Description ${checkpoint.description}`}
-                    onPress={() => handleMarkerPress(checkpoint)}
-                  />
-                ))}
+                {checkpoints.length > 0 &&
+                  checkpoints.map((checkpoint, i) => (
+                    <Marker
+                      key={`${i}-${checkpoint.idCustomer}`}
+                      coordinate={{ latitude: checkpoint.latitude, longitude: checkpoint.longitude }}
+                      pinColor={checkpoint.color}
+                      title={`Tendero/a ${checkpoint.name}`}
+                      description={`Descripción: ${checkpoint.description}`}
+                      onPress={() => handleMarkerPress(checkpoint)}
+                    />
+                  ))}
               </MapView>
 
-              {/* Mostrar detalles del marcador seleccionado */}
+              {checkpoints.length === 0 && (
+                <View style={{ position: 'absolute', top: 20, left: 20 }}>
+                  <Text style={{ color: colorsTheme.gris80, fontSize: 16 }}>
+                    No hay puntos para mostrar en el mapa.
+                  </Text>
+                </View>
+              )}
+
               {selectedMarker && (
                 <View style={styles.markerDetailsContainer}>
                   <Text style={[styles.markerDetailsTextBold, { fontSize: 20, marginBottom: 8 }]}>Datos del Tendero</Text>
-                  <Text style={styles.markerDetailsText}>{`Tendero/a: `}
-                    <Text style={styles.markerDetailsTextBold}>{selectedMarker.name}</Text>
-                  </Text>
-                  <Text style={styles.markerDetailsText}>{`DPI: `}
-                    <Text style={styles.markerDetailsTextBold}>{selectedMarker.dpi}</Text>
-                  </Text>
-                  <Text style={styles.markerDetailsText}>{`Teléfono: `}
-                    <Text style={styles.markerDetailsTextBold}>{selectedMarker.phone}</Text>
-                  </Text>
-                  <Text style={styles.markerDetailsText}>{`Comunidad: `}
-                    <Text style={styles.markerDetailsTextBold}>{selectedMarker.community.name}</Text>
-                  </Text>
+                  <Text style={styles.markerDetailsText}>Tendero/a: <Text style={styles.markerDetailsTextBold}>{selectedMarker.name}</Text></Text>
+                  <Text style={styles.markerDetailsText}>DPI: <Text style={styles.markerDetailsTextBold}>{selectedMarker.dpi}</Text></Text>
+                  <Text style={styles.markerDetailsText}>Teléfono: <Text style={styles.markerDetailsTextBold}>{selectedMarker.phone}</Text></Text>
+                  <Text style={styles.markerDetailsText}>Comunidad: <Text style={styles.markerDetailsTextBold}>{selectedMarker.community.name}</Text></Text>
+
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={openInGoogleMaps}>
+                      <Text style={styles.buttonText}>Abrir en Google Maps</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button} onPress={openInWaze}>
+                      <Text style={styles.buttonText}>Abrir en Waze</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               )}
             </View>
@@ -165,11 +186,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     elevation: 5,
   },
-  markerDetailsTitle: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 8,
-  },
   markerDetailsText: {
     fontSize: 14,
     marginBottom: 4,
@@ -193,6 +209,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   priorityText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  button: {
+    backgroundColor: colorsTheme.naranja,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  buttonText: {
     color: 'white',
     fontWeight: 'bold',
   },

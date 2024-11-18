@@ -1,7 +1,7 @@
-import {axiosInstanceShopkeeper} from '../functions/fncAxios';
+import {axiosInstance} from '../functions/fncAxios';
 
 export const uploatDataOffline = async (data) => {
-    return axiosInstanceShopkeeper
+    return axiosInstance
     .post(`/offline/syncData`, data)
     .then(inventory => {
       return inventory.data;
@@ -12,7 +12,7 @@ export const uploatDataOffline = async (data) => {
 };
 
 export const deleteStorageCollection = async(data) => {
-  return axiosInstanceShopkeeper
+  return axiosInstance
     .post(`/offline/deleteStorageCollection`, data)
     .then(inventory => {
       return inventory.data;

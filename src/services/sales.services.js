@@ -1,6 +1,5 @@
 import {
   axiosInstance,
-  axiosInstanceShopkeeper,
   customHeadersAuth
 } from '../functions/fncAxios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -48,7 +47,7 @@ export const getWallerByUser = async () => {
 
 export const getWallerByCustomer = async (customerId) => {
   try {
-    const response = await axiosInstanceShopkeeper.get(`/settings/wallet/customer/${customerId}`)
+    const response = await axiosInstance.get(`/settings/wallet/customer/${customerId}`)
     return response.data
   } catch (error) {
     console.log('[ getWallerByCustomer ] ', error)
@@ -57,7 +56,7 @@ export const getWallerByCustomer = async (customerId) => {
 }
 
 export const getAllPromotions = async () => {
-  return await axiosInstanceShopkeeper
+  return await axiosInstance
     .get(`/sales/balance/customer/offline/promotion`)
     .then(promotions => {
       return promotions.data;
@@ -70,7 +69,7 @@ export const getAllPromotions = async () => {
 
 export const getTransactionCarriedOut = async(idCustomer) => {
   try{
-    const response = await axiosInstanceShopkeeper.get(`/sales/transaction/customer/list/${idCustomer}`);
+    const response = await axiosInstance.get(`/sales/transaction/customer/list/${idCustomer}`);
     return response.data;
   }catch(error){
     console.error('[ getTransactionCarriedOut ]', error);
@@ -80,7 +79,7 @@ export const getTransactionCarriedOut = async(idCustomer) => {
 
 export const getDebtCustomer = async(idCustomer) => {
   try{
-    const datos = await axiosInstanceShopkeeper.get(`/sales/balance/debt/customer/${idCustomer}`);
+    const datos = await axiosInstance.get(`/sales/balance/debt/customer/${idCustomer}`);
     return datos.data;
   }catch(error){
     console.error('[ getDebtCustomer ]', error);
@@ -90,7 +89,7 @@ export const getDebtCustomer = async(idCustomer) => {
 
 export const getBalanceCustomer = async(idCustomer) => {
   try{
-    const datos = await axiosInstanceShopkeeper.get(`/sales/balance/list/${idCustomer}`);
+    const datos = await axiosInstance.get(`/sales/balance/list/${idCustomer}`);
     return datos.data;
   }catch(error){
     console.error('[ getBalanceCustomer ]', error);
@@ -100,7 +99,7 @@ export const getBalanceCustomer = async(idCustomer) => {
 
 export const getSaleCustomer = async(idCustomer) => {
   try{
-    const datos = await axiosInstanceShopkeeper.get(`/sales/code/generated/${idCustomer}`);
+    const datos = await axiosInstance.get(`/sales/code/generated/${idCustomer}`);
     return datos.data;
   } catch (error) {
     const { data } = error.response;

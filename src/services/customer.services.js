@@ -1,8 +1,8 @@
-import {axiosInstanceShopkeeper} from '../functions/fncAxios';
+import {axiosInstance} from '../functions/fncAxios';
 
 export const getTicketById = async () => {
   const headers = await customHeadersAuth();
-  return await axiosInstanceShopkeeper
+  return await axiosInstance
     .post(`settings/plan/ticket/list`, headers)
     .then(ticket => {
       console.log(ticket.data);

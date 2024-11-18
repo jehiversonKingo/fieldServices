@@ -261,17 +261,17 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
         isFocus: false,
         values: userAgentes,
       }]);
-
+      console.log("[ --1--]");
       let dataAddons = [];
       orderDetailAddonData.forEach((addon) => {
         dataAddons.push(addon.value);
       });
-
-      orderDetailKingoData.forEach(kingo => {
-        dataAddons.push(kingo.value);
-      });
-
-      setStep2(dataAddons);
+      console.log("[ --2--]");
+      // orderDetailKingoData.forEach(kingo => {
+      //   dataAddons.push(kingo.value);
+      // });
+      console.log("[ --3--]");
+      //setStep2(dataAddons);
 
       let dataPhoto = [];
       console.log("[ PHOTOOOOS ] ---> ", orderStationeryData);

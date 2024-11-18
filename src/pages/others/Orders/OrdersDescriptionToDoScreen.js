@@ -43,19 +43,20 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
 
   //1
   const InputsGenerate = ({item, index}) => {
+    console.log("DATOS DEL AGENTE ORDEN", item);
     return (
       <View style={styles.containerForm}>
-        <InputGenerateStep
+       <InputGenerateStep
           elementId={'id'}
           item={item}
           index={index}
           navigation={navigation}
           disable={true}
           objWithData={step1}
-          selectData={step1}
           setFunction={setStep1}
           setMessageAlert={setMessageAlert}
           setTitleAlert={setTitleAlert}
+          selectData={item.values}
         />
       </View>
     );
@@ -170,7 +171,6 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
   const getData = async () => {
     let orderData = await getOrder(id);
     if (orderData.status) {
-      console.log(orderData.data)
       const {
         idUser,
         orderDetailAddonData,
@@ -201,7 +201,7 @@ const OrdersDescriptionUpdateScreen = ({navigation, route}) => {
       id: 1,
       label: 'Agente',
       type: 'selects',
-      value: idUser,
+      value: user.idUser,
       isFocus: false,
       values: [{label: `${user.name} ${user.lastName}`, value: user.idUser}],
     }]);

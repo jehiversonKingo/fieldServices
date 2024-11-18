@@ -185,7 +185,11 @@ const SyncDataScreen = ({ navigation }) => {
       let options = [];
       if (inline) {
         options = await getModulesByRole(data.user.idRole);
-        await updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0);
+        
+        if(options){
+          await updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0);
+        }
+        
         setListItem(prevState => prevState.map(item =>
           item.title === 'Menu' ? { ...item, counter: item.counter + 1 } : item
         ));

@@ -38,8 +38,8 @@ export const TrackingProvider = ({ children }) => {
         startTracking();
         createFieldTrackerTable();
 
-        // if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
-        // saveIntervalRef.current = setInterval(saveLocationsToDatabase, 15000);
+        if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
+        saveIntervalRef.current = setInterval(saveLocationsToDatabase, 15000);
     };
 
     const cleanupTrackingService = () => {
@@ -114,12 +114,7 @@ export const TrackingProvider = ({ children }) => {
     };
 
     const startTracking = async () => {
-        try {            
-            clearInterval(timerRef.current);
-            clearInterval(saveIntervalRef.current);
-            await BackgroundGeolocation.removeAllListeners("location");
-            await BackgroundGeolocation.stop();
-            resetTrackingState();
+        try {
             const state = await BackgroundGeolocation.getState();
             if (state.enabled) await resetGeolocation();
     
@@ -130,8 +125,10 @@ export const TrackingProvider = ({ children }) => {
             timerRef.current = setInterval(() => setTimer((prev) => prev + 1), 1000);
             await BackgroundGeolocation.start();
     
+            // Eliminamos listeners anteriores antes de agregar uno nuevo
             BackgroundGeolocation.removeAllListeners("location");
     
+            // Solo agregamos el listener una vez
             BackgroundGeolocation.onLocation((location) => handleLocationUpdate(location));
         } catch (error) {
             console.error("Error al iniciar el rastreo:", error);
@@ -146,11 +143,12 @@ export const TrackingProvider = ({ children }) => {
         setLocations([]);
     };
 
-    const handleLocationUpdate = async (location) => {
+    const handleLocationUpdate = (location) => {
         const { latitude, longitude, speed } = location.coords;
         const { level } = location.battery;
         const timestamp = new Date(location.timestamp).toISOString();
     
+        // Comparar con la última ubicación para evitar duplicados
         const lastLocation = locationsRef.current[locationsRef.current.length - 1];
         if (lastLocation && lastLocation.GPS === `${latitude}, ${longitude}` && lastLocation.Date === timestamp) {
             console.log("Ubicación duplicada detectada, ignorando.");
@@ -159,7 +157,7 @@ export const TrackingProvider = ({ children }) => {
     
         if (level <= 0.21) {
             Vibration.vibrate(1000);
-            await saveLocationsToDatabase();
+            saveLocationsToDatabase();
             setShowBatteryAlert(true);
         }
     
@@ -169,9 +167,7 @@ export const TrackingProvider = ({ children }) => {
         }
     
         updateLocations(`${latitude}, ${longitude}`, timestamp, speed);
-        await saveLocationsToDatabase();
-    };
-        
+    };    
 
     const stopTracking = async () => {
         try {

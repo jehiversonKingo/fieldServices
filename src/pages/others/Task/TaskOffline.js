@@ -7,7 +7,6 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Progress from 'react-native-progress';
 import * as RNFS from 'react-native-fs';
 
-//Components
 import Header from '../../../components/Layouts/Header';
 import { getTasks, getTaskById, setDataAllTaskInstall, getStepInstruction, getElemetScreen, setDataAllTaskMigration, setDataAllTaskPickup, setDataAllTaskSwap, setDataTaskChecklist, setDataTaskPhotos, setDataAllTaskVisit } from '../../../services/task.services';
 import {getAllDataStep, deleteStep} from '../../../functions/fncSqlite';
@@ -26,15 +25,18 @@ const TaskOffline = ({navigation}) => {
     const [loading, setLoading] = useState(true);
     const [expanded, setExpanded] = useState([]);
     const [isAlert, setIsAlert] = useState(false);
-    const [showAlert, setShowAlert] = useState(false);
-    const [showProgressAlert, setShowProgressAlert] = useState(false);
+    
     const [showtitle, setShowTitle] = useState("");
     const [progressAlert, setProgressAlert] = useState(0);
     const [totalUpload, setTotalUpload] = useState(0);
     const [messageAlert, setMessageAlert] = useState('');
     const [titleAlert, setTitleAlert] = useState('');
+    
+    const [showAlert, setShowAlert] = useState(false);
+    const [showProgressAlert, setShowProgressAlert] = useState(false);
     const [totalEvidences, setTotalEvidences] = useState(0);
     const [disabledUpload, setDisabeldUpload] = useState(false);
+
     const {state} = useContext(AuthContext);
     const {inline} = state;
 
@@ -302,7 +304,7 @@ const TaskOffline = ({navigation}) => {
         setTitleAlert(`Preparando tarea ${idTask}`);
         setMessageAlert('');
         setTotalEvidences(evidences.length);
-
+        console.log('<<<1>>>>');
         let dataKingos = JSON.parse(await getStep('warehouseEquipment', 0, 0));
         let dataAddons = JSON.parse(await getStep('warehouseAddon', 0, 0));
 
@@ -310,7 +312,7 @@ const TaskOffline = ({navigation}) => {
           dataKingos.length > 0 ? dataKingos.map(item => item.barcode) : [];
         let inventoryAddon =
           dataAddons.length > 0 ? dataAddons.map(item => item.barcode) : [];
-
+          console.log('<<<2>>>>');
         let validArrayKingosStep2 = false;
 
         if (typeTask !== 7) {
@@ -327,7 +329,7 @@ const TaskOffline = ({navigation}) => {
           validArrayKingosStep2 = true;
           validArrayAddonsStep2 = true;
         }
-
+        console.log('<<<3>>>>');
         if (step2.length <= 0 && step4.length <= 0) {
           validArrayKingosStep2 = true;
         }
@@ -343,6 +345,7 @@ const TaskOffline = ({navigation}) => {
               setIsAlert(true);
             }, 300);
           }
+          console.log('<<<4>>>>');
           if (responseCheck?.status) {
             let taskStatus = null;
             setIsAlert(false);
@@ -470,7 +473,7 @@ const TaskOffline = ({navigation}) => {
                   await updateStep('taskDescriptionToDo', step.idStep, JSON.stringify(dataStepsToDo), 0);
                 });
               }
-
+              setShowAlert(false);
               setShowProgressAlert(false);
               navigation.navigate('Task', {taskStatus});
             } else {
@@ -495,6 +498,7 @@ const TaskOffline = ({navigation}) => {
               setShowAlert(true);
             }, 150);
           }
+          console.log('<<<5>>>>');
         } else {
           setIsAlert(false);
           setTimeout(() => {
@@ -505,6 +509,7 @@ const TaskOffline = ({navigation}) => {
             setShowAlert(true);
           }, 150);
         }
+        console.log('<<<6>>>>');
 
       } catch (error) {
         console.log(error);
@@ -532,10 +537,16 @@ const TaskOffline = ({navigation}) => {
             await handleResolveTask(task);
           });
           setIsAlert(false);
+          setShowProgressAlert(false);
+          setShowAlert(false);
           setDisabeldUpload(false)
           getAllDataTask();
+
+          
       } else {
-        setDisabeldUpload(false)
+        setDisabeldUpload(false);
+        setShowProgressAlert(false);
+        setIsAlert(true);
           setTitleAlert('Error sigues offline');
           setMessageAlert('No se pueden cargar las tareas por que sigues offline.')
           setTimeout(() => {

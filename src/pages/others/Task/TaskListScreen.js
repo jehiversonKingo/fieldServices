@@ -52,7 +52,8 @@ const TaskListScreen = ({ navigation, route }) => {
 
   const [isModal, setIsModal] = useState(false);
   const [taskData, setTaskData] = useState([]);
-
+  const [taskFlagStatus, setTaskFlagStatus] = useState(1);
+  
   const { state } = useContext(AuthContext);
   const { inline } = state;
 
@@ -140,6 +141,7 @@ const TaskListScreen = ({ navigation, route }) => {
           }}
           onPress={() => {
             setActive(0)
+            setTaskFlagStatus(1);
             handleDataList(1)
           }}>
           <Text style={{ color: colorsTheme.blanco }}>Pendientes</Text>
@@ -152,6 +154,7 @@ const TaskListScreen = ({ navigation, route }) => {
           }}
           onPress={() => {
             setActive(1)
+            setTaskFlagStatus(3);
             handleDataList(3)
           }}>
           <Text style={{ color: colorsTheme.blanco }}>Noc</Text>
@@ -182,7 +185,9 @@ const TaskListScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
               </View>
               <View style={{ flex:1 }}>
-                <FlatList
+                {
+                  inline || taskFlagStatus == 1?(
+                    <FlatList
                   data={orderBy(data, ['task.expirationDate', 'task.idTaskPriority'], ['desc'])}
                   renderItem={({ item }) => <RenderItemList 
                     item={item} 
@@ -216,6 +221,14 @@ const TaskListScreen = ({ navigation, route }) => {
                     </View>
                   }
                 />
+                  ):(
+                    <View style={{ backgroundColor: colorsTheme.naranja, margin: 10, padding: 10}}>
+                      <Text style={{color: colorsTheme.blanco, fontSize:15}}>Cuando estes offline no se pueden procesar tareas en estado NOC</Text>
+                    </View>
+                  )
+                }
+                
+
               </View>
             </>
           )

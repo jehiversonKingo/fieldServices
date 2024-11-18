@@ -1,4 +1,4 @@
-import {axiosInstance, axiosInstanceShopkeeper, customHeadersAuth} from '../functions/fncAxios';
+import {axiosInstance, customHeadersAuth} from '../functions/fncAxios';
 
 export const setTokenUser = async (user, token) => {
     return axiosInstance
@@ -52,7 +52,7 @@ export const getAllBanks = async () => {
 }
 
 export const getAllRules = async () => {
-    return axiosInstanceShopkeeper
+    return axiosInstance
         .get(`settings/rule/list`)
         .then(response => {
             return response.data
@@ -64,7 +64,7 @@ export const getAllRules = async () => {
 }
 
 export const getAllPlans = async () => {
-    return axiosInstanceShopkeeper
+    return axiosInstance
         .get(`settings/plan/ticket/list`)
         .then(response => {
             return response.data

@@ -218,6 +218,7 @@ const OrdersDescriptionAddScreen = ({ navigation }) => {
     const { user } = await handleGetDataUserLocal();
     console.log("[ USER ] > ", user);
     let userAgentes = await getUserByRole(3, user.idUser);
+    console.log('users --->', userAgentes);
     setStep1([{
       id: 1,
       label: 'Agente',

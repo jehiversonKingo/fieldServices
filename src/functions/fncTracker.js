@@ -1,5 +1,6 @@
 import { openDatabase } from 'react-native-sqlite-storage';
 import { getAsyncStorageData } from '../helper/helpers';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const db = openDatabase({ name: 'dev' });
 
@@ -36,6 +37,29 @@ export const insertLocationToDatabase = async (locationData, task, status) => {
             tx.executeSql(
                 `INSERT INTO Fieldtracker (idUser, idTask, status, GPS, createdAt) VALUES (?, ?, ?, ?, ?)`,
                 [idUser, idTask, status, locationData.GPS, new Date().toISOString()],
+                () => console.log('Location added to database'),
+                error => console.log('Error inserting location', error.message)
+            );
+        });
+    } catch (error) {
+        console.log("Error al obtener datos de AsyncStorage o al insertar en la BD:", error);
+    }
+};
+
+export const insertLocationToDatabaseSecond = async (locationData) => {
+    try {
+        const user = JSON.parse(await AsyncStorage.getItem('@user'));
+        const idTask = await getAsyncStorageData("@idTask");
+        if (!user.idUser) {
+            throw new Error("idUser es requerido y no puede ser nulo.");
+        }
+
+        console.warn("ESTE USUARIO SE GUARDARA", user.idUser, idTask, "Tracking", locationData.GPS, new Date().toISOString());
+        
+        db.transaction(tx => {
+            tx.executeSql(
+                `INSERT INTO Fieldtracker (idUser, idTask, status, GPS, createdAt) VALUES (?, ?, ?, ?, ?)`,
+                [user.idUser, idTask, "Tracking", locationData.GPS, new Date().toISOString()],
                 () => console.log('Location added to database'),
                 error => console.log('Error inserting location', error.message)
             );

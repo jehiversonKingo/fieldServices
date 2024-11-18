@@ -70,7 +70,7 @@ const OrdersListScreen = ({navigation, route}) => {
     return (
     <TouchableOpacity
       style={{...styles.orderContainer.background, flexDirection: 'row'}}
-      onPress={() => goTo(goToDirection, {id: item.idOrder})}>
+      onPress={() => {item.idWarehouseSender !== userId && goTo(goToDirection, {id: item.idOrder})}}>
       <View
         style={{
           flex: 0.2,

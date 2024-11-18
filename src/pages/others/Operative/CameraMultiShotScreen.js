@@ -150,21 +150,21 @@ const CameraMultiShotScreen = ({ navigation, route }) => {
             text: `No.: ${idTaskStep.toString()}`,
             position: { x: imageWidth * 0.2, y: imageHeight - (imageHeight * 0.2) },
             textSize: Math.floor(imageWidth * 0.05),
-            color: '#ed6a2c',
+            color: '#9B06CB',
           },
           {
             text: dateText,
             position: { x: imageWidth * 0.2, y: imageHeight - (imageHeight * 0.15) },
             textSize: Math.floor(imageWidth * 0.05),
             fontWeight: 700,
-            color: '#ed6a2c',
+            color: '#9B06CB',
           },
           {
             text: coordinateText,
             position: { x: imageWidth * 0.2, y: imageHeight - (imageHeight * 0.1) },
             textSize: Math.floor(imageWidth * 0.05),
             fontWeight: 700,
-            color: '#ed6a2c',
+            color: '#9B06CB',
           },
         ];
         return {width, height};
@@ -382,8 +382,6 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     textAlign: 'center',
   },
-
-  //-------------------------------------------
   safeArea: { flex: 1, backgroundColor: colorsTheme.negro },
   camera: { ...StyleSheet.absoluteFillObject },
   overlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'space-between' },
@@ -430,20 +428,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   container: {
-    flex: 1, // Ocupa toda la pantalla
+    flex: 1,
   },
   image: {
-    width: width,  // 100% del ancho de la pantalla
-    height: height, // 100% del alto de la pantalla
-    justifyContent: 'flex-end', // Esto posiciona los botones en la parte inferior
+    width: width,
+    height: height,
+    justifyContent: 'flex-end', 
   },
   overlay2: {
     position: 'absolute',
-    bottom: 100, // Distancia del fondo
+    bottom: 100,
     left: 0,
     right: 0,
     flexDirection: 'row',
-    justifyContent: 'space-around', // Distribuye los botones horizontalmente
+    justifyContent: 'space-around',
     paddingHorizontal: 20,
   },
 });

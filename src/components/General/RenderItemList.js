@@ -23,6 +23,7 @@ import { updateStep, getStep, deleteStep } from '../../functions/fncSqlite';
 import { createFieldTrackerTable, getLocationsFromDatabaseByIdTask, insertLocationToDatabase, deleteLocationsFromDatabaseByIdTask } from '../../functions/fncTracker';
 import { handleGetDataUserLocal } from '../../functions/fncGeneral';
 import { sendDataTracker } from '../../services/tracking.services';
+import { setAsyncStorageData } from '../../helper/helpers';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -74,7 +75,7 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
       case 'Alta':
         return { color: colorsTheme.naranja, icon: 'warning-outline', size: 40 };
       case 'Media':
-        return { color: 'yellow', icon: 'remove-circle-outline', size: 40 };
+        return { color: '#EBF813', icon: 'remove-circle-outline', size: 40 };
       case 'Baja':
         return { color: colorsTheme.verdeFuerte, icon: 'checkmark-circle-outline', size: 40 };
       default:
@@ -88,6 +89,7 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
     try {
       await updateStep('taskStatus', item.idTask, { status: "Tracking", createdAt: new Date() }, 0);
       setTaskStatus("Tracking");
+      setAsyncStorageData("@idTask", item.idTask);
       onPressExecution(item.idTask, "Tracking");
       reloadDataRef.current = setInterval(()=>{
         onGetData();
@@ -324,15 +326,18 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
                       }
                     />
                   </View>
-                  <View style={{ backgroundColor: colorsTheme.naranja }}>
+                  {process.env.REACT_APP_ENVIROMENT == 'test' &&(
+                    <>
+                    <View style={{ backgroundColor: colorsTheme.naranja }}>
                       <Text style={styles.sectionTitle}>{"Datos GPS"}</Text>
                     </View>
                   <View style={{ margin: 10 }}>
                     <FlatList
                       data={dataTracking}
                       keyExtractor={(addon) => addon.idTaskAddon}
-                      renderItem={({ item, index }) => (
-                        <View style={{ flexDirection: 'row', alignContent:'space-between' }}>
+                      renderItem={({ item, index }) => {
+                        return(
+                        <View style={{ }}>
                           <View style={{ flexDirection: 'row', padding: 5 }}>
                             <Text style={{ color: colorsTheme.negro }}>{index+1}</Text>
                           </View>
@@ -344,8 +349,14 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
                             <Text style={{ color: colorsTheme.negro, fontWeight:'bold'}}>Status: </Text>
                             <Text style={{ color: colorsTheme.negro }}>{item.status}</Text>
                           </View>
-                        </View>
-                      )}
+                          <View style={{ flexDirection: 'row', padding: 5 }}>
+                            <Text style={{ color: colorsTheme.negro, fontWeight:'bold'}}>CreatedAt: </Text>
+                            <Text style={{ color: colorsTheme.negro }}>{item.createdAt}</Text>
+                          </View>
+                        </View>)
+
+
+                      }}
                       ListEmptyComponent={
                         <View style={{ alignItems:'center'}}>
                           <Text style={{ color: colorsTheme.negro }}> No se cuenta con datos</Text>
@@ -353,6 +364,8 @@ const RenderItemList = ({ goTo, item, onPressExecution, cancelTracking, stopTrac
                       }
                     />
                   </View>
+                    </>
+                  )}
                 </View>
               )
             }

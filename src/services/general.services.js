@@ -1,9 +1,9 @@
-import {axiosInstanceShopkeeper} from '../functions/fncAxios';
+import {axiosInstance} from '../functions/fncAxios';
 import { customHeadersAuth} from '../functions/fncAxios';
 
 export const setCollection = async (data) => {
   const headers = await customHeadersAuth();
-  return await axiosInstanceShopkeeper
+  return await axiosInstance
     .post(`general/setCollection`, data)
     .then(ticket => {
       console.log(ticket.data);

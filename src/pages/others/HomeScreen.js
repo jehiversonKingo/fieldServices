@@ -77,12 +77,14 @@ const HomeScreen = ({navigation}) => {
           getAllCommunities()
         ]);
 
-        await Promise.all([
-          updateStep('warehouseAddon', 0, JSON.stringify(getAddon?.addons || []), 0),
-          updateStep('warehouseEquipment', 0, JSON.stringify(getAddon?.equipments || []), 0),
-          updateStep('communities', 1, JSON.stringify(getCommunities), 0),
-          updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0),
-        ]);
+        await updateStep('warehouseAddon', 0, JSON.stringify(getAddon?.addons || []), 0)
+        await updateStep('warehouseEquipment', 0, JSON.stringify(getAddon?.equipments || []), 0)
+        await updateStep('communities', 1, JSON.stringify(getCommunities), 0)
+        if(options){
+          await  updateStep('menuOptions', data.user.idRole, JSON.stringify(options), 0)
+        }
+      
+
         setBlockedTask(dataTask && dataTask.length > 0)
       } else {
         const storedOptions = JSON.parse(await getStep('menuOptions', data.user.idRole, 0));
@@ -147,11 +149,18 @@ const HomeScreen = ({navigation}) => {
   if (blockedForTask) {
     return (
       <View style={{ justifyContent: 'center', alignItems: 'center', alignContent: "center", flex: 1 }}>
-        <Text style={{ color: colorsTheme.naranja, fontSize: 20 }}> Aplicación bloqueada</Text>
+        <Text style={{ color: colorsTheme.naranja, fontSize: 25, fontWeight:'bold' }}> Aplicación bloqueada</Text>
         <View style={{ marginHorizontal: 25, flexDirection: "row" }}>
-          <Text style={{ color: colorsTheme.negro, fontWeight: "bold" }}>Tienes tareas pendiente de subir</Text>
+          <Text style={{ color: colorsTheme.negro}}>Tienes tareas pendiente de subir.</Text>
         </View>
-        <TouchableOpacity style={{ paddingHorizontal: 45, paddingVertical: 10, backgroundColor: colorsTheme.naranja, borderRadius: 15, marginTop: 10, flexDirection: "row" }}
+        <TouchableOpacity style={{
+          paddingVertical: 15,
+          paddingHorizontal: 25,
+          backgroundColor: colorsTheme.naranja, 
+          borderRadius: 15, 
+          marginTop: 10, 
+          flexDirection: "row",
+        }}
           onPress={() => navigation.navigate("TaskOffline")}
         >
           <FontAwesome5 name='cloud-upload-alt' color={colorsTheme.blanco} size={20} style={{ marginRight: 5 }} />
