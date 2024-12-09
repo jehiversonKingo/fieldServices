@@ -8,6 +8,7 @@ import { colorsTheme } from "../../../configurations/configStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 const TaskInfoScreen = ({data, isLoading}) => {
+    console.log("[-data-]", data);
   return (
       <Fragment>
         <Text style={{
@@ -48,7 +49,7 @@ const TaskInfoScreen = ({data, isLoading}) => {
                         <Text style={{color: colorsTheme.gris80}}>   
                             <Text style={{color: colorsTheme.naranja80, fontWeight: "700"}}>
                                 {"Fecha de expiración: "}
-                            </Text>{moment(data.expirationDate ?? "").format("MM-DD-YYYY")}
+                            </Text>{moment(data.expirationDate || new Date()).format("MM-DD-YYYY")}
                         </Text>
 
                         <Text style={{color: colorsTheme.gris80}}>

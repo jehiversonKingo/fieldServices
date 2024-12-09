@@ -229,6 +229,7 @@ const HandshakeServerScreen = ({
                                 updatedDebt,
                             );
                             if (creditLimit >= 0) {
+                                console.log("[1]");
                                 setLoading(false);
                                 setReceivedData(prevReceivedData => [
                                     ...prevReceivedData,
@@ -239,6 +240,7 @@ const HandshakeServerScreen = ({
                                             } - Envío un pago de Q ${parseFloat(data.amount).toFixed(2)}`,
                                     },
                                 ]);
+                                console.log("[***-^-^-***]", data.amount);
                                 setAmount(data.amount);
                                 setTitleAlert(`${data.customer.name}`);
                                 setMessageAlert(`¿Pago Q ${parseFloat(data.amount).toFixed(2)}?`);
@@ -303,15 +305,18 @@ const HandshakeServerScreen = ({
 
     const handleConfirmAmount = async () => {
         try {
-            console.log('[TIPO]', type);
+            console.log('[TIPO]', type, amount);
             let sendResponse = '';
             switch (type) {
                 case 1:
+                    console.log('[.1.]', amount);
                     sendResponse = JSON.stringify({
                         action: 'VALIDATE_PAYMENT',
                         data: { status: 'OK', message: 'El pago fue recibido', amount },
                     });
+                    console.log('[.2.]', amount);
                     BluetoothServerModule.sendDataToClient(sendResponse);
+                    console.log('[.3.]', amount);
                     setReceivedData(prevReceivedData => [
                         ...prevReceivedData,
                         {
@@ -320,11 +325,15 @@ const HandshakeServerScreen = ({
                             description: 'El pago fue recibido',
                         },
                     ]);
+                    console.log("[3]");
                     let walletUser = JSON.parse(await getStep('walletUser', 0, 0));
+                    console.log("[4]");
                     let debtUser = JSON.parse(await getStep('debtUser', 0, 0));
+                    console.log("[5]",debtUser);
                     walletUser.wallet.debt = debt;
+                    console.log("[6]");
                     debtUser.amount = debt;
-
+                    console.log("[7]");
                     console.log('THISISMY NEWDEVT ==>', walletUser);
                     console.log('THISISMY NEWDEVT <==', debtUser);
                     setDisableButton(false)
@@ -561,6 +570,7 @@ const HandshakeServerScreen = ({
                         />
                     </View>
                 )}
+                {console.log('[---------------------/ [ TYPESREEN 1] /----------------------]')}
             </View>
             <AwesomeAlert
                 show={showAlert}

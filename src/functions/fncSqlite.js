@@ -22,17 +22,11 @@ export const getAllDataStep = async(table, columns = '*') => {
             temp.push(JSON.parse(currentRow.value));
           }
           if (temp.length > 0) {
-            // let stringToJSon = [];
-            //   temp.forEach((data) => {
-            //     console.log("VALUE", data);
-            //     stringToJSon.push(data);
-            //   });
             console.log('[ TEMP ]', temp);
             resolve(temp);
           } else resolve([]);
         },
         err => {
-          console.log(err)
           resolve([]);
           reject(err);
         },
@@ -75,8 +69,6 @@ export const updateStep = async(table, idRowModule, params, step) => {
         `CREATE TABLE IF NOT EXISTS ${table}(id INTEGER PRIMARY KEY AUTOINCREMENT, idRowModule INTEGER, value TEXT, step INTEGER);`,
         [],
         async tx => {
-          // let findData = await JSON.parse(getStep(table, idRowModule, step))
-          // console.log('FIND', findData);
           tx.executeSql(
             `INSERT INTO ${table}(idRowModule, value, step) VALUES (?,?,?);`,
             [idRowModule, JSON.stringify(params), step],

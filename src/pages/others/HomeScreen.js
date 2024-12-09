@@ -71,7 +71,8 @@ const HomeScreen = ({navigation}) => {
       let options = [];
       if (inline) {
         options = await getModulesByRole(data.user.idRole);
-        let dataTask = await getAllDataStep('TaskComplete');
+        let dataTask = await getAllDataStep('TaskComplete') || [];
+        console.log("<GGG===>", dataTask);
         const [getAddon, getCommunities] = await Promise.all([
           getListAddon(),
           getAllCommunities()

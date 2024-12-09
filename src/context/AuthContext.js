@@ -31,6 +31,7 @@ const signIn = dispatch => {
   return async ({ user, password }) => {
     let tokenId = await handleSignInFirebase(user, password);
     if (tokenId.error) {
+      console.log("Error en el login", tokenId.message);
       dispatch({
         type: 'signInError',
         payload: {

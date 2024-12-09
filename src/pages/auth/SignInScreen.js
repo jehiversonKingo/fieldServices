@@ -42,6 +42,7 @@ const SignInScreen = ({ }) => {
     }
 
     const login = await signIn({ user, password });
+    console.log("<LOGIN==>", login);
     setIsLoading(false);
     if (login) setLoadingState();
   };
@@ -99,7 +100,7 @@ const SignInScreen = ({ }) => {
       </View>
       <AwesomeAlert
         show={showAlert} 
-        title={alertTitle} 
+        title={alertTitle}  
         message={alertMessage}
         closeOnTouchOutside={false}
         closeOnHardwareBackPress={false}

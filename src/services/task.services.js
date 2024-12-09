@@ -8,6 +8,7 @@ export const getTasks = async () => {
   return await axiosInstance
     .post('/task/listByUser', {'uid': user.uid}, headers)
     .then(task => {
+      console.log("[*******task*******]", task.data);
       return task.data;
     })
     .catch(error => {

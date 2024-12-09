@@ -60,7 +60,7 @@ const Header = ({
           <Text style={{color: colorsTheme.blanco}}>{process.env.REACT_APP_ENVIROMENT} {DeviceInfo.getVersion()}</Text> 
         </View> 
         <View style={styles.containerProfile}>
-          {isRight && (
+          {isRight && ( 
             <TouchableOpacity
               onPress={() => {
                 isOpenFunction(isOpen);

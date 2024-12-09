@@ -42,7 +42,7 @@ const TaskOffline = ({navigation}) => {
 
     const getAllDataTask = async () => {
       let getTasks = [];
-      let dataTask = await getAllDataStep('TaskComplete');
+      let dataTask = await getAllDataStep('TaskComplete') || [];
       getTasks = dataTask;
       setData(getTasks);
       setLoading(false);

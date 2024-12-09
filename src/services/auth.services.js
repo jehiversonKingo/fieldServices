@@ -4,11 +4,9 @@ import { setTokenUser } from './settings.services';
 
 export const getUserByUid = async (uid) => {
     try {
-        console.log("HEEEE", uid);
         return await axiosInstance
             .get(`/settings/user/${uid}`)
             .then(async user => {
-                console.log('{SUCESS}', user.data);
                 if (user.data !== null) {
                     await AsyncStorage.setItem('@session', 'true');
                     await AsyncStorage.setItem('@user', JSON.stringify(user.data));
@@ -18,11 +16,9 @@ export const getUserByUid = async (uid) => {
                 }
             })
             .catch(error => {
-                console.log("???1???", error)
                 return { error: true, message: error.message };
             });
     } catch (error) {
-        console.log("???2???")
         return { error: true, message: error.message };
     }
 };
@@ -43,7 +39,6 @@ export const getUserByRole = async (role, idUser) => {
 };
 
 export const getUserById = async (idUser) => {
-    console.log(idUser);
     return axiosInstance
         .get(`settings/user/data/${idUser}`, customHeadersWithoutAuth)
         .then(resp => {

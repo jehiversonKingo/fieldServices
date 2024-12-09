@@ -34,35 +34,20 @@ export const setDataAllOrder = async (data) => {
   const {idWarehouse} = await handleGetDataUserLocal();
   const {step1, step2, step3} = data;
 
-  // let urlsPhotos = [];
-  // let url = '';
-  // await Promise.all(
-  //   step3.map(async (photo) => {
-  //       if (handleIsValidUrl(photo) === false) {
-  //         url = await handleUpdateImage(Math.random(), 'orders', photo.photo);
-  //       } else {
-  //         url = photo;
-  //       }
-
-  //       urlsPhotos.push({url});
-  //     })
-  //   );
-    return await axiosInstance
-      .post('/order/setOrder', {
-          received:step1[0].value,
-          step2,
-          // photos:urlsPhotos,
-          sender:idWarehouse,
-        }, headers)
-      .then(task => {
-        const {title, message, idOrder} = task.data;
-        return {status: true, title, message, idOrder};
-      })
-      .catch(error => {
-        console.log("ERROR ORDER", error)
-        const {title, message} = error.response.data;
-        return {status: false, message, title};
-      });
+  return await axiosInstance
+    .post('/order/setOrder', {
+        received:step1[0].value,
+        step2,
+        sender:idWarehouse,
+      }, headers)
+    .then(task => {
+      const {title, message, idOrder} = task.data;
+      return {status: true, title, message, idOrder};
+    })
+    .catch(error => {
+      const {title, message} = error.response.data;
+      return {status: false, message, title};
+    });
 };
 
 export const setDataOrderPhotos = async (params) => {
@@ -70,11 +55,9 @@ export const setDataOrderPhotos = async (params) => {
   return await axiosInstance
     .post('/order/images', params, headers)
     .then(order => {
-      console.log("[ RESPONSE UPLOAD ] => ", order);
       return order.data;
     })
     .catch(error => {
-      console.log("[AXIOS ERROR UPLOAD ORDER ERRORS]>>", error);
       return error;
     });
 }
@@ -126,7 +109,6 @@ export const completeOrder = async (data) => {
         return {status: true, title, message};
       })
       .catch(error => {
-        console.log(error)
         const {title, message} = error.response.data;
         return {status: false, message, title};
       });

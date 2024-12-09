@@ -220,7 +220,7 @@ const SyncDataScreen = ({ navigation }) => {
         let getWallet = await getWallerByUser();
         let getDebt = await getDebetAgent();
         let getTransaction = await getTransactionAgent();
-        console.log("////////--1--//////////", await getStep('debtUser', 0, 0))
+        console.log("-////////--1--//////////-", getWallet)
         await updateStep('walletUser', 0, JSON.stringify(getWallet), 0);
         if (typeof await getStep('debtUser', 0, 0) === 'object') {
           await updateStep('debtUser', 0, JSON.stringify(getDebt), 0);
@@ -280,12 +280,12 @@ const SyncDataScreen = ({ navigation }) => {
         ));
 
         let getPromotions = await getAllPromotions();
-        console.log("....................[ PROMOCIONES ]...................", getPromotions);
+        console.log("....................[ PROMOCIONES ]...................");
         await updateStep('customerPromotions', 0, JSON.stringify(getPromotions), 0);
         setListItem(prevState => prevState.map(item =>
           item.title === 'Promociones' ? { ...item, counter: item.counter + 1 } : item
         ));
-
+        console.log("....................[ /PROMOCIONES ]...................");
         let customersData = [];
         let walletsData = [];
         let transactionData = [];
@@ -295,15 +295,24 @@ const SyncDataScreen = ({ navigation }) => {
         let creditsData = [];
         let counterWalletCustomer = (1 / customersId.length);
         let valueWalletCustomer = 0;
+        console.log("....................[ CUSTOMER ]...................", customersId);
         for (let customer of customersId) {
           valueWalletCustomer = valueWalletCustomer + counterWalletCustomer;
+          console.log("....................[ CUSTOMER 1]...................", customer);
           let customerData = await getDataCustomerById(customer);
+          console.log("....................[ CUSTOMER 2]...................", customerData);
           let walletCustomer = await getWallerByCustomer(customer);
+          console.log("....................[ CUSTOMER 3]...................", walletCustomer);
           let transactionCustomer = await getTransactionCarriedOut(customer);
+          console.log("....................[ CUSTOMER 4]...................", transactionCustomer);
           let debetCustomer = await getDebtCustomer(customer);
+          console.log("....................[ CUSTOMER 5]...................", debetCustomer);
           let balanceCustomer = await getBalanceCustomer(customer);
+          console.log("....................[ CUSTOMER 6]...................", balanceCustomer);
           let salesCustomer = await getSaleCustomer(customer);
+          console.log("....................[ CUSTOMER 7]...................", salesCustomer);
           let creditCustomer = await getCreditsCustomer(customer);
+          console.log("....................[ CUSTOMER 8]...................", creditCustomer);
 
           console.log('[ TENDERO ] --> ', {...customerData.customer, currency: customerData.currency})
 
@@ -367,7 +376,7 @@ const SyncDataScreen = ({ navigation }) => {
           secondButton: true,
           secondAction: (() => {
             setIsVisible(false);
-            navigation.navigate("Principal", { reloadData: true })
+            //navigation.navigate("Principal", { reloadData: true })
           }),
           blocked: true
         })

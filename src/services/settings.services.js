@@ -1,13 +1,13 @@
 import {axiosInstance, customHeadersAuth} from '../functions/fncAxios';
 
 export const setTokenUser = async (user, token) => {
+    const headers = await customHeadersAuth();
     return axiosInstance
-        .get(`settings/user/pushToken/${user.idUser}/${token}/App`, customHeadersAuth)
+        .get(`settings/user/pushToken/${user.idUser}/${token}/App`, headers)
         .then(token => {
             return token;
         })
         .catch((e) => {
-            console.log("[ ERROR setTokenUser ]", e)
             return [];
         });
   };
@@ -20,7 +20,6 @@ export const getModulesByRole = async (role) => {
             return response.data
         })
         .catch((e) => {
-            console.log("[ ERROR getModulesByRole ]", e);
             return e;
         })
 }
@@ -33,7 +32,6 @@ export const getAllCommunities = async () => {
             return response.data
         })
         .catch((e) => {
-            console.log("[ ERROR getAllCommunities ]", e);
             return e;
         })
 }
@@ -46,31 +44,30 @@ export const getAllBanks = async () => {
             return response.data
         })
         .catch((e) => {
-            console.log("[ ERROR getAllBanks ]", e);
             return e;
         })
 }
 
 export const getAllRules = async () => {
+    const headers = await customHeadersAuth();
     return axiosInstance
-        .get(`settings/rule/list`)
+        .get(`settings/rule/list`, headers)
         .then(response => {
             return response.data
         })
         .catch((e) => {
-            console.log("[ ERROR getAllBanks ]", e);
             return e;
         })
 }
 
 export const getAllPlans = async () => {
+    const headers = await customHeadersAuth();
     return axiosInstance
-        .get(`settings/plan/ticket/list`)
+        .get(`settings/plan/ticket/list`, headers)
         .then(response => {
             return response.data
         })
         .catch((e) => {
-            console.log("[ ERROR getAllBanks ]", e);
             return e;
         })
 }
@@ -83,7 +80,6 @@ export const getCurrency = async () => {
             return response.data
         })
         .catch((e) => {
-            console.log("[ ERROR getAllBanks ]", e);
             return e;
         })
 }

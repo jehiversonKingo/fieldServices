@@ -172,7 +172,6 @@ export const TrackingProvider = ({ children }) => {
         await saveLocationsToDatabase();
     };
         
-
     const stopTracking = async () => {
         try {
             clearInterval(timerRef.current);
